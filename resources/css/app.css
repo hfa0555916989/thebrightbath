@@ -1,0 +1,271 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   Bright Path - Custom Styles
+   مؤسسة الطريق المشرق للتدريب والتطوير
+============================================ */
+
+/* Base Styles */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Tajawal', sans-serif;
+    direction: rtl;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* ============================================
+   Animations
+============================================ */
+
+/* Fade In Up */
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fade In Right (RTL) */
+.fade-in-right {
+    animation: fadeInRight 0.8s ease-out;
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Scale Up */
+.scale-up {
+    animation: scaleUp 0.5s ease-out;
+}
+
+@keyframes scaleUp {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Float Animation */
+.float-animation {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Pulse Gold */
+.pulse-gold {
+    animation: pulseGold 2s infinite;
+}
+
+@keyframes pulseGold {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(248, 197, 36, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 15px rgba(248, 197, 36, 0);
+    }
+}
+
+/* ============================================
+   Gradient Text
+============================================ */
+
+.gradient-text {
+    background: linear-gradient(135deg, #F8C524 0%, #F28C28 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ============================================
+   Glass Effect
+============================================ */
+
+.glass-effect {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
+
+/* ============================================
+   Service Cards
+============================================ */
+
+.service-card:hover .service-icon {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+.service-card:hover .service-action {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============================================
+   Form Inputs
+============================================ */
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+}
+
+/* ============================================
+   Prose Styles (For Book Content)
+============================================ */
+
+.prose h2 {
+    color: #1F3A63;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.prose h3 {
+    color: #1F3A63;
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.prose p {
+    margin-bottom: 1rem;
+    line-height: 1.8;
+}
+
+.prose ul,
+.prose ol {
+    margin-bottom: 1rem;
+    padding-right: 1.5rem;
+}
+
+.prose li {
+    margin-bottom: 0.5rem;
+}
+
+.prose blockquote {
+    border-right: 4px solid #F8C524;
+    padding-right: 1rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: #6B7280;
+    background: #F5F7FA;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+/* ============================================
+   Admin Sidebar Scrollbar
+============================================ */
+
+.sidebar-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+    background: #3B5B89;
+    border-radius: 2px;
+}
+
+/* ============================================
+   Button Styles
+============================================ */
+
+.btn-primary {
+    @apply bg-brand-gold text-brand-dark px-6 py-3 rounded-lg font-bold hover:bg-brand-goldDeep transition shadow-lg;
+}
+
+.btn-secondary {
+    @apply bg-brand-DEFAULT text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-dark transition shadow-lg;
+}
+
+.btn-outline {
+    @apply border-2 border-brand-DEFAULT text-brand-DEFAULT px-6 py-3 rounded-lg font-bold hover:bg-brand-DEFAULT hover:text-white transition;
+}
+
+/* ============================================
+   Card Styles
+============================================ */
+
+.card {
+    @apply bg-white rounded-2xl shadow-lg p-6 border border-brand-border;
+}
+
+.card-hover {
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+}
+
+/* ============================================
+   Print Styles
+============================================ */
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+    }
+    
+    .print-break {
+        page-break-before: always;
+    }
+}
+
+
+

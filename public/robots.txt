@@ -1,0 +1,37 @@
+# Robots.txt for thebrightbath.com
+# الطريق المشرق للتدريب والتطوير
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://thebrightbath.com/sitemap.xml
+
+# Disallow admin and private areas
+Disallow: /control-panel/
+Disallow: /consultant/
+Disallow: /لوحة-التحكم/
+Disallow: /storage/
+Disallow: /api/
+
+# Allow search engines to crawl CSS and JS
+Allow: /css/
+Allow: /js/
+Allow: /images/
+
+# Block specific file types
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*.txt$
+
+# Allow sitemap files
+Allow: /sitemap.xml
+Allow: /sitemap-pages.xml
+Allow: /sitemap-assessments.xml
+Allow: /sitemap-consultations.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+
+

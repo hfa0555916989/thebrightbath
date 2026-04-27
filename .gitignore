@@ -1,0 +1,53 @@
+# ─── Environment & Secrets ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ─── Vendor & Dependencies ────────────────────────────────────────────────────
+/vendor/
+/node_modules/
+
+# ─── Storage (user uploads, logs, cache) ─────────────────────────────────────
+/storage/app/analysis-models/
+/storage/app/private/
+/storage/logs/
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/framework/testing/
+/storage/framework/views/
+!/storage/app/public/
+!/storage/.gitignore
+!/storage/app/.gitignore
+!/storage/app/public/.gitignore
+!/storage/framework/.gitignore
+!/storage/logs/.gitignore
+
+# ─── Bootstrap cache ─────────────────────────────────────────────────────────
+/bootstrap/cache/*.php
+!/bootstrap/cache/.gitignore
+
+# ─── Build output ────────────────────────────────────────────────────────────
+/public/build/
+/public/hot/
+
+# ─── Database ────────────────────────────────────────────────────────────────
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# ─── SQL dump (generated locally, not for repo) ──────────────────────────────
+insert_analysis_models.sql
+parse_excel.py
+
+# ─── OS & Editor junk ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ─── Misc ────────────────────────────────────────────────────────────────────
+DO_NOT_UPLOAD_HERE
+npm-debug.log
+yarn-error.log

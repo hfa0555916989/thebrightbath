@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(php artisan db:seed:*)",
+      "Bash(cmd.exe /c \"php --version 2>&1\")",
+      "Bash(cmd.exe /c \"where php 2>&1\")",
+      "Bash(cmd.exe /c \"dir C:\\\\php* /b 2>&1 & dir C:\\\\xampp\\\\php\\\\php.exe 2>&1 & dir C:\\\\wamp*\\\\bin\\\\php\\\\ /b 2>&1 & dir C:\\\\laragon\\\\bin\\\\php\\\\ /b 2>&1\")",
+      "Bash(cmd.exe /c \"dir C:\\\\ /b 2>&1\")",
+      "Bash(/c/xampp/php/php.exe artisan db:seed --class=AnalysisModelSeeder)",
+      "Bash(/c/xampp/php/php.exe artisan:*)",
+      "Bash(/c/xampp/php/php.exe:*)",
+      "Bash(pip3 show:*)",
+      "Bash(python3:*)",
+      "Bash(pip3 install:*)",
+      "Bash(\"/c/Users/hassan/AppData/Local/Programs/Python/Python312/python.exe\" -c \"import openpyxl; print\\(''ok''\\)\")",
+      "Bash(\"/c/Users/hassan/AppData/Local/Programs/Python/Python312/python.exe\":*)",
+      "Bash(PYTHONIOENCODING=utf-8 \"/c/Users/hassan/AppData/Local/Programs/Python/Python312/python.exe\":*)",
+      "Bash(git init:*)",
+      "Bash(git config:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
