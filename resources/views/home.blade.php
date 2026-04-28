@@ -105,12 +105,12 @@
 
     {{-- Hero Section with Career Counseling Image --}}
     <header id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {{-- Background Image - Career Counseling/Mentoring --}}
+        {{-- Background Image - Professional Career Guidance --}}
         <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" 
-                 alt="جلسة إرشاد مهني" 
+            <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                 alt="جلسة إرشاد مهني احترافية"
                  class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-gradient-to-l from-brand-dark/95 via-brand-dark/85 to-brand-dark/70"></div>
+            <div class="absolute inset-0 bg-gradient-to-l from-brand-dark/95 via-brand-dark/85 to-brand-dark/60"></div>
         </div>
 
         <div class="container mx-auto px-6 relative z-10 py-20">
@@ -210,25 +210,37 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 {{-- Image Side --}}
                 <div class="relative">
-                    <div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl bg-white flex items-center justify-center h-[500px]">
-                        <img src="{{ asset('images/bright-path-logo.png') }}" 
-                             alt="الطريق المشرق - Bright Path" 
-                             class="w-auto h-[400px] object-contain">
+                    {{-- Main Photo: Career counseling session --}}
+                    <div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl h-[480px]">
+                        <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                             alt="جلسة إرشاد مهني فردية"
+                             class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-brand-dark/40 to-transparent"></div>
                     </div>
-                    <div class="absolute -bottom-6 -left-6 w-48 h-48 bg-brand-gold/20 rounded-2xl -z-10"></div>
-                    <div class="absolute -top-6 -right-6 w-32 h-32 bg-brand-DEFAULT/20 rounded-full -z-10"></div>
-                    
+                    {{-- Small overlay photo --}}
+                    <div class="absolute -bottom-8 -left-8 w-44 h-44 rounded-2xl overflow-hidden shadow-xl border-4 border-white z-20">
+                        <img src="https://images.unsplash.com/photo-1573497620053-ea5300f94f21?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+                             alt="مستشارة مهنية"
+                             class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute -top-6 -right-6 w-32 h-32 bg-brand-gold/20 rounded-full -z-10"></div>
+
                     {{-- Floating Card --}}
-                    <div class="absolute -bottom-4 -right-4 bg-white rounded-xl shadow-xl p-4 z-20">
+                    <div class="absolute top-6 -right-6 bg-white rounded-xl shadow-xl p-4 z-20">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 bg-brand-gold rounded-full flex items-center justify-center">
-                                <i class="fas fa-star text-white"></i>
+                                <i class="fas fa-award text-white"></i>
                             </div>
                             <div>
                                 <div class="font-bold text-brand-dark">+10 سنوات</div>
-                                <div class="text-sm text-brand-textMuted">من الخبرة</div>
+                                <div class="text-sm text-brand-textMuted">من الخبرة المعتمدة</div>
                             </div>
                         </div>
+                    </div>
+                    {{-- Stats card --}}
+                    <div class="absolute bottom-12 right-4 bg-brand-dark/90 backdrop-blur-sm text-white rounded-xl shadow-xl px-5 py-3 z-20">
+                        <div class="text-2xl font-bold text-brand-gold">+5000</div>
+                        <div class="text-xs text-gray-300">مستفيد من خدماتنا</div>
                     </div>
                 </div>
                 
@@ -298,8 +310,8 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {{-- Service 1: Assessments --}}
                 <div class="group relative rounded-2xl overflow-hidden shadow-xl h-[450px]">
-                    <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                         alt="اختبارات الميول المهنية" 
+                    <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                         alt="اختبارات الميول المهنية"
                          class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/50 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 right-0 p-8">
@@ -317,8 +329,8 @@
                 
                 {{-- Service 2: Counseling --}}
                 <div class="group relative rounded-2xl overflow-hidden shadow-xl h-[450px]">
-                    <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                         alt="الإرشاد المهني" 
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                         alt="الإرشاد المهني الفردي"
                          class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/50 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 right-0 p-8">
@@ -336,8 +348,8 @@
 
                 {{-- Service 3: Training --}}
                 <div class="group relative rounded-2xl overflow-hidden shadow-xl h-[450px]">
-                    <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                         alt="برامج التدريب" 
+                    <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                         alt="برامج التدريب والتطوير"
                          class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/50 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 right-0 p-8">
@@ -377,8 +389,8 @@
                 {{-- Assessment Card 1 --}}
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition group">
                     <div class="relative h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                             alt="اختبار هولاند" 
+                        <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+                             alt="اختبار هولاند للميول المهنية"
                              class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                         <div class="absolute top-3 right-3 bg-brand-gold text-brand-dark text-xs px-3 py-1 rounded-full font-bold">
                             الأكثر شعبية
@@ -401,8 +413,8 @@
                 {{-- Assessment Card 2 --}}
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition group">
                     <div class="relative h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                             alt="اختبار MBTI" 
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+                             alt="اختبار الشخصية MBTI"
                              class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                     </div>
                     <div class="p-6">
@@ -422,8 +434,8 @@
                 {{-- Assessment Card 3 --}}
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition group">
                     <div class="relative h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                             alt="الذكاءات المتعددة" 
+                        <img src="https://images.unsplash.com/photo-1455849318743-b2233052fcff?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+                             alt="الذكاءات المتعددة"
                              class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                     </div>
                     <div class="p-6">
@@ -443,8 +455,8 @@
                 {{-- Assessment Card 4 --}}
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition group">
                     <div class="relative h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                             alt="القيم المهنية" 
+                        <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+                             alt="القيم المهنية"
                              class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                         <div class="absolute top-3 right-3 bg-brand-DEFAULT text-white text-xs px-3 py-1 rounded-full font-bold">
                             جديد
@@ -658,10 +670,10 @@
     {{-- CTA Section --}}
     <section class="py-20 relative overflow-hidden">
         <div class="absolute inset-0">
-            <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" 
-                 alt="مكتب احترافي" 
+            <img src="https://images.unsplash.com/photo-1560472355-536de3962603?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                 alt="مسار مهني ناجح"
                  class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-brand-dark/90"></div>
+            <div class="absolute inset-0 bg-brand-dark/88"></div>
         </div>
         
         <div class="container mx-auto px-6 relative z-10 text-center">
