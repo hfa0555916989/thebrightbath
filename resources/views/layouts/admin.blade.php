@@ -98,12 +98,61 @@
             <nav class="p-4 sidebar-scroll overflow-y-auto h-[calc(100vh-4rem)]">
                 <div class="space-y-2">
                     {{-- Dashboard --}}
-                    <a href="{{ route('admin.dashboard') }}" 
+                    <a href="{{ route('admin.dashboard') }}"
                        class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.dashboard') ? 'bg-brand-gold text-brand-dark' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
                         <i class="fas fa-home w-5"></i>
                         <span>لوحة التحكم</span>
                     </a>
-                    
+
+                    {{-- ===== CMS Section ===== --}}
+                    <div class="border-t border-white/10 pt-3 mt-3">
+                        <p class="text-xs text-gray-500 px-4 pb-2 uppercase tracking-wider">إدارة المحتوى</p>
+                    </div>
+
+                    {{-- Site Settings --}}
+                    <a href="{{ route('admin.site-settings.index') }}"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.site-settings*') ? 'bg-brand-gold text-brand-dark' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                        <i class="fas fa-palette w-5"></i>
+                        <span>إعدادات الموقع</span>
+                    </a>
+
+                    {{-- Repeatable Content --}}
+                    <div x-data="{ open: {{ request()->routeIs('admin.content*') ? 'true' : 'false' }} }">
+                        <button @click="open = !open"
+                                class="flex items-center justify-between w-full px-4 py-3 rounded-xl text-gray-300 hover:bg-white/10 hover:text-white transition">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-layer-group w-5"></i>
+                                <span>المحتوى المتكرر</span>
+                            </div>
+                            <i class="fas fa-chevron-down transform transition" :class="open ? 'rotate-180' : ''"></i>
+                        </button>
+                        <div x-show="open" x-collapse class="mr-4 mt-1 space-y-1">
+                            @foreach([
+                                ['testimonials',  'fas fa-quote-right', 'شهادات العملاء'],
+                                ['services',      'fas fa-cogs',        'الخدمات (الرئيسية)'],
+                                ['service-details','fas fa-list-ul',    'الخدمات (تفصيل)'],
+                                ['stats',         'fas fa-chart-bar',   'الإحصائيات'],
+                                ['features',      'fas fa-star',        'الميزات'],
+                                ['steps',         'fas fa-shoe-prints', 'خطوات "كيف يعمل"'],
+                                ['values',        'fas fa-heart',       'القيم'],
+                                ['goals',         'fas fa-bullseye',    'الأهداف الاستراتيجية'],
+                                ['team',          'fas fa-users',       'الفريق'],
+                                ['process-steps', 'fas fa-calendar-check','خطوات الاستشارات'],
+                            ] as [$cType, $icon, $label])
+                            <a href="{{ route('admin.content.index', $cType) }}"
+                               class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-white hover:bg-white/5 transition text-sm
+                               {{ request()->is("control-panel/content/{$cType}*") ? 'text-brand-gold' : 'text-gray-400' }}">
+                                <i class="{{ $icon }} w-4"></i> {{ $label }}
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Divider --}}
+                    <div class="border-t border-white/10 pt-3 mt-3">
+                        <p class="text-xs text-gray-500 px-4 pb-2 uppercase tracking-wider">إدارة العمليات</p>
+                    </div>
+
                     {{-- Assessments --}}
                     <div x-data="{ open: {{ request()->routeIs('admin.assessments*') ? 'true' : 'false' }} }">
                         <button @click="open = !open" 

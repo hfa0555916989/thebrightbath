@@ -76,7 +76,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-brand-dark mb-2">العنوان</h3>
-                                <p class="text-brand-textMuted">المملكة العربية السعودية</p>
+                                <p class="text-brand-textMuted">{{ setting('address','المملكة العربية السعودية') }}</p>
                             </div>
                         </div>
 
@@ -86,7 +86,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-brand-dark mb-2">الهاتف</h3>
-                                <a href="tel:+966543494316" class="text-brand-textMuted hover:text-brand-gold transition" dir="ltr">+966 54 349 4316</a>
+                                <a href="tel:{{ setting('phone','+966543494316') }}" class="text-brand-textMuted hover:text-brand-gold transition" dir="ltr">{{ setting('phone','+966 54 349 4316') }}</a>
                             </div>
                         </div>
 
@@ -96,7 +96,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-brand-dark mb-2">واتساب</h3>
-                                <a href="https://wa.me/966543494316" target="_blank" class="text-brand-textMuted hover:text-green-600 transition" dir="ltr">+966 54 349 4316</a>
+                                <a href="https://wa.me/{{ setting('whatsapp','966543494316') }}" target="_blank" class="text-brand-textMuted hover:text-green-600 transition" dir="ltr">{{ setting('phone','+966 54 349 4316') }}</a>
                             </div>
                         </div>
 
@@ -106,7 +106,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-brand-dark mb-2">البريد الإلكتروني</h3>
-                                <a href="mailto:cs@thebrightbath.com" class="text-brand-textMuted hover:text-brand-gold transition">cs@thebrightbath.com</a>
+                                <a href="mailto:{{ setting('email','cs@thebrightbath.com') }}" class="text-brand-textMuted hover:text-brand-gold transition">{{ setting('email','cs@thebrightbath.com') }}</a>
                             </div>
                         </div>
 
@@ -116,7 +116,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-brand-dark mb-2">ساعات العمل</h3>
-                                <p class="text-brand-textMuted">الأحد - الخميس: 9 ص - 5 م</p>
+                                <p class="text-brand-textMuted">{{ setting('working_hours','الأحد - الخميس: 9 ص - 5 م') }}</p>
                             </div>
                         </div>
                     </div>
@@ -125,16 +125,16 @@
                     <div class="mt-8">
                         <h3 class="font-bold text-brand-dark mb-4">تابعنا على</h3>
                         <div class="flex gap-3">
-                            <a href="#" class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-brand-textMuted hover:bg-brand-gold hover:text-white transition shadow-md">
+                            <a href="{{ setting('social_twitter','#') }}" target="_blank" class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-brand-textMuted hover:bg-brand-gold hover:text-white transition shadow-md">
                                 <i class="fab fa-twitter text-xl"></i>
                             </a>
-                            <a href="#" class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-brand-textMuted hover:bg-brand-gold hover:text-white transition shadow-md">
+                            <a href="{{ setting('social_instagram','#') }}" target="_blank" class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-brand-textMuted hover:bg-brand-gold hover:text-white transition shadow-md">
                                 <i class="fab fa-instagram text-xl"></i>
                             </a>
-                            <a href="#" class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-brand-textMuted hover:bg-brand-gold hover:text-white transition shadow-md">
+                            <a href="{{ setting('social_linkedin','#') }}" target="_blank" class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-brand-textMuted hover:bg-brand-gold hover:text-white transition shadow-md">
                                 <i class="fab fa-linkedin-in text-xl"></i>
                             </a>
-                            <a href="https://wa.me/966543494316" target="_blank" class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-brand-textMuted hover:bg-green-500 hover:text-white transition shadow-md">
+                            <a href="https://wa.me/{{ setting('whatsapp','966543494316') }}" target="_blank" class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-brand-textMuted hover:bg-green-500 hover:text-white transition shadow-md">
                                 <i class="fab fa-whatsapp text-xl"></i>
                             </a>
                         </div>

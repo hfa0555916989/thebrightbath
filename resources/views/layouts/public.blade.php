@@ -5,13 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     {{-- Google Analytics (gtag.js) --}}
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-K7ZEBV8Z8D"></script>
+    @php $gaId = setting('ga_id', 'G-K7ZEBV8Z8D'); @endphp
+    @if($gaId && $gaId !== '#')
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaId }}"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-K7ZEBV8Z8D');
+        gtag('config', '{{ $gaId }}');
     </script>
+    @endif
     
     {{-- SEO Component --}}
     <x-seo 
@@ -40,7 +43,21 @@
     {{-- Alpine.js --}}
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
-    {{-- Tailwind Config --}}
+    {{-- Tailwind Config (colors driven by DB settings) --}}
+    @php
+        $cp = setting('color_primary',   '#1F3A63');
+        $cg = setting('color_gold',      '#F8C524');
+        $cgd= setting('color_gold_deep', '#E5A91F');
+        $cgl= setting('color_gold_light','#FFD96A');
+        $co = setting('color_orange',    '#F28C28');
+        $cd = setting('color_dark',      '#162032');
+        $cbg= setting('color_bg',        '#F5F7FA');
+        $ct = setting('color_text',      '#1F2933');
+        $ctm= setting('color_text_muted','#6B7280');
+        $cb = setting('color_border',    '#E0E6ED');
+        $fp = setting('font_primary',    'Tajawal');
+        $fd = setting('font_display',    'Noto Kufi Arabic');
+    @endphp
     <script>
         tailwind.config = {
             theme: {
@@ -48,33 +65,44 @@
                     colors: {
                         brand: {
                             light: '#f7fafc',
-                            DEFAULT: '#1F3A63',
-                            dark: '#162032',
-                            gold: '#F8C524',
-                            goldDeep: '#E5A91F',
-                            goldLight: '#FFD96A',
-                            orange: '#F28C28',
+                            DEFAULT: '{{ $cp }}',
+                            dark: '{{ $cd }}',
+                            gold: '{{ $cg }}',
+                            goldDeep: '{{ $cgd }}',
+                            goldLight: '{{ $cgl }}',
+                            orange: '{{ $co }}',
                             orangeDark: '#E56A1F',
                             accent: '#e2e8f0',
-                            blue: '#1F3A63',
+                            blue: '{{ $cp }}',
                             blueLight: '#3B5B89',
-                            navy: '#162032',
+                            navy: '{{ $cd }}',
                             red: '#D94235',
-                            bg: '#F5F7FA',
+                            bg: '{{ $cbg }}',
                             card: '#FFFFFF',
-                            border: '#E0E6ED',
-                            text: '#1F2933',
-                            textMuted: '#6B7280'
+                            border: '{{ $cb }}',
+                            text: '{{ $ct }}',
+                            textMuted: '{{ $ctm }}'
                         }
                     },
                     fontFamily: {
-                        sans: ['Tajawal', 'sans-serif'],
-                        display: ['Noto Kufi Arabic', 'sans-serif'],
+                        sans: ['{{ $fp }}', 'sans-serif'],
+                        display: ['{{ $fd }}', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
+    {{-- Dynamic CSS Variables --}}
+    <style>
+        :root {
+            --color-primary: {{ $cp }};
+            --color-gold: {{ $cg }};
+            --color-orange: {{ $co }};
+            --color-dark: {{ $cd }};
+            --color-bg: {{ $cbg }};
+            --color-text: {{ $ct }};
+        }
+    </style>
     
     <style>
         /* Smooth Scrolling */
@@ -368,13 +396,13 @@
             
             {{-- WhatsApp Quick Contact --}}
             <div class="mt-4 p-3 bg-gradient-to-l from-green-50 to-green-100 rounded-xl">
-                <a href="https://wa.me/966543494316" target="_blank" class="flex items-center gap-3">
+                <a href="https://wa.me/{{ setting('whatsapp','966543494316') }}" target="_blank" class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
                         <i class="fab fa-whatsapp text-white text-lg"></i>
                     </div>
                     <div>
                         <p class="text-xs text-gray-600">تواصل مباشر</p>
-                        <p class="font-bold text-green-600 text-sm" dir="ltr">+966 54 349 4316</p>
+                        <p class="font-bold text-green-600 text-sm" dir="ltr">{{ setting('phone','+966 54 349 4316') }}</p>
                     </div>
                 </a>
             </div>
@@ -470,15 +498,21 @@
                         الطريق المشرق للتدريب والتطوير - رواد في التدريب والتطوير المهني والإرشاد الوظيفي.
                     </p>
                     <div class="flex gap-3">
-                        <a href="#" class="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-gold transition text-sm">
+                        @if(setting('social_twitter','#') !== '#')
+                        <a href="{{ setting('social_twitter','#') }}" target="_blank" class="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-gold transition text-sm">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="#" class="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-gold transition text-sm">
+                        @endif
+                        @if(setting('social_instagram','#') !== '#')
+                        <a href="{{ setting('social_instagram','#') }}" target="_blank" class="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-gold transition text-sm">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="#" class="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-gold transition text-sm">
+                        @endif
+                        @if(setting('social_linkedin','#') !== '#')
+                        <a href="{{ setting('social_linkedin','#') }}" target="_blank" class="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand-gold transition text-sm">
                             <i class="fab fa-linkedin-in"></i>
                         </a>
+                        @endif
                     </div>
                 </div>
 
@@ -510,15 +544,15 @@
                     <ul class="space-y-3 lg:space-y-4 text-gray-400 text-sm lg:text-base">
                         <li class="flex items-center gap-3">
                             <i class="fas fa-phone-alt text-brand-gold"></i>
-                            <a href="tel:+966543494316" class="hover:text-white transition" dir="ltr">+966 54 349 4316</a>
+                            <a href="tel:{{ setting('phone','+966543494316') }}" class="hover:text-white transition" dir="ltr">{{ setting('phone','+966 54 349 4316') }}</a>
                         </li>
                         <li class="flex items-center gap-3">
                             <i class="fab fa-whatsapp text-brand-gold"></i>
-                            <a href="https://wa.me/966543494316" target="_blank" class="hover:text-white transition" dir="ltr">واتساب</a>
+                            <a href="https://wa.me/{{ setting('whatsapp','966543494316') }}" target="_blank" class="hover:text-white transition" dir="ltr">واتساب</a>
                         </li>
                         <li class="flex items-center gap-3">
                             <i class="fas fa-envelope text-brand-gold"></i>
-                            <a href="mailto:cs@thebrightbath.com" class="hover:text-white transition text-xs lg:text-base">cs@thebrightbath.com</a>
+                            <a href="mailto:{{ setting('email','cs@thebrightbath.com') }}" class="hover:text-white transition text-xs lg:text-base">{{ setting('email','cs@thebrightbath.com') }}</a>
                         </li>
                     </ul>
                 </div>
@@ -526,7 +560,7 @@
 
             <div class="border-t border-white/10 pt-6 lg:pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                 <p class="text-gray-500 text-xs lg:text-sm text-center md:text-right">
-                    &copy; {{ date('Y') }} الطريق المشرق للتدريب والتطوير. جميع الحقوق محفوظة.
+                    &copy; {{ date('Y') }} {{ setting('copyright_text','الطريق المشرق للتدريب والتطوير. جميع الحقوق محفوظة.') }}
                 </p>
                 <div class="flex gap-4 lg:gap-6 text-xs lg:text-sm text-gray-500">
                     <a href="{{ route('privacy') }}" class="hover:text-white transition">سياسة الخصوصية</a>
@@ -539,14 +573,14 @@
     {{-- Floating Contact Buttons --}}
     <div class="fixed bottom-4 left-4 lg:bottom-6 lg:left-6 z-50 flex flex-col gap-2 lg:gap-3">
         {{-- Phone Call Button --}}
-        <a href="tel:+966543494316" 
+        <a href="tel:{{ setting('phone','+966543494316') }}"
            class="group w-12 h-12 lg:w-14 lg:h-14 bg-brand-DEFAULT rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all duration-300"
            title="اتصل بنا">
             <i class="fas fa-phone-alt text-white text-lg lg:text-xl"></i>
         </a>
-        
+
         {{-- WhatsApp Button --}}
-        <a href="https://wa.me/966543494316?text=السلام%20عليكم،%20أرغب%20في%20الاستفسار%20عن%20خدماتكم" 
+        <a href="https://wa.me/{{ setting('whatsapp','966543494316') }}?text={{ urlencode(setting('whatsapp_message','السلام عليكم، أرغب في الاستفسار عن خدماتكم')) }}" 
            target="_blank"
            class="group w-14 h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all duration-300 animate-bounce-slow relative"
            title="تواصل عبر الواتساب">

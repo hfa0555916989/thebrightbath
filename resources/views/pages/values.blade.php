@@ -39,100 +39,28 @@
     </section>
 
     {{-- Values Grid --}}
+    @php $values = \App\Models\ContentItem::ofType('value')->forPage('global')->active()->ordered()->get(); @endphp
     <section class="py-20 bg-brand-bg">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                {{-- Value 1 --}}
+                @foreach($values as $value)
                 <div class="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition group">
                     <div class="flex items-start gap-6">
-                        <div class="w-20 h-20 bg-brand-gold/20 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-brand-gold transition">
-                            <i class="fas fa-medal text-3xl text-brand-gold group-hover:text-white transition"></i>
+                        <div class="w-20 h-20 rounded-2xl flex items-center justify-center flex-shrink-0 transition"
+                            style="background-color: {{ $value->color ?? '#F8C524' }}20"
+                            x-data
+                            @mouseenter="$el.style.backgroundColor='{{ $value->color ?? '#F8C524' }}'"
+                            @mouseleave="$el.style.backgroundColor='{{ $value->color ?? '#F8C524' }}20'">
+                            <i class="{{ $value->icon ?? 'fas fa-star' }} text-3xl transition"
+                                style="color: {{ $value->color ?? '#F8C524' }}"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold text-brand-dark mb-3">التميز</h3>
-                            <p class="text-brand-textMuted leading-relaxed">
-                                نسعى دائماً لتقديم أفضل ما لدينا في كل خدمة نقدمها. نلتزم بأعلى معايير الجودة في اختباراتنا وبرامجنا التدريبية وجلساتنا الإرشادية.
-                            </p>
+                            <h3 class="text-xl font-bold text-brand-dark mb-3">{{ $value->title }}</h3>
+                            <p class="text-brand-textMuted leading-relaxed">{{ $value->body }}</p>
                         </div>
                     </div>
                 </div>
-
-                {{-- Value 2 --}}
-                <div class="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition group">
-                    <div class="flex items-start gap-6">
-                        <div class="w-20 h-20 bg-brand-DEFAULT/20 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-brand-DEFAULT transition">
-                            <i class="fas fa-handshake text-3xl text-brand-DEFAULT group-hover:text-white transition"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-brand-dark mb-3">الأمانة والمصداقية</h3>
-                            <p class="text-brand-textMuted leading-relaxed">
-                                نتعامل بشفافية ومصداقية مع جميع عملائنا. نقدم معلومات دقيقة وصادقة، ونحافظ على سرية بيانات المستفيدين.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Value 3 --}}
-                <div class="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition group">
-                    <div class="flex items-start gap-6">
-                        <div class="w-20 h-20 bg-brand-orange/20 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-brand-orange transition">
-                            <i class="fas fa-lightbulb text-3xl text-brand-orange group-hover:text-white transition"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-brand-dark mb-3">الإبداع والتطوير</h3>
-                            <p class="text-brand-textMuted leading-relaxed">
-                                نؤمن بأهمية التطوير المستمر والبحث عن حلول مبتكرة. نحرص على تحديث أدواتنا ومناهجنا لمواكبة أحدث الممارسات العالمية.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Value 4 --}}
-                <div class="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition group">
-                    <div class="flex items-start gap-6">
-                        <div class="w-20 h-20 bg-green-500/20 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-green-500 transition">
-                            <i class="fas fa-users text-3xl text-green-600 group-hover:text-white transition"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-brand-dark mb-3">الشراكة والتعاون</h3>
-                            <p class="text-brand-textMuted leading-relaxed">
-                                نبني علاقات شراكة حقيقية مع عملائنا. نرافقهم في رحلتهم المهنية ونعمل معاً لتحقيق أهدافهم.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Value 5 --}}
-                <div class="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition group">
-                    <div class="flex items-start gap-6">
-                        <div class="w-20 h-20 bg-purple-500/20 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-purple-500 transition">
-                            <i class="fas fa-heart text-3xl text-purple-600 group-hover:text-white transition"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-brand-dark mb-3">الاحترام والتقدير</h3>
-                            <p class="text-brand-textMuted leading-relaxed">
-                                نحترم تفرد كل فرد ونقدر اختلافاته. نتعامل مع الجميع باحترام ونقدر ثقتهم بنا في مسيرتهم المهنية.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Value 6 --}}
-                <div class="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition group">
-                    <div class="flex items-start gap-6">
-                        <div class="w-20 h-20 bg-blue-500/20 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500 transition">
-                            <i class="fas fa-shield-alt text-3xl text-blue-600 group-hover:text-white transition"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-brand-dark mb-3">الموثوقية العلمية</h3>
-                            <p class="text-brand-textMuted leading-relaxed">
-                                نعتمد على أسس علمية راسخة في جميع خدماتنا. اختباراتنا مبنية على نظريات مثبتة ومعتمدة عالمياً.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
+                @endforeach
             </div>
         </div>
     </section>

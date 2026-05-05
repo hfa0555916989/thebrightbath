@@ -39,125 +39,32 @@
     </section>
 
     {{-- Goals Section --}}
+    @php $goals = \App\Models\ContentItem::ofType('goal')->forPage('global')->active()->ordered()->get(); @endphp
     <section class="py-20 bg-brand-bg">
         <div class="container mx-auto px-6">
             <div class="max-w-4xl mx-auto">
-                
-                {{-- Goal 1 --}}
-                <div class="flex gap-6 mb-12 items-start">
-                    <div class="w-16 h-16 bg-brand-gold rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                        <span class="text-2xl font-bold text-brand-dark">1</span>
+                @foreach($goals as $i => $goal)
+                <div class="flex gap-6 {{ !$loop->last ? 'mb-12' : '' }} items-start">
+                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg"
+                        style="background-color: {{ $goal->color ?? '#F8C524' }}">
+                        <span class="text-2xl font-bold text-white">{{ $loop->iteration }}</span>
                     </div>
                     <div class="bg-white rounded-2xl p-8 shadow-lg flex-1">
-                        <h3 class="text-xl font-bold text-brand-dark mb-4">التوسع في تقديم الخدمات</h3>
-                        <p class="text-brand-textMuted leading-relaxed mb-4">
-                            توسيع نطاق خدماتنا لتشمل المزيد من الاختبارات والبرامج التدريبية المتخصصة، والوصول إلى شريحة أكبر من المستفيدين في جميع أنحاء المملكة.
-                        </p>
+                        <h3 class="text-xl font-bold text-brand-dark mb-4">{{ $goal->title }}</h3>
+                        <p class="text-brand-textMuted leading-relaxed mb-4">{{ $goal->body }}</p>
+                        @if($goal->getMeta('sub_goals'))
                         <ul class="space-y-2 text-brand-textMuted">
+                            @foreach($goal->getMeta('sub_goals') as $subGoal)
                             <li class="flex items-center gap-2">
                                 <i class="fas fa-check text-brand-gold"></i>
-                                إضافة 10 اختبارات جديدة خلال 3 سنوات
+                                {{ $subGoal }}
                             </li>
-                            <li class="flex items-center gap-2">
-                                <i class="fas fa-check text-brand-gold"></i>
-                                الوصول إلى 50,000 مستفيد سنوياً
-                            </li>
+                            @endforeach
                         </ul>
+                        @endif
                     </div>
                 </div>
-
-                {{-- Goal 2 --}}
-                <div class="flex gap-6 mb-12 items-start">
-                    <div class="w-16 h-16 bg-brand-DEFAULT rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                        <span class="text-2xl font-bold text-white">2</span>
-                    </div>
-                    <div class="bg-white rounded-2xl p-8 shadow-lg flex-1">
-                        <h3 class="text-xl font-bold text-brand-dark mb-4">تعزيز الشراكات الاستراتيجية</h3>
-                        <p class="text-brand-textMuted leading-relaxed mb-4">
-                            بناء شراكات قوية مع الجامعات والمؤسسات التعليمية والشركات لتوفير خدمات الإرشاد المهني للطلاب والموظفين.
-                        </p>
-                        <ul class="space-y-2 text-brand-textMuted">
-                            <li class="flex items-center gap-2">
-                                <i class="fas fa-check text-brand-gold"></i>
-                                شراكات مع 20 جامعة وجهة تعليمية
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <i class="fas fa-check text-brand-gold"></i>
-                                تعاون مع 50 شركة في القطاع الخاص
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                {{-- Goal 3 --}}
-                <div class="flex gap-6 mb-12 items-start">
-                    <div class="w-16 h-16 bg-brand-orange rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                        <span class="text-2xl font-bold text-white">3</span>
-                    </div>
-                    <div class="bg-white rounded-2xl p-8 shadow-lg flex-1">
-                        <h3 class="text-xl font-bold text-brand-dark mb-4">التميز في جودة الخدمات</h3>
-                        <p class="text-brand-textMuted leading-relaxed mb-4">
-                            الحصول على اعتمادات وشهادات جودة محلية ودولية، وتطوير فريق العمل بشكل مستمر لضمان أعلى مستويات الجودة.
-                        </p>
-                        <ul class="space-y-2 text-brand-textMuted">
-                            <li class="flex items-center gap-2">
-                                <i class="fas fa-check text-brand-gold"></i>
-                                الحصول على شهادة ISO في جودة الخدمات
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <i class="fas fa-check text-brand-gold"></i>
-                                تحقيق نسبة رضا عملاء 95%
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                {{-- Goal 4 --}}
-                <div class="flex gap-6 mb-12 items-start">
-                    <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                        <span class="text-2xl font-bold text-white">4</span>
-                    </div>
-                    <div class="bg-white rounded-2xl p-8 shadow-lg flex-1">
-                        <h3 class="text-xl font-bold text-brand-dark mb-4">الريادة في التقنية والابتكار</h3>
-                        <p class="text-brand-textMuted leading-relaxed mb-4">
-                            تطوير منصة رقمية متكاملة تقدم تجربة مستخدم متميزة، واستخدام أحدث التقنيات في تحليل البيانات والذكاء الاصطناعي.
-                        </p>
-                        <ul class="space-y-2 text-brand-textMuted">
-                            <li class="flex items-center gap-2">
-                                <i class="fas fa-check text-brand-gold"></i>
-                                إطلاق تطبيق موبايل متكامل
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <i class="fas fa-check text-brand-gold"></i>
-                                دمج تقنيات الذكاء الاصطناعي في التحليل
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                {{-- Goal 5 --}}
-                <div class="flex gap-6 items-start">
-                    <div class="w-16 h-16 bg-purple-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                        <span class="text-2xl font-bold text-white">5</span>
-                    </div>
-                    <div class="bg-white rounded-2xl p-8 shadow-lg flex-1">
-                        <h3 class="text-xl font-bold text-brand-dark mb-4">المسؤولية المجتمعية</h3>
-                        <p class="text-brand-textMuted leading-relaxed mb-4">
-                            تقديم خدمات مجانية للفئات الأقل حظاً، والمساهمة في رفع الوعي بأهمية الإرشاد المهني في المجتمع.
-                        </p>
-                        <ul class="space-y-2 text-brand-textMuted">
-                            <li class="flex items-center gap-2">
-                                <i class="fas fa-check text-brand-gold"></i>
-                                تقديم 1000 اختبار مجاني سنوياً
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <i class="fas fa-check text-brand-gold"></i>
-                                إقامة 20 فعالية توعوية سنوياً
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
+                @endforeach
             </div>
         </div>
     </section>

@@ -107,8 +107,9 @@
     <header id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
         {{-- Background Image - Career Counseling/Mentoring --}}
         <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" 
-                 alt="جلسة إرشاد مهني" 
+            @php $heroImg = setting('hero_image','https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); @endphp
+            <img src="{{ str_starts_with($heroImg,'http') ? $heroImg : asset('storage/'.$heroImg) }}"
+                 alt="جلسة إرشاد مهني"
                  class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-l from-brand-dark/95 via-brand-dark/85 to-brand-dark/70"></div>
         </div>
@@ -118,12 +119,17 @@
                 {{-- Content --}}
                 <div class="text-white text-center lg:text-right">
                     <span class="inline-block bg-brand-gold/20 backdrop-blur-sm text-brand-gold font-bold tracking-widest mb-6 uppercase text-sm px-6 py-2 rounded-full border border-brand-gold/30">
-                        الطريق المشرق للتدريب والتطوير
+                        {{ setting('hero_badge','الطريق المشرق للتدريب والتطوير') }}
                     </span>
+                    @php
+                        $heroT1   = setting('hero_title_1','اكتشف ميولك المهنية');
+                        $goldWord = setting('hero_gold_word','ميولك المهنية');
+                        $heroT2   = setting('hero_title_2','وابنِ مستقبلك بثقة');
+                    @endphp
                     <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6 leading-tight">
-                        اكتشف <span class="text-brand-gold">ميولك المهنية</span>
+                        {!! str_replace($goldWord, '<span class="text-brand-gold">'.$goldWord.'</span>', e($heroT1)) !!}
                         <br>
-                        وابنِ مستقبلك بثقة
+                        {{ $heroT2 }}
                     </h1>
                     <p class="text-lg md:text-xl text-gray-200 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0 lg:mr-0">
                         نقدم لك منظومة متكاملة من خدمات الإرشاد المهني، تشمل الجلسات الفردية، ورخص الإرشاد المهني، إضافة إلى الدورات وورش العمل، ومكتبة مهنية داعمة تساعدك في اختيار المسار المهني الأنسب لك
@@ -131,33 +137,24 @@
                     <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                         <a href="{{ route('assessments.index') }}" class="inline-flex items-center justify-center gap-2 bg-brand-gold text-brand-dark px-10 py-4 font-bold rounded-xl hover:bg-white transition duration-300 shadow-xl text-lg">
                             <i class="fas fa-clipboard-list"></i>
-                            <span>ابدأ الاختبار الآن</span>
+                            <span>{{ setting('hero_cta_primary','ابدأ الاختبار الآن') }}</span>
                         </a>
                         <a href="{{ route('register') }}" class="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 px-10 py-4 font-bold rounded-xl hover:bg-white hover:text-brand-dark transition duration-300">
                             <i class="fas fa-user-plus"></i>
-                            <span>سجل مجاناً</span>
+                            <span>{{ setting('hero_cta_secondary','سجل مجاناً') }}</span>
                         </a>
                     </div>
                 </div>
                 
                 {{-- Stats Cards --}}
+                @php $stats = \App\Models\ContentItem::ofType('stat')->forPage('home')->active()->ordered()->get(); @endphp
                 <div class="hidden lg:grid grid-cols-2 gap-4">
-                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                        <div class="text-4xl font-bold text-brand-gold mb-2">+5000</div>
-                        <div class="text-gray-300">مستفيد من خدماتنا</div>
+                    @foreach($stats as $i => $stat)
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 {{ $i % 2 === 1 ? 'mt-8' : '' }}">
+                        <div class="text-4xl font-bold text-brand-gold mb-2">{{ $stat->title }}</div>
+                        <div class="text-gray-300">{{ $stat->subtitle }}</div>
                     </div>
-                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 mt-8">
-                        <div class="text-4xl font-bold text-brand-gold mb-2">5</div>
-                        <div class="text-gray-300">اختبارات متخصصة</div>
-                    </div>
-                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                        <div class="text-4xl font-bold text-brand-gold mb-2">+10</div>
-                        <div class="text-gray-300">سنوات من الخبرة</div>
-                    </div>
-                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 mt-8">
-                        <div class="text-4xl font-bold text-brand-gold mb-2">98%</div>
-                        <div class="text-gray-300">نسبة رضا العملاء</div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -169,37 +166,25 @@
     </header>
 
     {{-- Features Strip --}}
+    @php $features = \App\Models\ContentItem::ofType('feature')->forPage('home')->active()->ordered()->get(); @endphp
     <section class="py-16 bg-white relative z-20">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                @foreach($features as $feature)
                 <div class="text-center group">
-                    <div class="w-16 h-16 bg-brand-gold/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-gold group-hover:scale-110 transition duration-300">
-                        <i class="fas fa-certificate text-2xl text-brand-gold group-hover:text-white"></i>
+                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition duration-300"
+                        style="background-color: {{ $feature->color ?? '#F8C524' }}18"
+                        x-data
+                        @mouseenter="$el.style.backgroundColor='{{ $feature->color ?? '#F8C524' }}'"
+                        @mouseleave="$el.style.backgroundColor='{{ $feature->color ?? '#F8C524' }}18'">
+                        <i class="{{ $feature->icon ?? 'fas fa-star' }} text-2xl transition duration-300"
+                            style="color:{{ $feature->color ?? '#F8C524' }}"
+                            x-ref="icon"></i>
                     </div>
-                    <h3 class="font-bold text-brand-dark mb-1">اختبارات معتمدة</h3>
-                    <p class="text-sm text-brand-textMuted">علمية وموثوقة دولياً</p>
+                    <h3 class="font-bold text-brand-dark mb-1">{{ $feature->title }}</h3>
+                    <p class="text-sm text-brand-textMuted">{{ $feature->body }}</p>
                 </div>
-                <div class="text-center group">
-                    <div class="w-16 h-16 bg-brand-DEFAULT/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-DEFAULT group-hover:scale-110 transition duration-300">
-                        <i class="fas fa-user-shield text-2xl text-brand-DEFAULT group-hover:text-white"></i>
-                    </div>
-                    <h3 class="font-bold text-brand-dark mb-1">سرية تامة</h3>
-                    <p class="text-sm text-brand-textMuted">بياناتك محمية ومشفرة</p>
-                </div>
-                <div class="text-center group">
-                    <div class="w-16 h-16 bg-brand-orange/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-orange group-hover:scale-110 transition duration-300">
-                        <i class="fas fa-bolt text-2xl text-brand-orange group-hover:text-white"></i>
-                    </div>
-                    <h3 class="font-bold text-brand-dark mb-1">نتائج فورية</h3>
-                    <p class="text-sm text-brand-textMuted">تقرير PDF مفصل</p>
-                </div>
-                <div class="text-center group">
-                    <div class="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-green-500 group-hover:scale-110 transition duration-300">
-                        <i class="fas fa-headset text-2xl text-green-500 group-hover:text-white"></i>
-                    </div>
-                    <h3 class="font-bold text-brand-dark mb-1">دعم متواصل</h3>
-                    <p class="text-sm text-brand-textMuted">فريق متخصص لمساعدتك</p>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>
@@ -579,78 +564,36 @@
                 <h2 class="text-3xl lg:text-4xl font-display font-bold text-brand-dark mb-4">ماذا يقولون عنا؟</h2>
             </div>
 
+            @php $testimonials = \App\Models\ContentItem::ofType('testimonial')->forPage('home')->active()->ordered()->get(); @endphp
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {{-- Testimonial 1 --}}
+                @foreach($testimonials as $t)
                 <div class="bg-white rounded-2xl p-8 shadow-lg relative">
                     <div class="absolute -top-4 right-8 text-6xl text-brand-gold/20 font-serif">"</div>
                     <div class="flex items-center gap-4 mb-6">
-                        <div class="w-16 h-16 rounded-full bg-brand-DEFAULT flex items-center justify-center text-white text-2xl font-bold">
-                            م
+                        <div class="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold"
+                            style="background-color: {{ $t->color ?? '#1F3A63' }}">
+                            {{ $t->getMeta('avatar_letter','؟') }}
                         </div>
                         <div>
-                            <h4 class="font-bold text-brand-dark">محمد العتيبي</h4>
-                            <p class="text-sm text-brand-textMuted">مهندس - الرياض</p>
+                            <h4 class="font-bold text-brand-dark">{{ $t->title }}</h4>
+                            <p class="text-sm text-brand-textMuted">{{ $t->subtitle }}</p>
                         </div>
                     </div>
-                    <p class="text-brand-textMuted leading-relaxed">
-                        "اختبار هولاند ساعدني كثيراً في فهم ميولي المهنية واتخاذ قرار تغيير مساري الوظيفي. الآن أعمل في مجال يناسبني تماماً."
-                    </p>
+                    <p class="text-brand-textMuted leading-relaxed">"{{ $t->body }}"</p>
                     <div class="flex gap-1 mt-4 text-brand-gold">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
+                        @php $rating = (float)($t->getMeta('rating', 5)); @endphp
+                        @for($s = 1; $s <= 5; $s++)
+                            @if($s <= floor($rating))
+                                <i class="fas fa-star"></i>
+                            @elseif($s - 0.5 <= $rating)
+                                <i class="fas fa-star-half-alt"></i>
+                            @else
+                                <i class="far fa-star"></i>
+                            @endif
+                        @endfor
                     </div>
                 </div>
-
-                {{-- Testimonial 2 --}}
-                <div class="bg-white rounded-2xl p-8 shadow-lg relative">
-                    <div class="absolute -top-4 right-8 text-6xl text-brand-gold/20 font-serif">"</div>
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-16 h-16 rounded-full bg-brand-gold flex items-center justify-center text-brand-dark text-2xl font-bold">
-                            ن
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-brand-dark">نورة الشمري</h4>
-                            <p class="text-sm text-brand-textMuted">خريجة - جدة</p>
-                        </div>
-                    </div>
-                    <p class="text-brand-textMuted leading-relaxed">
-                        "الكتاب المهني كان مرجعاً قيماً لي في رحلة البحث عن عمل. المعلومات مفيدة جداً والتقارير واضحة ومفصلة."
-                    </p>
-                    <div class="flex gap-1 mt-4 text-brand-gold">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                </div>
-
-                {{-- Testimonial 3 --}}
-                <div class="bg-white rounded-2xl p-8 shadow-lg relative">
-                    <div class="absolute -top-4 right-8 text-6xl text-brand-gold/20 font-serif">"</div>
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-16 h-16 rounded-full bg-brand-orange flex items-center justify-center text-white text-2xl font-bold">
-                            ع
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-brand-dark">عبدالرحمن القحطاني</h4>
-                            <p class="text-sm text-brand-textMuted">طالب جامعي - الدمام</p>
-                        </div>
-                    </div>
-                    <p class="text-brand-textMuted leading-relaxed">
-                        "جلسة الإرشاد المهني كانت نقطة تحول في حياتي. المرشد كان محترفاً وساعدني على وضع خطة واضحة لمستقبلي."
-                    </p>
-                    <div class="flex gap-1 mt-4 text-brand-gold">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>
@@ -658,16 +601,16 @@
     {{-- CTA Section --}}
     <section class="py-20 relative overflow-hidden">
         <div class="absolute inset-0">
-            <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" 
-                 alt="مكتب احترافي" 
+            @php $ctaImg = setting('home_cta_image','https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); @endphp
+            <img src="{{ str_starts_with($ctaImg,'http') ? $ctaImg : asset('storage/'.$ctaImg) }}"
+                 alt="مكتب احترافي"
                  class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-brand-dark/90"></div>
         </div>
         
         <div class="container mx-auto px-6 relative z-10 text-center">
             <h2 class="text-3xl lg:text-5xl font-display font-bold text-white mb-6">
-                هل أنت مستعد لاكتشاف
-                <span class="text-brand-gold">ميولك المهنية؟</span>
+                {{ setting('home_cta_title','هل أنت مستعد لاكتشاف ميولك المهنية؟') }}
             </h2>
             <p class="text-gray-300 mb-10 max-w-2xl mx-auto text-lg">
                 ابدأ رحلتك الآن مع اختباراتنا المعتمدة واحصل على تقرير مفصل يساعدك في اتخاذ القرار الصحيح

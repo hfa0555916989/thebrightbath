@@ -7,6 +7,8 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Admin\AttemptController;
 use App\Http\Controllers\Admin\LogoController;
 use App\Http\Controllers\Admin\ConsultantController;
+use App\Http\Controllers\Admin\SiteSettingsController;
+use App\Http\Controllers\Admin\ContentItemController;
 
 /*
 |--------------------------------------------------------------------------
@@ -242,6 +244,41 @@ Route::prefix('control-panel')
         // Logo Management
         Route::get('logo', [LogoController::class, 'index'])->name('logo.index');
         Route::post('logo', [LogoController::class, 'upload'])->name('logo.upload');
+
+        // ===== Site Settings (CMS) =====
+        Route::get('site-settings', [SiteSettingsController::class, 'index'])->name('site-settings.index');
+        Route::put('site-settings/visual',       [SiteSettingsController::class, 'updateVisual'])->name('site-settings.visual');
+        Route::put('site-settings/contact',      [SiteSettingsController::class, 'updateContact'])->name('site-settings.contact');
+        Route::put('site-settings/social',       [SiteSettingsController::class, 'updateSocial'])->name('site-settings.social');
+        Route::put('site-settings/seo',          [SiteSettingsController::class, 'updateSeo'])->name('site-settings.seo');
+        Route::put('site-settings/footer',       [SiteSettingsController::class, 'updateFooter'])->name('site-settings.footer');
+        Route::put('site-settings/hero',         [SiteSettingsController::class, 'updateHero'])->name('site-settings.hero');
+        Route::put('site-settings/about',        [SiteSettingsController::class, 'updateAboutPage'])->name('site-settings.about');
+        Route::put('site-settings/vision',       [SiteSettingsController::class, 'updateVisionMission'])->name('site-settings.vision');
+        Route::put('site-settings/contact-page', [SiteSettingsController::class, 'updateContactPage'])->name('site-settings.contact-page');
+
+        // ===== Content Items (CMS - Repeatable Sections) =====
+        $contentTypes = ['testimonials','services','service-details','stats','features','steps','values','goals','team','about-values','process-steps'];
+        foreach ($contentTypes as $cType) {
+            Route::get("content/{$cType}",               [ContentItemController::class, 'index']  )->name("content.{$cType}.index"  )->defaults('type', $cType);
+            Route::get("content/{$cType}/create",        [ContentItemController::class, 'create'] )->name("content.{$cType}.create" )->defaults('type', $cType);
+            Route::post("content/{$cType}",              [ContentItemController::class, 'store']  )->name("content.{$cType}.store"  )->defaults('type', $cType);
+            Route::get("content/{$cType}/{id}/edit",     [ContentItemController::class, 'edit']   )->name("content.{$cType}.edit"   )->defaults('type', $cType);
+            Route::put("content/{$cType}/{id}",          [ContentItemController::class, 'update'] )->name("content.{$cType}.update" )->defaults('type', $cType);
+            Route::delete("content/{$cType}/{id}",       [ContentItemController::class, 'destroy'])->name("content.{$cType}.destroy")->defaults('type', $cType);
+            Route::post("content/{$cType}/reorder",      [ContentItemController::class, 'reorder'])->name("content.{$cType}.reorder")->defaults('type', $cType);
+            Route::patch("content/{$cType}/{id}/toggle", [ContentItemController::class, 'toggle'] )->name("content.{$cType}.toggle" )->defaults('type', $cType);
+        }
+
+        // Generic named helpers used by views
+        Route::get('content/{type}',               [ContentItemController::class, 'index']  )->name('content.index');
+        Route::get('content/{type}/create',        [ContentItemController::class, 'create'] )->name('content.create');
+        Route::post('content/{type}',              [ContentItemController::class, 'store']  )->name('content.store');
+        Route::get('content/{type}/{id}/edit',     [ContentItemController::class, 'edit']   )->name('content.edit');
+        Route::put('content/{type}/{id}',          [ContentItemController::class, 'update'] )->name('content.update');
+        Route::delete('content/{type}/{id}',       [ContentItemController::class, 'destroy'])->name('content.destroy');
+        Route::post('content/{type}/reorder',      [ContentItemController::class, 'reorder'])->name('content.reorder');
+        Route::patch('content/{type}/{id}/toggle', [ContentItemController::class, 'toggle'] )->name('content.toggle');
         
         // Analysis Models Management
         Route::resource('analysis-models', App\Http\Controllers\Admin\AnalysisModelController::class);

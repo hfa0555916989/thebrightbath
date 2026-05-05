@@ -53,9 +53,9 @@
                         <i class="fas fa-eye ml-2"></i>
                         رؤيتنا
                     </span>
-                    <h2 class="text-3xl lg:text-4xl font-display font-bold text-brand-dark mb-6">نحو مستقبل مهني مشرق للجميع</h2>
+                    <h2 class="text-3xl lg:text-4xl font-display font-bold text-brand-dark mb-6">{{ setting('vision_title','نحو مستقبل مهني مشرق للجميع') }}</h2>
                     <p class="text-brand-textMuted leading-relaxed text-lg mb-6">
-                        أن تكون الطريق المشرق مرجعًا مميزًا في التدريب والتطوير في مجال الموارد البشرية والإرشاد المهني، ومزوّدًا رائدًا للحلول التدريبية والاعتمادات الدولية التي تسهم في صناعة كفاءات مهنية قادرة على قيادة المستقبل.
+                        {{ setting('vision_text','أن تكون الطريق المشرق مرجعًا مميزًا في التدريب والتطوير في مجال الموارد البشرية والإرشاد المهني.') }}
                     </p>
                 </div>
             </div>
@@ -71,27 +71,19 @@
                         <i class="fas fa-bullseye ml-2"></i>
                         رسالتنا
                     </span>
-                    <h2 class="text-3xl lg:text-4xl font-display font-bold text-brand-dark mb-6">تمكين الأفراد والمؤسسات</h2>
+                    <h2 class="text-3xl lg:text-4xl font-display font-bold text-brand-dark mb-6">{{ setting('mission_title','تمكين الأفراد والمؤسسات') }}</h2>
                     <p class="text-brand-textMuted leading-relaxed text-lg mb-6">
-                        نسعى لتمكين الأفراد والمؤسسات من خلال تقديم برامج تدريبية متخصصة، وجلسات إرشاد مهني احترافية، وتأهيل مهني معتمد دوليًا، وذلك عبر منهجيات تعليمية حديثة، ومدربين مؤهلين، وحلول تدريبية مبتكرة تعزز التطور المهني وتلائم متطلبات سوق العمل المتجددة.
+                        {{ setting('mission_text','نسعى لتمكين الأفراد والمؤسسات من خلال تقديم برامج تدريبية متخصصة.') }}
                     </p>
                     <ul class="space-y-4">
+                        @foreach([1,2,3,4] as $i)
+                        @if(setting("mission_bullet{$i}"))
                         <li class="flex items-start gap-3">
                             <i class="fas fa-check-circle text-brand-gold text-xl mt-1"></i>
-                            <span class="text-brand-dark">توفير اختبارات علمية معتمدة ودقيقة</span>
+                            <span class="text-brand-dark">{{ setting("mission_bullet{$i}") }}</span>
                         </li>
-                        <li class="flex items-start gap-3">
-                            <i class="fas fa-check-circle text-brand-gold text-xl mt-1"></i>
-                            <span class="text-brand-dark">تقديم جلسات إرشادية فردية متخصصة</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <i class="fas fa-check-circle text-brand-gold text-xl mt-1"></i>
-                            <span class="text-brand-dark">تطوير برامج تدريبية مبتكرة</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <i class="fas fa-check-circle text-brand-gold text-xl mt-1"></i>
-                            <span class="text-brand-dark">دعم المؤسسات في تطوير موظفيها</span>
-                        </li>
+                        @endif
+                        @endforeach
                     </ul>
                 </div>
                 <div class="relative">

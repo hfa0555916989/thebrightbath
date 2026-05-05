@@ -65,13 +65,13 @@
                     </span>
                     <h2 class="text-3xl lg:text-4xl font-display font-bold text-brand-dark mb-6">من نحن؟</h2>
                     <p class="text-brand-textMuted leading-relaxed mb-6 text-lg">
-                        الطريق المشرق للتدريب والتطوير - رواد في مجال التدريب والتطوير المهني والإرشاد الوظيفي في المملكة العربية السعودية.
+                        {{ setting('about_story_p1','الطريق المشرق للتدريب والتطوير - رواد في مجال التدريب والتطوير المهني والإرشاد الوظيفي.') }}
                     </p>
                     <p class="text-brand-textMuted leading-relaxed mb-6">
-                        تأسسنا بهدف مساعدة الأفراد على اكتشاف ميولهم وقدراتهم، وتوجيههم نحو المسارات المهنية الأنسب لهم. نؤمن بأن كل فرد يمتلك إمكانيات فريدة تستحق الاكتشاف والتنمية.
+                        {{ setting('about_story_p2','تأسسنا بهدف مساعدة الأفراد على اكتشاف ميولهم وقدراتهم.') }}
                     </p>
                     <p class="text-brand-textMuted leading-relaxed mb-8">
-                        نقدم مجموعة متكاملة من الخدمات تشمل اختبارات الميول المهنية العلمية، والبرامج التدريبية المتخصصة، وجلسات الإرشاد المهني الفردية.
+                        {{ setting('about_story_p3','نقدم مجموعة متكاملة من الخدمات تشمل اختبارات الميول المهنية والإرشاد المهني.') }}
                     </p>
                     
                     <div class="grid grid-cols-2 gap-6">
@@ -95,8 +95,9 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {{-- Vision --}}
                 <div class="relative rounded-2xl overflow-hidden h-[400px] group">
-                    <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                         alt="الرؤية" 
+                    @php $vImg = setting('vision_image','https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'); @endphp
+                    <img src="{{ str_starts_with($vImg,'http') ? $vImg : asset('storage/'.$vImg) }}"
+                         alt="الرؤية"
                          class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/60 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 right-0 p-8">
@@ -104,9 +105,7 @@
                             <i class="fas fa-eye text-2xl text-brand-dark"></i>
                         </div>
                         <h3 class="text-2xl font-bold text-white mb-3">رؤيتنا</h3>
-                        <p class="text-gray-300">
-                            أن تكون الطريق المشرق مرجعًا مميزًا في التدريب والتطوير في مجال الموارد البشرية والإرشاد المهني، ومزوّدًا رائدًا للحلول التدريبية والاعتمادات الدولية التي تسهم في صناعة كفاءات مهنية قادرة على قيادة المستقبل.
-                        </p>
+                        <p class="text-gray-300">{{ setting('vision_text','أن تكون الطريق المشرق مرجعًا مميزًا في التدريب والتطوير.') }}</p>
                     </div>
                 </div>
 
