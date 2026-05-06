@@ -1,43 +1,70 @@
 <?php
+set_time_limit(300);
+ob_implicit_flush(true);
+ob_end_flush();
+
 $token = $_GET['token'] ?? '';
 if ($token !== 'brightbath2026setup') { die('Unauthorized'); }
 
 echo "<pre style='background:#111;color:#0f0;padding:20px;font-size:13px;line-height:1.6;'>";
+flush();
+
+function run($cmd) {
+    echo "$ $cmd\n";
+    flush();
+    $out = shell_exec($cmd . ' 2>&1');
+    echo ($out ?: '(no output)') . "\n";
+    flush();
+    return $out;
+}
+
 echo "=== THEBRIGHTBATH SETUP ===\n\n";
 
 $domainPath = '/home/u354011138/domains/thebrightbath.com';
 $repoUrl    = 'https://github.com/hfa0555916989/thebrightbath';
-$php        = PHP_BINARY;
 $action     = $_GET['action'] ?? 'status';
 
-echo "Domain path: $domainPath\n";
-echo "PHP: $php\n";
-echo "Action: $action\n\n";
+// Find correct PHP CLI (not lsphp)
+$phpPaths = [
+    '/opt/alt/php84/usr/bin/php',
+    '/opt/alt/php83/usr/bin/php',
+    '/opt/alt/php82/usr/bin/php',
+    '/usr/local/bin/php',
+    '/usr/bin/php',
+];
+$php = 'php';
+foreach ($phpPaths as $p) {
+    if (file_exists($p)) { $php = $p; break; }
+}
 
-// ─── DEPLOY: clone/pull all Laravel files ───────────────────────────────────
+echo "Domain: $domainPath\n";
+echo "PHP CLI: $php\n";
+echo "PHP version: " . shell_exec("$php -v 2>&1 | head -1") . "\n";
+echo "Action: $action\n\n";
+flush();
+
+// ─── DEPLOY ─────────────────────────────────────────────────────────────────
 if ($action === 'deploy') {
 
-    echo "=== STEP 1: Setup Git in domain directory ===\n";
-
-    // Init git if not already
+    echo "=== STEP 1: Git Setup ===\n";
     if (!is_dir("$domainPath/.git")) {
-        echo shell_exec("cd $domainPath && git init 2>&1") . "\n";
-        echo shell_exec("cd $domainPath && git remote add origin $repoUrl 2>&1") . "\n";
+        run("cd $domainPath && git init");
+        run("cd $domainPath && git remote add origin $repoUrl");
     } else {
         echo "Git already initialized.\n";
-        // Make sure remote is correct
-        shell_exec("cd $domainPath && git remote set-url origin $repoUrl 2>&1");
+        run("cd $domainPath && git remote set-url origin $repoUrl");
     }
+    flush();
 
-    echo "\n=== STEP 2: Pull latest code from GitHub ===\n";
-    echo shell_exec("cd $domainPath && git fetch --depth=1 origin main 2>&1") . "\n";
-    echo shell_exec("cd $domainPath && git checkout -f origin/main 2>&1") . "\n";
-    echo shell_exec("cd $domainPath && git pull origin main 2>&1") . "\n";
+    echo "\n=== STEP 2: Pull Code from GitHub ===\n";
+    run("cd $domainPath && git fetch --depth=1 origin main");
+    run("cd $domainPath && git reset --hard origin/main");
+    flush();
 
-    echo "\n=== STEP 3: Create .env file ===\n";
+    echo "\n=== STEP 3: Create .env ===\n";
     $envFile = "$domainPath/.env";
     if (!file_exists($envFile)) {
-        $envContent = 'APP_NAME="Bright Path Portal"
+        $env = 'APP_NAME="Bright Path Portal"
 APP_ENV=production
 APP_KEY=base64:XYXLD85OE72qQIohCkNRJ+3O+gCfu4f54OrqxuJYHlc=
 APP_DEBUG=false
@@ -47,7 +74,6 @@ APP_URL=https://thebrightbath.com
 APP_LOCALE=ar
 APP_FALLBACK_LOCALE=en
 APP_FAKER_LOCALE=ar_SA
-
 BCRYPT_ROUNDS=12
 
 LOG_CHANNEL=stack
@@ -71,7 +97,6 @@ SESSION_DOMAIN=null
 BROADCAST_CONNECTION=log
 FILESYSTEM_DISK=local
 QUEUE_CONNECTION=sync
-
 CACHE_STORE=file
 
 MAIL_MAILER=smtp
@@ -87,74 +112,77 @@ SESSION_SECURE_COOKIE=true
 SESSION_HTTP_ONLY=true
 SESSION_SAME_SITE=strict
 ';
-        file_put_contents($envFile, $envContent);
-        echo ".env file created!\n";
+        file_put_contents($envFile, $env);
+        echo ".env created!\n";
     } else {
-        echo ".env already exists.\n";
+        echo ".env already exists - keeping it.\n";
     }
+    flush();
 
-    echo "\n=== STEP 4: Install Composer dependencies ===\n";
-    // Try different composer paths
-    $composerPaths = ['composer', '/usr/local/bin/composer', '/usr/bin/composer'];
+    echo "\n=== STEP 4: Composer Install ===\n";
+    $composerPaths = ['/usr/local/bin/composer', '/usr/bin/composer', 'composer'];
     $composer = null;
     foreach ($composerPaths as $cp) {
-        $v = shell_exec("$cp --version 2>&1");
-        if ($v && str_contains($v, 'Composer')) {
-            $composer = $cp;
-            echo "Found composer: $cp\n";
-            break;
-        }
+        if (trim(shell_exec("which $cp 2>/dev/null"))) { $composer = $cp; break; }
     }
-
     if ($composer) {
-        echo shell_exec("cd $domainPath && $composer install --no-dev --optimize-autoloader --no-interaction 2>&1") . "\n";
+        echo "Using composer: $composer\n";
+        run("cd $domainPath && $composer install --no-dev --optimize-autoloader --no-interaction");
     } else {
-        echo "WARNING: Composer not found. Trying to download it...\n";
-        echo shell_exec("cd $domainPath && curl -sS https://getcomposer.org/installer | $php && $php composer.phar install --no-dev --optimize-autoloader --no-interaction 2>&1") . "\n";
+        echo "Downloading composer...\n";
+        run("curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php");
+        run("$php /tmp/composer-setup.php --install-dir=/tmp --filename=composer");
+        run("cd $domainPath && $php /tmp/composer install --no-dev --optimize-autoloader --no-interaction");
     }
+    flush();
 
-    echo "\n=== STEP 5: Fix storage permissions ===\n";
-    echo shell_exec("chmod -R 775 $domainPath/storage $domainPath/bootstrap/cache 2>&1") . "\n";
+    echo "\n=== STEP 5: Storage Permissions ===\n";
+    run("chmod -R 775 $domainPath/storage");
+    run("chmod -R 775 $domainPath/bootstrap/cache");
+    flush();
 
-    echo "\n=== STEP 6: Run Migrations ===\n";
-    echo shell_exec("cd $domainPath && $php artisan migrate --force 2>&1") . "\n";
+    echo "\n=== STEP 6: Migrations ===\n";
+    run("cd $domainPath && $php artisan migrate --force");
+    flush();
 
-    echo "\n=== STEP 7: Run Seeders ===\n";
-    echo shell_exec("cd $domainPath && $php artisan db:seed --class=SiteSettingsSeeder --force 2>&1") . "\n";
-    echo shell_exec("cd $domainPath && $php artisan db:seed --class=ContentItemsSeeder --force 2>&1") . "\n";
+    echo "\n=== STEP 7: Seeders ===\n";
+    run("cd $domainPath && $php artisan db:seed --class=SiteSettingsSeeder --force");
+    run("cd $domainPath && $php artisan db:seed --class=ContentItemsSeeder --force");
+    flush();
 
     echo "\n=== STEP 8: Clear Cache ===\n";
-    echo shell_exec("cd $domainPath && $php artisan config:clear 2>&1") . "\n";
-    echo shell_exec("cd $domainPath && $php artisan cache:clear 2>&1") . "\n";
-    echo shell_exec("cd $domainPath && $php artisan view:clear 2>&1") . "\n";
-    echo shell_exec("cd $domainPath && $php artisan route:clear 2>&1") . "\n";
+    run("cd $domainPath && $php artisan config:clear");
+    run("cd $domainPath && $php artisan cache:clear");
+    run("cd $domainPath && $php artisan view:clear");
+    run("cd $domainPath && $php artisan route:clear");
+    flush();
 
-    echo "\n✓ DEPLOY COMPLETE! Visit https://thebrightbath.com\n";
+    echo "\n✓✓✓ DEPLOY COMPLETE! Visit https://thebrightbath.com ✓✓✓\n";
 
 } elseif ($action === 'status') {
-    echo "Directory contents:\n";
-    $files = scandir($domainPath);
-    foreach ($files as $f) {
+    echo "Files in domain root:\n";
+    foreach (scandir($domainPath) as $f) {
         if ($f !== '.' && $f !== '..') {
-            $type = is_dir("$domainPath/$f") ? '[DIR]' : '[FILE]';
-            echo "  $type $f\n";
+            echo "  " . (is_dir("$domainPath/$f") ? '[DIR]' : '     ') . " $f\n";
         }
     }
-    echo "\nvendor exists: " . (is_dir("$domainPath/vendor") ? 'YES' : 'NO') . "\n";
-    echo ".env exists: " . (file_exists("$domainPath/.env") ? 'YES' : 'NO') . "\n";
-    echo ".git exists: " . (is_dir("$domainPath/.git") ? 'YES' : 'NO') . "\n";
+    echo "\nvendor: " . (is_dir("$domainPath/vendor") ? '✓ EXISTS' : '✗ MISSING') . "\n";
+    echo ".env:   " . (file_exists("$domainPath/.env") ? '✓ EXISTS' : '✗ MISSING') . "\n";
+    echo ".git:   " . (is_dir("$domainPath/.git") ? '✓ EXISTS' : '✗ MISSING') . "\n";
+    echo "\n";
+    run("$php --version");
+    run("which composer || echo 'composer not in PATH'");
+    run("which git || echo 'git not found'");
 
 } elseif ($action === 'migrate') {
-    echo shell_exec("cd $domainPath && $php artisan migrate --force 2>&1");
+    run("cd $domainPath && $php artisan migrate --force");
 } elseif ($action === 'seed') {
-    echo shell_exec("cd $domainPath && $php artisan db:seed --class=SiteSettingsSeeder --force 2>&1");
-    echo shell_exec("cd $domainPath && $php artisan db:seed --class=ContentItemsSeeder --force 2>&1");
+    run("cd $domainPath && $php artisan db:seed --class=SiteSettingsSeeder --force");
+    run("cd $domainPath && $php artisan db:seed --class=ContentItemsSeeder --force");
 } elseif ($action === 'cache-clear') {
-    echo shell_exec("cd $domainPath && $php artisan config:clear 2>&1");
-    echo shell_exec("cd $domainPath && $php artisan cache:clear 2>&1");
-    echo shell_exec("cd $domainPath && $php artisan view:clear 2>&1");
-} elseif ($action === 'pull') {
-    echo shell_exec("cd $domainPath && git pull origin main 2>&1");
+    run("cd $domainPath && $php artisan config:clear");
+    run("cd $domainPath && $php artisan cache:clear");
+    run("cd $domainPath && $php artisan view:clear");
 }
 
 echo "\n=== DONE ===\n</pre>";
