@@ -453,9 +453,7 @@
     </section>
 
     {{-- Analysis Models Section --}}
-    @php
-        $analysisModels = \App\Models\AnalysisModel::active()->featured()->ordered()->take(4)->get();
-    @endphp
+    @php try { $analysisModels = \App\Models\AnalysisModel::active()->featured()->ordered()->take(4)->get(); } catch (\Exception $e) { $analysisModels = collect([]); } @endphp
     @if($analysisModels->count() > 0)
     <section class="py-20 bg-white">
         <div class="container mx-auto px-6">

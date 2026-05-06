@@ -110,10 +110,7 @@
                     </a>
                     
                     {{-- Pending Requests --}}
-                    @php
-                        $consultant = \App\Models\Consultant::where('user_id', auth()->id())->first();
-                        $pendingCount = $consultant ? \App\Models\Booking::where('consultant_id', $consultant->id)->where('status', 'pending_approval')->count() : 0;
-                    @endphp
+                    @php try { $consultant = \App\Models\Consultant::where('user_id', auth()->id())->first(); $pendingCount = $consultant ? \App\Models\Booking::where('consultant_id', $consultant->id)->where('status', 'pending_approval')->count() : 0; } catch (\Exception $e) { $consultant = null; $pendingCount = 0; } @endphp
                     <a href="{{ route('consultant.pending-requests') }}" 
                        class="flex items-center justify-between px-4 py-3 rounded-xl transition {{ request()->routeIs('consultant.pending-requests') ? 'bg-brand-gold text-brand-dark' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
                         <div class="flex items-center gap-3">

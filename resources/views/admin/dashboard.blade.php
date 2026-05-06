@@ -6,34 +6,23 @@
 @php
     use App\Models\AssessmentAttempt;
     use App\Models\User;
-    
-    // Statistics
-    $totalAttempts = AssessmentAttempt::count();
-    $todayAttempts = AssessmentAttempt::today()->count();
-    $weekAttempts = AssessmentAttempt::thisWeek()->count();
-    $monthAttempts = AssessmentAttempt::thisMonth()->count();
-    $newAttempts = AssessmentAttempt::status('completed')->count();
-    $totalUsers = User::where('role', 'client')->count();
-    
-    // Recent attempts
-    $recentAttempts = AssessmentAttempt::with('user')
-        ->orderBy('created_at', 'desc')
-        ->take(10)
-        ->get();
-    
-    // Assessment distribution
-    $assessmentStats = AssessmentAttempt::selectRaw('assessment_slug, assessment_name, count(*) as count')
-        ->groupBy('assessment_slug', 'assessment_name')
-        ->orderByDesc('count')
-        ->get();
-    
-    // Top Holland codes
-    $topCodes = AssessmentAttempt::where('assessment_slug', 'holland')
-        ->selectRaw('type_code, count(*) as count')
-        ->groupBy('type_code')
-        ->orderByDesc('count')
-        ->take(5)
-        ->get();
+    try {
+        $totalAttempts  = AssessmentAttempt::count();
+        $todayAttempts  = AssessmentAttempt::today()->count();
+        $weekAttempts   = AssessmentAttempt::thisWeek()->count();
+        $monthAttempts  = AssessmentAttempt::thisMonth()->count();
+        $newAttempts    = AssessmentAttempt::status('completed')->count();
+        $totalUsers     = User::where('role', 'client')->count();
+        $recentAttempts = AssessmentAttempt::with('user')->orderBy('created_at', 'desc')->take(10)->get();
+        $assessmentStats = AssessmentAttempt::selectRaw('assessment_slug, assessment_name, count(*) as count')
+            ->groupBy('assessment_slug', 'assessment_name')->orderByDesc('count')->get();
+        $topCodes = AssessmentAttempt::where('assessment_slug', 'holland')
+            ->selectRaw('type_code, count(*) as count')
+            ->groupBy('type_code')->orderByDesc('count')->take(5)->get();
+    } catch (\Exception $e) {
+        $totalAttempts = $todayAttempts = $weekAttempts = $monthAttempts = $newAttempts = $totalUsers = 0;
+        $recentAttempts = $assessmentStats = $topCodes = collect([]);
+    }
 @endphp
 
 <div class="space-y-6">

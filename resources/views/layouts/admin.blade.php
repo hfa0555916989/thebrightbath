@@ -178,9 +178,7 @@
                     </div>
                     
                     {{-- Attempts --}}
-                    @php
-                        $newAttemptsCount = \App\Models\AssessmentAttempt::whereIn('status', ['new', 'completed'])->count();
-                    @endphp
+                    @php try { $newAttemptsCount = \App\Models\AssessmentAttempt::whereIn('status', ['new', 'completed'])->count(); } catch (\Exception $e) { $newAttemptsCount = 0; } @endphp
                     <a href="{{ route('admin.attempts.index') }}" 
                        class="flex items-center justify-between px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.attempts*') ? 'bg-brand-gold text-brand-dark' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
                         <div class="flex items-center gap-3">
