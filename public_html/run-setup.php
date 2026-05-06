@@ -5,33 +5,61 @@ set_time_limit(300);
 $token = $_GET['token'] ?? '';
 if ($token !== 'brightbath2026setup') { die('Unauthorized'); }
 
-$domainPath = '/home/u354011138/domains/thebrightbath.com';
+// Auto-detect Laravel root (parent of this script's public_html)
+// This script is at .../public_html/run-setup.php
+// Laravel root is at .../
+$laravelRoot = dirname(__DIR__);
+
+// Verify
+if (!file_exists("$laravelRoot/artisan") || !is_dir("$laravelRoot/app")) {
+    // Try fallback paths
+    $candidates = [
+        '/home/u354011138/domains/thebrightbath.com',
+        '/home/u354011138/public_html/domains/thebrightbath.com',
+        dirname(dirname(__DIR__)),
+    ];
+    foreach ($candidates as $c) {
+        if (file_exists("$c/artisan") && is_dir("$c/app")) {
+            $laravelRoot = $c;
+            break;
+        }
+    }
+}
+
 $action = $_GET['action'] ?? 'status';
 
 echo "<!DOCTYPE html><html><body><pre style='background:#111;color:#0f0;padding:20px;font-size:13px;'>";
-echo "=== THEBRIGHTBATH SETUP (no-shell mode) ===\n";
-echo "Domain: $domainPath\n";
-echo "Action: $action\n\n";
+echo "=== THEBRIGHTBATH SETUP ===\n";
+echo "Script:       " . __FILE__ . "\n";
+echo "Laravel root: $laravelRoot\n";
+echo "Action:       $action\n\n";
 
 // ─── STATUS ─────────────────────────────────────────────────────────────────
 if ($action === 'status') {
     echo "Directory contents:\n";
-    foreach (scandir($domainPath) as $f) {
+    foreach (scandir($laravelRoot) as $f) {
         if ($f === '.' || $f === '..') continue;
-        $isDir = is_dir("$domainPath/$f");
+        $isDir = is_dir("$laravelRoot/$f");
         echo "  " . ($isDir ? "[DIR] " : "      ") . "$f\n";
     }
     echo "\nKey checks:\n";
-    echo "  vendor/:        " . (is_dir("$domainPath/vendor") ? "✓" : "✗ MISSING - upload vendor.zip!") . "\n";
-    echo "  vendor/autoload:" . (file_exists("$domainPath/vendor/autoload.php") ? "✓" : "✗") . "\n";
-    echo "  .env:           " . (file_exists("$domainPath/.env") ? "✓" : "✗ MISSING") . "\n";
-    echo "  artisan:        " . (file_exists("$domainPath/artisan") ? "✓" : "✗ MISSING") . "\n";
-    echo "  app/:           " . (is_dir("$domainPath/app") ? "✓" : "✗ MISSING") . "\n";
-    echo "  bootstrap/:     " . (is_dir("$domainPath/bootstrap") ? "✓" : "✗ MISSING") . "\n";
+    echo "  vendor/:        " . (is_dir("$laravelRoot/vendor") ? "✓" : "✗ MISSING") . "\n";
+    echo "  vendor/autoload:" . (file_exists("$laravelRoot/vendor/autoload.php") ? "✓" : "✗") . "\n";
+    echo "  .env:           " . (file_exists("$laravelRoot/.env") ? "✓" : "✗ MISSING") . "\n";
+    echo "  artisan:        " . (file_exists("$laravelRoot/artisan") ? "✓" : "✗") . "\n";
+    echo "  app/:           " . (is_dir("$laravelRoot/app") ? "✓" : "✗") . "\n";
+    echo "  bootstrap/:     " . (is_dir("$laravelRoot/bootstrap") ? "✓" : "✗") . "\n";
+
+    echo "\nStorage permissions:\n";
+    $storage = "$laravelRoot/storage";
+    if (is_dir($storage)) {
+        echo "  storage/ writable: " . (is_writable($storage) ? "✓" : "✗") . "\n";
+        echo "  storage/ perms: " . substr(sprintf('%o', fileperms($storage)), -4) . "\n";
+    }
 
 // ─── CREATE ENV ──────────────────────────────────────────────────────────────
 } elseif ($action === 'create-env') {
-    $envFile = "$domainPath/.env";
+    $envFile = "$laravelRoot/.env";
     if (file_exists($envFile)) {
         echo ".env already exists.\n";
     } else {
@@ -82,136 +110,101 @@ SESSION_SECURE_COOKIE=true
 SESSION_HTTP_ONLY=true
 SESSION_SAME_SITE=strict
 ';
-        if (file_put_contents($envFile, $env)) echo ".env created ✓\n";
-        else echo "ERROR: Could not write .env!\n";
+        if (file_put_contents($envFile, $env)) echo ".env created at $envFile ✓\n";
+        else echo "ERROR: Could not write .env to $envFile!\n";
     }
 
-// ─── ENABLE DEBUG ────────────────────────────────────────────────────────────
+// ─── ENABLE/DISABLE DEBUG ────────────────────────────────────────────────────
 } elseif ($action === 'debug-on') {
-    $envFile = "$domainPath/.env";
-    if (!file_exists($envFile)) { echo "No .env yet.\n"; }
-    else {
-        $c = file_get_contents($envFile);
-        $c = preg_replace('/APP_DEBUG=.*/', 'APP_DEBUG=true', $c);
-        file_put_contents($envFile, $c);
-        echo "APP_DEBUG=true ✓ (revert with action=debug-off)\n";
-    }
+    $envFile = "$laravelRoot/.env";
+    $c = file_get_contents($envFile);
+    $c = preg_replace('/APP_DEBUG=.*/', 'APP_DEBUG=true', $c);
+    file_put_contents($envFile, $c);
+    echo "APP_DEBUG=true ✓\n";
 } elseif ($action === 'debug-off') {
-    $envFile = "$domainPath/.env";
+    $envFile = "$laravelRoot/.env";
     $c = file_get_contents($envFile);
     $c = preg_replace('/APP_DEBUG=.*/', 'APP_DEBUG=false', $c);
     file_put_contents($envFile, $c);
     echo "APP_DEBUG=false ✓\n";
 
-// ─── MIGRATE (via Laravel kernel) ────────────────────────────────────────────
-} elseif ($action === 'migrate') {
-    if (!file_exists("$domainPath/vendor/autoload.php")) {
-        die("vendor/ missing! Upload vendor folder first.\n");
-    }
-    chdir($domainPath);
-    require "$domainPath/vendor/autoload.php";
-    $app = require_once "$domainPath/bootstrap/app.php";
-    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-
-    echo "Running migrate...\n";
-    $output = new Symfony\Component\Console\Output\BufferedOutput();
-    $code = $kernel->call('migrate', ['--force' => true], $output);
-    echo $output->fetch();
-    echo "\nExit code: $code\n";
-
-// ─── SEED ────────────────────────────────────────────────────────────────────
-} elseif ($action === 'seed') {
-    chdir($domainPath);
-    require "$domainPath/vendor/autoload.php";
-    $app = require_once "$domainPath/bootstrap/app.php";
-    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-
-    foreach (['SiteSettingsSeeder', 'ContentItemsSeeder'] as $seeder) {
-        echo "Running $seeder...\n";
-        $output = new Symfony\Component\Console\Output\BufferedOutput();
-        $code = $kernel->call('db:seed', ['--class' => $seeder, '--force' => true], $output);
-        echo $output->fetch();
-        echo "Exit: $code\n\n";
-    }
-
-// ─── CACHE CLEAR ─────────────────────────────────────────────────────────────
-} elseif ($action === 'cache-clear') {
-    chdir($domainPath);
-    require "$domainPath/vendor/autoload.php";
-    $app = require_once "$domainPath/bootstrap/app.php";
-    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-
-    foreach (['config:clear','cache:clear','view:clear','route:clear'] as $cmd) {
-        echo "Running $cmd...\n";
-        $output = new Symfony\Component\Console\Output\BufferedOutput();
-        $kernel->call($cmd, [], $output);
-        echo $output->fetch() . "\n";
-    }
-
-// ─── MIGRATE STATUS ──────────────────────────────────────────────────────────
-} elseif ($action === 'migrate-status') {
-    chdir($domainPath);
-    require "$domainPath/vendor/autoload.php";
-    $app = require_once "$domainPath/bootstrap/app.php";
-    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-    $output = new Symfony\Component\Console\Output\BufferedOutput();
-    $kernel->call('migrate:status', [], $output);
-    echo $output->fetch();
-
 // ─── DB TEST ─────────────────────────────────────────────────────────────────
 } elseif ($action === 'db-test') {
-    chdir($domainPath);
-    require "$domainPath/vendor/autoload.php";
-    $app = require_once "$domainPath/bootstrap/app.php";
+    chdir($laravelRoot);
+    require "$laravelRoot/vendor/autoload.php";
+    $app = require_once "$laravelRoot/bootstrap/app.php";
     try {
         $pdo = $app->make('db')->connection()->getPdo();
         echo "✓ Database connected: " . $pdo->getAttribute(PDO::ATTR_SERVER_VERSION) . "\n";
+        echo "Database: " . $app->make('db')->connection()->getDatabaseName() . "\n";
     } catch (\Exception $e) {
         echo "✗ DB ERROR: " . $e->getMessage() . "\n";
     }
 
-// ─── ALL IN ONE ──────────────────────────────────────────────────────────────
-} elseif ($action === 'finish') {
-    if (!file_exists("$domainPath/.env")) {
-        echo "No .env! Run action=create-env first.\n";
+// ─── MIGRATE / SEED / CACHE / FINISH (via Laravel kernel) ────────────────────
+} elseif (in_array($action, ['migrate','seed','cache-clear','migrate-status','finish'])) {
+    if (!file_exists("$laravelRoot/vendor/autoload.php")) {
+        die("vendor/ missing!\n");
     }
-    if (!file_exists("$domainPath/vendor/autoload.php")) {
-        die("\nvendor/ missing! Upload vendor.zip first.\n");
+    if (!file_exists("$laravelRoot/.env")) {
+        die(".env missing! Run action=create-env first.\n");
     }
-    chdir($domainPath);
-    require "$domainPath/vendor/autoload.php";
-    $app = require_once "$domainPath/bootstrap/app.php";
+    chdir($laravelRoot);
+    require "$laravelRoot/vendor/autoload.php";
+    $app = require_once "$laravelRoot/bootstrap/app.php";
     $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 
-    echo "=== STEP 1: Test DB ===\n";
-    try {
-        $pdo = $app->make('db')->connection()->getPdo();
-        echo "✓ Connected\n\n";
-    } catch (\Exception $e) {
-        die("✗ DB Error: " . $e->getMessage() . "\n");
+    $callKernel = function($cmd, $args = []) use ($kernel) {
+        $output = new Symfony\Component\Console\Output\BufferedOutput();
+        $code = $kernel->call($cmd, $args, $output);
+        echo $output->fetch();
+        echo "(exit: $code)\n\n";
+    };
+
+    if ($action === 'migrate') {
+        echo "Running migrate...\n";
+        $callKernel('migrate', ['--force' => true]);
+
+    } elseif ($action === 'migrate-status') {
+        $callKernel('migrate:status', []);
+
+    } elseif ($action === 'seed') {
+        foreach (['SiteSettingsSeeder', 'ContentItemsSeeder'] as $s) {
+            echo "Running $s...\n";
+            $callKernel('db:seed', ['--class' => $s, '--force' => true]);
+        }
+
+    } elseif ($action === 'cache-clear') {
+        foreach (['config:clear','cache:clear','view:clear','route:clear'] as $cmd) {
+            echo "Running $cmd...\n";
+            $callKernel($cmd, []);
+        }
+
+    } elseif ($action === 'finish') {
+        echo "=== STEP 1: DB Test ===\n";
+        try {
+            $pdo = $app->make('db')->connection()->getPdo();
+            echo "✓ Connected to " . $app->make('db')->connection()->getDatabaseName() . "\n\n";
+        } catch (\Exception $e) {
+            die("✗ DB Error: " . $e->getMessage() . "\n");
+        }
+
+        echo "=== STEP 2: Migrate ===\n";
+        $callKernel('migrate', ['--force' => true]);
+
+        echo "=== STEP 3: Seed SiteSettings ===\n";
+        $callKernel('db:seed', ['--class' => 'SiteSettingsSeeder', '--force' => true]);
+
+        echo "=== STEP 4: Seed ContentItems ===\n";
+        $callKernel('db:seed', ['--class' => 'ContentItemsSeeder', '--force' => true]);
+
+        echo "=== STEP 5: Clear caches ===\n";
+        foreach (['config:clear','cache:clear','view:clear'] as $cmd) {
+            $callKernel($cmd, []);
+        }
+
+        echo "\n✓✓✓ DONE! Visit https://thebrightbath.com ✓✓✓\n";
     }
-
-    echo "=== STEP 2: Migrate ===\n";
-    $out = new Symfony\Component\Console\Output\BufferedOutput();
-    $kernel->call('migrate', ['--force' => true], $out);
-    echo $out->fetch() . "\n";
-
-    echo "=== STEP 3: Seed ===\n";
-    foreach (['SiteSettingsSeeder', 'ContentItemsSeeder'] as $s) {
-        echo "-- $s\n";
-        $out = new Symfony\Component\Console\Output\BufferedOutput();
-        $kernel->call('db:seed', ['--class' => $s, '--force' => true], $out);
-        echo $out->fetch() . "\n";
-    }
-
-    echo "=== STEP 4: Cache clear ===\n";
-    foreach (['config:clear','cache:clear','view:clear'] as $cmd) {
-        $out = new Symfony\Component\Console\Output\BufferedOutput();
-        $kernel->call($cmd, [], $out);
-        echo $out->fetch();
-    }
-
-    echo "\n✓✓✓ DONE! Visit https://thebrightbath.com ✓✓✓\n";
 }
 
 echo "\n=== END ===\n</pre></body></html>";
