@@ -1,0 +1,6 @@
+* text=auto eol=lf
+
+# Treat vendor composer-generated files as binary to avoid line-ending churn
+vendor/composer/* binary
+vendor/composer/*.php -text
+composer.lock -text
