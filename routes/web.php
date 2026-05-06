@@ -171,13 +171,11 @@ Route::prefix('control-panel')
         Route::patch('consultants/{consultant}/toggle-active', [ConsultantController::class, 'toggleActive'])->name('consultants.toggle-active');
         
         // Assessments Management
-        Route::get('assessments', function () {
-            return view('admin.assessments.index');
-        })->name('assessments.index');
-        
-        Route::get('assessments/create', function () {
-            return view('admin.assessments.create');
-        })->name('assessments.create');
+        Route::resource('assessments', \App\Http\Controllers\Admin\AssessmentController::class)
+            ->only(['index', 'create', 'store', 'edit', 'update']);
+        Route::get('assessments/{assessment}/questions', [\App\Http\Controllers\Admin\AssessmentController::class, 'questions'])->name('assessments.questions');
+        Route::post('assessments/{assessment}/questions', [\App\Http\Controllers\Admin\AssessmentController::class, 'storeQuestions'])->name('assessments.questions.store');
+        Route::delete('assessments/{assessment}/questions/{question}', [\App\Http\Controllers\Admin\AssessmentController::class, 'deleteQuestion'])->name('assessments.questions.delete');
         
         // Attempts Management
         Route::get('attempts', [AttemptController::class, 'index'])->name('attempts.index');

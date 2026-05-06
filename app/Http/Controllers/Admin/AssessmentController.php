@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\AssessmentQuestion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AssessmentController extends Controller
@@ -79,14 +80,25 @@ class AssessmentController extends Controller
     public function update(Request $request, Assessment $assessment)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:assessments,slug,' . $assessment->id,
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
-            'estimated_minutes' => 'integer|min:5|max:120',
-            'icon' => 'nullable|string|max:50',
-            'config_json' => 'nullable|array',
+            'name'              => 'required|string|max:255',
+            'slug'              => 'required|string|max:255|unique:assessments,slug,' . $assessment->id,
+            'type'              => 'nullable|string|max:50',
+            'description'       => 'nullable|string',
+            'is_active'         => 'boolean',
+            'estimated_minutes' => 'integer|min:1|max:120',
+            'icon'              => 'nullable|string|max:50',
+            'image'             => 'nullable|image|max:2048',
+            'config_json'       => 'nullable|array',
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($assessment->image) {
+                Storage::disk('public')->delete($assessment->image);
+            }
+            $validated['image'] = $request->file('image')->store('assessments', 'public');
+        }
+
+        $validated['is_active'] = $request->boolean('is_active');
 
         $assessment->update($validated);
 

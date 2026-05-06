@@ -12,11 +12,13 @@ class Assessment extends Model
 
     protected $fillable = [
         'slug',
+        'type',
         'name',
         'description',
         'is_active',
         'config_json',
         'icon',
+        'image',
         'estimated_minutes',
     ];
 

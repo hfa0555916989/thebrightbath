@@ -1,4 +1,6 @@
 @extends('layouts.admin')
+@use(Illuminate\Support\Facades\Storage)
+@use(Illuminate\Support\Str)
 
 @section('title', 'إدارة الاختبارات')
 @section('header', 'إدارة الاختبارات')
@@ -87,145 +89,48 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-brand-border">
-                    {{-- Holland Test --}}
+                    @foreach($assessments as $assessment)
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-compass text-blue-600"></i>
+                                @if($assessment->image)
+                                <img src="{{ Storage::url($assessment->image) }}" alt="{{ $assessment->name }}"
+                                     class="w-10 h-10 object-cover rounded-lg border border-brand-border">
+                                @else
+                                <div class="w-10 h-10 bg-brand-gold/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas {{ $assessment->icon ?? 'fa-clipboard-list' }} text-brand-gold"></i>
                                 </div>
+                                @endif
                                 <div>
-                                    <p class="font-medium text-brand-dark">اختبار هولاند (RIASEC)</p>
-                                    <p class="text-sm text-brand-textMuted">اكتشف ميولك المهنية</p>
+                                    <p class="font-medium text-brand-dark">{{ $assessment->name }}</p>
+                                    <p class="text-sm text-brand-textMuted">{{ Str::limit($assessment->description, 40) }}</p>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-brand-textMuted">ميول مهنية</td>
-                        <td class="px-6 py-4 text-sm text-brand-dark font-medium">42 سؤال</td>
-                        <td class="px-6 py-4 text-sm text-brand-dark">--</td>
+                        <td class="px-6 py-4 text-sm text-brand-textMuted">{{ $assessment->type ?? '—' }}</td>
+                        <td class="px-6 py-4 text-sm text-brand-dark font-medium">{{ $assessment->questions_count }} سؤال</td>
+                        <td class="px-6 py-4 text-sm text-brand-dark">{{ $assessment->attempts_count }}</td>
                         <td class="px-6 py-4">
+                            @if($assessment->is_active)
                             <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">نشط</span>
+                            @else
+                            <span class="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-medium">معطّل</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex gap-2">
-                                <a href="{{ route('assessments.show', 'holland') }}" target="_blank" class="p-2 text-gray-400 hover:text-brand-gold transition" title="معاينة">
+                                <a href="{{ route('admin.assessments.edit', $assessment) }}"
+                                   class="p-2 text-gray-400 hover:text-brand-primary transition" title="تعديل">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ route('assessments.show', $assessment->slug) }}" target="_blank"
+                                   class="p-2 text-gray-400 hover:text-brand-gold transition" title="معاينة">
                                     <i class="fas fa-eye"></i>
                                 </a>
                             </div>
                         </td>
                     </tr>
-
-                    {{-- MBTI Test --}}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-brain text-purple-600"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-brand-dark">اختبار MBTI</p>
-                                    <p class="text-sm text-brand-textMuted">تحليل نمط الشخصية</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-brand-textMuted">تحليل شخصية</td>
-                        <td class="px-6 py-4 text-sm text-brand-dark font-medium">70 سؤال</td>
-                        <td class="px-6 py-4 text-sm text-brand-dark">--</td>
-                        <td class="px-6 py-4">
-                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">نشط</span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex gap-2">
-                                <a href="{{ route('assessments.show', 'mbti') }}" target="_blank" class="p-2 text-gray-400 hover:text-brand-gold transition" title="معاينة">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-
-                    {{-- MI Test --}}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-lightbulb text-green-600"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-brand-dark">اختبار الذكاءات المتعددة</p>
-                                    <p class="text-sm text-brand-textMuted">اكتشف أنواع ذكاءاتك</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-brand-textMuted">ذكاءات</td>
-                        <td class="px-6 py-4 text-sm text-brand-dark font-medium">56 سؤال</td>
-                        <td class="px-6 py-4 text-sm text-brand-dark">--</td>
-                        <td class="px-6 py-4">
-                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">نشط</span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex gap-2">
-                                <a href="{{ route('assessments.show', 'multiple-intelligences') }}" target="_blank" class="p-2 text-gray-400 hover:text-brand-gold transition" title="معاينة">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-
-                    {{-- Work Values Test --}}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-star text-yellow-600"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-brand-dark">اختبار القيم المهنية</p>
-                                    <p class="text-sm text-brand-textMuted">اكتشف قيمك في العمل</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-brand-textMuted">قيم مهنية</td>
-                        <td class="px-6 py-4 text-sm text-brand-dark font-medium">35 سؤال</td>
-                        <td class="px-6 py-4 text-sm text-brand-dark">--</td>
-                        <td class="px-6 py-4">
-                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">نشط</span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex gap-2">
-                                <a href="{{ route('assessments.show', 'work-values') }}" target="_blank" class="p-2 text-gray-400 hover:text-brand-gold transition" title="معاينة">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-
-                    {{-- Career Fit Test --}}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-bullseye text-red-600"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-brand-dark">اختبار التوافق المهني</p>
-                                    <p class="text-sm text-brand-textMuted">اكتشف المهن المناسبة</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-brand-textMuted">توافق مهني</td>
-                        <td class="px-6 py-4 text-sm text-brand-dark font-medium">40 سؤال</td>
-                        <td class="px-6 py-4 text-sm text-brand-dark">--</td>
-                        <td class="px-6 py-4">
-                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">نشط</span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex gap-2">
-                                <a href="{{ route('assessments.show', 'career-fit') }}" target="_blank" class="p-2 text-gray-400 hover:text-brand-gold transition" title="معاينة">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
