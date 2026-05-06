@@ -4,7 +4,7 @@
 !.env.example
 
 # ─── Vendor & Dependencies ────────────────────────────────────────────────────
-/vendor/
+# vendor/ committed for Hostinger Git deploy (no composer install on server)
 /node_modules/
 
 # ─── Storage (user uploads, logs, cache) ─────────────────────────────────────
@@ -62,6 +62,6 @@ yarn-error.log
 /.sixth/
 /public/
 
-# ─── Setup script (temporary deployment helper, not for permanent repo) ──────
-/public_html/run-setup.php
+# ─── Local zips (not for repo) ───────────────────────────────────────────────
 /thebrightbath_deploy.zip
+/vendor.zip
