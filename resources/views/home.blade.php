@@ -147,7 +147,7 @@
                 </div>
                 
                 {{-- Stats Cards --}}
-                @php $stats = \App\Models\ContentItem::ofType('stat')->forPage('home')->active()->ordered()->get(); @endphp
+                @php try { $stats = \App\Models\ContentItem::ofType('stat')->forPage('home')->active()->ordered()->get(); } catch (\Exception $e) { $stats = collect([]); } @endphp
                 <div class="hidden lg:grid grid-cols-2 gap-4">
                     @foreach($stats as $i => $stat)
                     <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 {{ $i % 2 === 1 ? 'mt-8' : '' }}">
@@ -166,7 +166,7 @@
     </header>
 
     {{-- Features Strip --}}
-    @php $features = \App\Models\ContentItem::ofType('feature')->forPage('home')->active()->ordered()->get(); @endphp
+    @php try { $features = \App\Models\ContentItem::ofType('feature')->forPage('home')->active()->ordered()->get(); } catch (\Exception $e) { $features = collect([]); } @endphp
     <section class="py-16 bg-white relative z-20">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -564,7 +564,7 @@
                 <h2 class="text-3xl lg:text-4xl font-display font-bold text-brand-dark mb-4">ماذا يقولون عنا؟</h2>
             </div>
 
-            @php $testimonials = \App\Models\ContentItem::ofType('testimonial')->forPage('home')->active()->ordered()->get(); @endphp
+            @php try { $testimonials = \App\Models\ContentItem::ofType('testimonial')->forPage('home')->active()->ordered()->get(); } catch (\Exception $e) { $testimonials = collect([]); } @endphp
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 @foreach($testimonials as $t)
                 <div class="bg-white rounded-2xl p-8 shadow-lg relative">

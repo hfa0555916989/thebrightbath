@@ -39,7 +39,7 @@
     </section>
 
     {{-- Goals Section --}}
-    @php $goals = \App\Models\ContentItem::ofType('goal')->forPage('global')->active()->ordered()->get(); @endphp
+    @php try { $goals = \App\Models\ContentItem::ofType('goal')->forPage('global')->active()->ordered()->get(); } catch (\Exception $e) { $goals = collect([]); } @endphp
     <section class="py-20 bg-brand-bg">
         <div class="container mx-auto px-6">
             <div class="max-w-4xl mx-auto">

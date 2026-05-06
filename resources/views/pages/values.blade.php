@@ -39,7 +39,7 @@
     </section>
 
     {{-- Values Grid --}}
-    @php $values = \App\Models\ContentItem::ofType('value')->forPage('global')->active()->ordered()->get(); @endphp
+    @php try { $values = \App\Models\ContentItem::ofType('value')->forPage('global')->active()->ordered()->get(); } catch (\Exception $e) { $values = collect([]); } @endphp
     <section class="py-20 bg-brand-bg">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
