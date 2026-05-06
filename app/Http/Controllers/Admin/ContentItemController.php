@@ -55,14 +55,14 @@ class ContentItemController extends Controller
         return redirect()->route('admin.content.index', $type)->with('success', 'تم إضافة العنصر بنجاح.');
     }
 
-    public function edit(string $type, int $id)
+    public function edit(string $type, string|int $id)
     {
         $config = $this->getConfig($type);
         $item = ContentItem::findOrFail($id);
         return view('admin.content.edit', compact('item', 'type', 'config'));
     }
 
-    public function update(string $type, int $id, Request $request)
+    public function update(string $type, string|int $id, Request $request)
     {
         $config = $this->getConfig($type);
         $item = ContentItem::findOrFail($id);
@@ -81,7 +81,7 @@ class ContentItemController extends Controller
         return redirect()->route('admin.content.index', $type)->with('success', 'تم تحديث العنصر بنجاح.');
     }
 
-    public function destroy(string $type, int $id)
+    public function destroy(string $type, string|int $id)
     {
         $item = ContentItem::findOrFail($id);
         if ($item->image && !str_starts_with($item->image, 'http')) {
@@ -100,7 +100,7 @@ class ContentItemController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function toggle(string $type, int $id)
+    public function toggle(string $type, string|int $id)
     {
         $item = ContentItem::findOrFail($id);
         $item->update(['is_active' => !$item->is_active]);
