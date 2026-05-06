@@ -1,59 +1,88 @@
 <?php
-// Security token - delete this file after use!
 $token = $_GET['token'] ?? '';
-if ($token !== 'brightbath2026setup') {
-    die('Unauthorized');
-}
+if ($token !== 'brightbath2026setup') { die('Unauthorized'); }
 
-define('LARAVEL_START', microtime(true));
-require __DIR__ . '/../vendor/autoload.php';
-
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-
-echo "<pre style='font-family:monospace;background:#1a1a1a;color:#00ff00;padding:20px;'>";
+echo "<pre style='background:#111;color:#0f0;padding:20px;font-size:13px;'>";
 echo "=== THEBRIGHTBATH SETUP ===\n\n";
 
-$action = $_GET['action'] ?? 'status';
+// Find Laravel root
+$possibleRoots = [
+    dirname(__DIR__),
+    dirname(dirname(__DIR__)),
+    '/home/u354011138/thebrightbath',
+    '/home/u354011138/public_html/../',
+];
 
-if ($action === 'migrate') {
-    echo "Running migrations...\n";
-    $status = $kernel->call('migrate', ['--force' => true]);
-    echo $kernel->output();
-    echo "\nMigrate exit code: $status\n";
-
-} elseif ($action === 'seed') {
-    echo "Running SiteSettings seeder...\n";
-    $kernel->call('db:seed', ['--class' => 'SiteSettingsSeeder', '--force' => true]);
-    echo $kernel->output();
-
-    echo "\nRunning ContentItems seeder...\n";
-    $kernel->call('db:seed', ['--class' => 'ContentItemsSeeder', '--force' => true]);
-    echo $kernel->output();
-
-} elseif ($action === 'cache-clear') {
-    echo "Clearing cache...\n";
-    $kernel->call('config:clear'); echo $kernel->output();
-    $kernel->call('cache:clear');  echo $kernel->output();
-    $kernel->call('view:clear');   echo $kernel->output();
-    $kernel->call('route:clear');  echo $kernel->output();
-    echo "Cache cleared!\n";
-
-} elseif ($action === 'pull') {
-    echo "Pulling from GitHub...\n";
-    $output = shell_exec('cd ' . dirname(__DIR__) . ' && git pull origin main 2>&1');
-    echo $output;
-
-} else {
-    echo "Available actions:\n";
-    echo "  ?token=brightbath2026setup&action=migrate     - Run migrations\n";
-    echo "  ?token=brightbath2026setup&action=seed        - Run seeders\n";
-    echo "  ?token=brightbath2026setup&action=cache-clear - Clear all cache\n";
-    echo "  ?token=brightbath2026setup&action=pull        - Git pull from GitHub\n";
-    echo "\nCurrent status:\n";
-    $kernel->call('migrate:status', ['--no-interaction' => true]);
-    echo $kernel->output();
+$laravelRoot = null;
+foreach ($possibleRoots as $path) {
+    if (file_exists($path . '/artisan')) {
+        $laravelRoot = realpath($path);
+        break;
+    }
 }
 
-echo "\n=== DONE ===\n";
-echo "</pre>";
+echo "Laravel root: " . ($laravelRoot ?? 'NOT FOUND') . "\n";
+echo "Script dir: " . __DIR__ . "\n";
+echo "Parent dir: " . dirname(__DIR__) . "\n\n";
+
+if (!$laravelRoot) {
+    // Show what's in parent directories
+    echo "Contents of " . dirname(__DIR__) . ":\n";
+    $files = @scandir(dirname(__DIR__));
+    if ($files) foreach ($files as $f) echo "  $f\n";
+    die("\nERROR: Could not find Laravel root!");
+}
+
+$action = $_GET['action'] ?? 'status';
+$php = PHP_BINARY;
+
+echo "PHP: $php\n";
+echo "Action: $action\n\n";
+
+$artisan = $laravelRoot . '/artisan';
+
+if ($action === 'pull') {
+    echo "--- Git Pull ---\n";
+    $out = shell_exec("cd $laravelRoot && git pull origin main 2>&1");
+    echo $out . "\n";
+
+} elseif ($action === 'migrate') {
+    echo "--- Migrate ---\n";
+    $out = shell_exec("cd $laravelRoot && $php artisan migrate --force 2>&1");
+    echo $out . "\n";
+
+} elseif ($action === 'seed') {
+    echo "--- Seed SiteSettings ---\n";
+    $out = shell_exec("cd $laravelRoot && $php artisan db:seed --class=SiteSettingsSeeder --force 2>&1");
+    echo $out . "\n";
+    echo "--- Seed ContentItems ---\n";
+    $out = shell_exec("cd $laravelRoot && $php artisan db:seed --class=ContentItemsSeeder --force 2>&1");
+    echo $out . "\n";
+
+} elseif ($action === 'cache-clear') {
+    echo "--- Clear Cache ---\n";
+    $out = shell_exec("cd $laravelRoot && $php artisan config:clear && $php artisan cache:clear && $php artisan view:clear && $php artisan route:clear 2>&1");
+    echo $out . "\n";
+
+} elseif ($action === 'all') {
+    echo "--- Running ALL steps ---\n\n";
+    echo "1. Git Pull:\n";
+    echo shell_exec("cd $laravelRoot && git pull origin main 2>&1") . "\n";
+    echo "2. Migrate:\n";
+    echo shell_exec("cd $laravelRoot && $php artisan migrate --force 2>&1") . "\n";
+    echo "3. Seed:\n";
+    echo shell_exec("cd $laravelRoot && $php artisan db:seed --class=SiteSettingsSeeder --force 2>&1") . "\n";
+    echo shell_exec("cd $laravelRoot && $php artisan db:seed --class=ContentItemsSeeder --force 2>&1") . "\n";
+    echo "4. Clear Cache:\n";
+    echo shell_exec("cd $laravelRoot && $php artisan config:clear 2>&1") . "\n";
+    echo shell_exec("cd $laravelRoot && $php artisan cache:clear 2>&1") . "\n";
+    echo shell_exec("cd $laravelRoot && $php artisan view:clear 2>&1") . "\n";
+
+} else {
+    echo "Actions: pull | migrate | seed | cache-clear | all\n";
+    echo "Status:\n";
+    $out = shell_exec("cd $laravelRoot && $php artisan migrate:status 2>&1");
+    echo $out . "\n";
+}
+
+echo "\n=== DONE ===\n</pre>";
