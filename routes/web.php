@@ -256,19 +256,6 @@ Route::prefix('control-panel')
         Route::put('site-settings/contact-page', [SiteSettingsController::class, 'updateContactPage'])->name('site-settings.contact-page');
 
         // ===== Content Items (CMS - Repeatable Sections) =====
-        $contentTypes = ['testimonials','services','service-details','stats','features','steps','values','goals','team','about-values','process-steps'];
-        foreach ($contentTypes as $cType) {
-            Route::get("content/{$cType}",               [ContentItemController::class, 'index']  )->name("content.{$cType}.index"  )->defaults('type', $cType);
-            Route::get("content/{$cType}/create",        [ContentItemController::class, 'create'] )->name("content.{$cType}.create" )->defaults('type', $cType);
-            Route::post("content/{$cType}",              [ContentItemController::class, 'store']  )->name("content.{$cType}.store"  )->defaults('type', $cType);
-            Route::get("content/{$cType}/{id}/edit",     [ContentItemController::class, 'edit']   )->name("content.{$cType}.edit"   )->defaults('type', $cType);
-            Route::put("content/{$cType}/{id}",          [ContentItemController::class, 'update'] )->name("content.{$cType}.update" )->defaults('type', $cType);
-            Route::delete("content/{$cType}/{id}",       [ContentItemController::class, 'destroy'])->name("content.{$cType}.destroy")->defaults('type', $cType);
-            Route::post("content/{$cType}/reorder",      [ContentItemController::class, 'reorder'])->name("content.{$cType}.reorder")->defaults('type', $cType);
-            Route::patch("content/{$cType}/{id}/toggle", [ContentItemController::class, 'toggle'] )->name("content.{$cType}.toggle" )->defaults('type', $cType);
-        }
-
-        // Generic named helpers used by views
         Route::get('content/{type}',               [ContentItemController::class, 'index']  )->name('content.index');
         Route::get('content/{type}/create',        [ContentItemController::class, 'create'] )->name('content.create');
         Route::post('content/{type}',              [ContentItemController::class, 'store']  )->name('content.store');
