@@ -17,7 +17,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Load helper manually so composer dump-autoload is not required
+        require_once app_path('Helpers/settings.php');
     }
 
     /**
