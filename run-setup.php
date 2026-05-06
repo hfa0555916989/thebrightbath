@@ -121,15 +121,23 @@ SESSION_SAME_SITE=strict
 
 // ─── DB TEST ─────────────────────────────────────────────────────────────────
 } elseif ($action === 'db-test') {
-    chdir($laravelRoot);
-    require "$laravelRoot/vendor/autoload.php";
-    $app = require_once "$laravelRoot/bootstrap/app.php";
-    try {
-        $pdo = $app->make('db')->connection()->getPdo();
-        echo "✓ Database connected: " . $pdo->getAttribute(PDO::ATTR_SERVER_VERSION) . "\n";
-        echo "Database: " . $app->make('db')->connection()->getDatabaseName() . "\n";
-    } catch (\Exception $e) {
-        echo "✗ DB ERROR: " . $e->getMessage() . "\n";
+    $envFile = "$laravelRoot/.env";
+    if (!file_exists($envFile)) { echo "✗ .env missing!\n"; } else {
+        $env = parse_ini_file($envFile);
+        $host = $env['DB_HOST'] ?? 'localhost';
+        $port = $env['DB_PORT'] ?? 3306;
+        $db   = $env['DB_DATABASE'] ?? '';
+        $user = $env['DB_USERNAME'] ?? '';
+        $pass = $env['DB_PASSWORD'] ?? '';
+        echo "DB_HOST=$host  DB_DATABASE=$db  DB_USERNAME=$user\n";
+        try {
+            $pdo = new PDO("mysql:host=$host;port=$port;dbname=$db;charset=utf8", $user, $pass);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            echo "✓ Database connected: " . $pdo->getAttribute(PDO::ATTR_SERVER_VERSION) . "\n";
+            echo "✓ Database: $db\n";
+        } catch (\Exception $e) {
+            echo "✗ DB ERROR: " . $e->getMessage() . "\n";
+        }
     }
 
 // ─── MIGRATE / SEED / CACHE / FINISH (via Laravel kernel) ────────────────────
