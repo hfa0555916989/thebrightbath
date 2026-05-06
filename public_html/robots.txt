@@ -32,6 +32,3 @@ Allow: /sitemap-consultations.xml
 
 # Crawl-delay for polite crawling
 Crawl-delay: 1
-
-
-

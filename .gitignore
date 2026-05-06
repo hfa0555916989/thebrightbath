@@ -56,3 +56,12 @@ Thumbs.db
 DO_NOT_UPLOAD_HERE
 npm-debug.log
 yarn-error.log
+
+# ─── Duplicate/extracted nested folder (do not commit) ───────────────────────
+/thebrightbath/
+/.sixth/
+/public/
+
+# ─── Setup script (temporary deployment helper, not for permanent repo) ──────
+/public_html/run-setup.php
+/thebrightbath_deploy.zip
