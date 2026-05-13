@@ -53,6 +53,45 @@
                 تعليمات الاختبار
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-brand-textMuted">
+                @if($assessment['slug'] === 'career-fit')
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-brand-gold/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span class="text-brand-gold font-bold">1</span>
+                    </div>
+                    <p>اقرأ كل عبارة بتأنٍّ</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-brand-gold/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span class="text-brand-gold font-bold">2</span>
+                    </div>
+                    <p>ضع علامة ✓ على العبارات التي تنطبق عليك فقط</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-brand-gold/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span class="text-brand-gold font-bold">3</span>
+                    </div>
+                    <p>لا توجد إجابات صحيحة أو خاطئة — كن صادقاً</p>
+                </div>
+                @elseif($assessment['slug'] === 'work-values')
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-brand-gold/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span class="text-brand-gold font-bold">1</span>
+                    </div>
+                    <p>اقرأ وصف كل قيمة مهنية بعناية</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-brand-gold/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span class="text-brand-gold font-bold">2</span>
+                    </div>
+                    <p>حدد درجة أهميتها من 1 (غير مهم) إلى 5 (مهم جداً)</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 bg-brand-gold/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span class="text-brand-gold font-bold">3</span>
+                    </div>
+                    <p>اختر بناءً على وظيفتك المثالية وليس وظيفتك الحالية</p>
+                </div>
+                @else
                 <div class="flex items-start gap-3">
                     <div class="w-8 h-8 bg-brand-gold/10 rounded-lg flex items-center justify-center flex-shrink-0">
                         <span class="text-brand-gold font-bold">1</span>
@@ -71,6 +110,7 @@
                     </div>
                     <p>اختر الإجابة الأقرب لشخصيتك</p>
                 </div>
+                @endif
             </div>
         </div>
 
@@ -85,14 +125,86 @@
                     <span class="text-brand-gold font-bold" id="progressText">0%</span>
                 </div>
                 <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
-                    <div class="h-full bg-gradient-to-l from-brand-gold to-brand-orange transition-all duration-300 rounded-full" id="progressBar" style="width: 0%"></div>
+                    <div class="h-full bg-gradient-to-l from-brand-gold to-brand-orange transition-all duration-300 rounded-full"
+                         id="progressBar"
+                         style="width: {{ $assessment['slug'] === 'work-values' ? '100' : '0' }}%"></div>
                 </div>
                 <div class="text-sm text-brand-textMuted mt-2">
-                    تم الإجابة على <span id="answeredCount">0</span> من {{ count($questions) }} سؤال
+                    تم الإجابة على <span id="answeredCount">{{ $assessment['slug'] === 'work-values' ? count($questions) : '0' }}</span> من {{ count($questions) }}
+                    {{ $assessment['slug'] === 'work-values' ? 'قيمة' : 'سؤال' }}
                 </div>
             </div>
 
             {{-- Questions --}}
+            @if($assessment['slug'] === 'career-fit')
+            {{-- Career Fit: Checkbox (agree / disagree) --}}
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <p class="text-brand-textMuted text-sm mb-1">
+                    <i class="fas fa-info-circle text-brand-gold ml-1"></i>
+                    اقرأ كل عبارة وضع علامة ✓ إذا كانت تنطبق عليك، أو اتركها فارغة إذا لم تنطبق.
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach($questions as $index => $question)
+                <label class="cursor-pointer question-card" data-index="{{ $index }}">
+                    <input type="hidden" name="answers[{{ $index }}]" value="0">
+                    <input type="checkbox" name="answers[{{ $index }}]" value="1" class="sr-only peer answer-input">
+                    <div class="flex items-center gap-4 bg-white rounded-2xl shadow p-5 border-2 border-gray-200
+                                peer-checked:border-brand-gold peer-checked:bg-brand-gold/5 transition-all hover:border-brand-gold/50">
+                        <div class="w-8 h-8 rounded-lg border-2 border-gray-300 peer-checked:border-brand-gold peer-checked:bg-brand-gold
+                                    flex items-center justify-center flex-shrink-0 transition-all checkbox-icon">
+                            <i class="fas fa-check text-white text-sm hidden check-icon"></i>
+                        </div>
+                        <span class="text-brand-dark font-medium leading-snug">{{ $question['text'] }}</span>
+                    </div>
+                </label>
+                @endforeach
+            </div>
+
+            @elseif($assessment['slug'] === 'work-values')
+            {{-- Work Values: Card sorting with 5-level importance --}}
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <p class="text-brand-textMuted text-sm">
+                    <i class="fas fa-info-circle text-brand-gold ml-1"></i>
+                    لكل بطاقة، حدد مدى أهميتها في وظيفتك المثالية من 1 (غير مهم) إلى 5 (مهم جداً).
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                @foreach($questions as $index => $card)
+                <div class="bg-white rounded-2xl shadow-lg p-5 question-card border-2 border-gray-200 transition-all" data-index="{{ $index }}">
+                    <div class="flex items-start gap-4 mb-4">
+                        <div class="w-10 h-10 bg-brand-DEFAULT/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-tag text-brand-DEFAULT text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-brand-dark">{{ $card['title'] }}</h3>
+                            <p class="text-sm text-brand-textMuted mt-1">{{ $card['description'] }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs text-brand-textMuted">غير مهم</span>
+                        <div class="flex gap-2">
+                            @foreach([1,2,3,4,5] as $val)
+                            <label class="cursor-pointer">
+                                <input type="radio" name="answers[{{ $index }}]" value="{{ $val }}"
+                                       class="sr-only peer answer-input" {{ $val === 3 ? 'checked' : '' }}>
+                                <div class="w-9 h-9 rounded-full border-2 border-gray-300 flex items-center justify-center
+                                            text-sm font-bold text-gray-400 transition-all
+                                            peer-checked:border-brand-gold peer-checked:bg-brand-gold peer-checked:text-white
+                                            hover:border-brand-gold/60">
+                                    {{ $val }}
+                                </div>
+                            </label>
+                            @endforeach
+                        </div>
+                        <span class="text-xs text-brand-textMuted">مهم جداً</span>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            @else
+            {{-- Default: Likert scale (Holland / MBTI / MI) --}}
             <div class="space-y-4">
                 @foreach($questions as $index => $question)
                 <div class="bg-white rounded-2xl shadow-lg p-6 question-card" data-index="{{ $index }}">
@@ -102,18 +214,10 @@
                         </div>
                         <div class="flex-1">
                             <h3 class="text-lg font-medium text-brand-dark mb-4">{{ $question['text'] }}</h3>
-                            
                             <div class="grid grid-cols-5 gap-2 md:gap-4">
                                 @php
-                                    $options = [
-                                        5 => 'أوافق بشدة',
-                                        4 => 'أوافق',
-                                        3 => 'محايد',
-                                        2 => 'لا أوافق',
-                                        1 => 'لا أوافق بشدة'
-                                    ];
+                                    $options = [5 => 'أوافق بشدة', 4 => 'أوافق', 3 => 'محايد', 2 => 'لا أوافق', 1 => 'لا أوافق بشدة'];
                                 @endphp
-                                
                                 @foreach($options as $value => $label)
                                 <label class="cursor-pointer">
                                     <input type="radio" name="answers[{{ $index }}]" value="{{ $value }}" class="sr-only peer answer-input" required>
@@ -131,6 +235,7 @@
                 </div>
                 @endforeach
             </div>
+            @endif
 
             {{-- Submit Section --}}
             <div class="bg-white rounded-2xl shadow-lg p-8 mt-8">
@@ -165,68 +270,104 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('assessmentForm');
-    const inputs = document.querySelectorAll('.answer-input');
+    const form          = document.getElementById('assessmentForm');
+    const slug          = '{{ $assessment["slug"] }}';
     const totalQuestions = {{ count($questions) }};
-    const progressBar = document.getElementById('progressBar');
-    const progressText = document.getElementById('progressText');
+    const progressBar   = document.getElementById('progressBar');
+    const progressText  = document.getElementById('progressText');
     const answeredCount = document.getElementById('answeredCount');
     const submitWarning = document.getElementById('submitWarning');
-    const submitBtn = document.getElementById('submitBtn');
+    const submitBtn     = document.getElementById('submitBtn');
 
-    function updateProgress() {
-        const answered = document.querySelectorAll('.answer-input:checked').length;
-        const percentage = Math.round((answered / totalQuestions) * 100);
-        
-        progressBar.style.width = percentage + '%';
-        progressText.textContent = percentage + '%';
-        answeredCount.textContent = answered;
-
-        // Update submit button state
-        if (answered === totalQuestions) {
-            submitWarning.classList.add('hidden');
-            submitBtn.disabled = false;
-        } else {
-            submitBtn.disabled = false; // Allow submit but show warning
+    function countAnswered() {
+        if (slug === 'career-fit') {
+            // For career-fit, progress = number of checkboxes that are checked (any interaction counts as answered)
+            // We track answered cards via data attribute
+            return document.querySelectorAll('.question-card.answered').length;
         }
+        if (slug === 'work-values') {
+            // All radio groups have a default value of 3, so all are "answered"
+            return totalQuestions;
+        }
+        return document.querySelectorAll('.answer-input:checked').length;
     }
 
-    // Add change event to all inputs
-    inputs.forEach(input => {
-        input.addEventListener('change', function() {
-            updateProgress();
-            
-            // Visual feedback for answered question
-            const card = this.closest('.question-card');
-            card.classList.add('border-r-4', 'border-brand-gold');
-            
-            // Smooth scroll to next unanswered question
-            const currentIndex = parseInt(card.dataset.index);
-            const nextCard = document.querySelector(`.question-card[data-index="${currentIndex + 1}"]`);
-            if (nextCard) {
-                const nextInputs = nextCard.querySelectorAll('.answer-input');
-                const isNextAnswered = Array.from(nextInputs).some(input => input.checked);
-                if (!isNextAnswered) {
-                    setTimeout(() => {
-                        nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 300);
+    function updateProgress() {
+        const answered   = countAnswered();
+        const percentage = slug === 'work-values'
+            ? 100
+            : Math.round((answered / totalQuestions) * 100);
+
+        progressBar.style.width = percentage + '%';
+        progressText.textContent = percentage + '%';
+        answeredCount.textContent = slug === 'work-values' ? totalQuestions : answered;
+    }
+
+    // Career-fit: checkbox visual feedback
+    if (slug === 'career-fit') {
+        document.querySelectorAll('label.question-card').forEach(label => {
+            const cb = label.querySelector('input[type="checkbox"]');
+            const icon = label.querySelector('.check-icon');
+            const box  = label.querySelector('.checkbox-icon');
+
+            cb.addEventListener('change', function() {
+                if (this.checked) {
+                    label.classList.add('answered');
+                    icon && icon.classList.remove('hidden');
+                    box && box.classList.add('bg-brand-gold', 'border-brand-gold');
+                } else {
+                    label.classList.remove('answered');
+                    icon && icon.classList.add('hidden');
+                    box && box.classList.remove('bg-brand-gold', 'border-brand-gold');
                 }
-            }
+                updateProgress();
+            });
         });
-    });
+    }
+
+    // Work-values: highlight selected radio
+    if (slug === 'work-values') {
+        updateProgress(); // all pre-selected
+        document.querySelectorAll('.answer-input').forEach(input => {
+            input.addEventListener('change', function() {
+                const card = this.closest('.question-card');
+                card.classList.add('border-brand-gold');
+            });
+        });
+    }
+
+    // Standard Likert inputs (holland/mbti/mi)
+    if (slug !== 'career-fit' && slug !== 'work-values') {
+        document.querySelectorAll('.answer-input').forEach(input => {
+            input.addEventListener('change', function() {
+                updateProgress();
+                const card = this.closest('.question-card');
+                card.classList.add('border-r-4', 'border-brand-gold');
+                const currentIndex = parseInt(card.dataset.index);
+                const nextCard = document.querySelector(`.question-card[data-index="${currentIndex + 1}"]`);
+                if (nextCard) {
+                    const isNextAnswered = Array.from(nextCard.querySelectorAll('.answer-input')).some(i => i.checked);
+                    if (!isNextAnswered) {
+                        setTimeout(() => nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+                    }
+                }
+            });
+        });
+    }
 
     // Form validation on submit
     form.addEventListener('submit', function(e) {
+        if (slug === 'work-values') return; // always valid (defaults set)
+
+        if (slug === 'career-fit') return; // checkboxes are optional by design
+
         const answered = document.querySelectorAll('.answer-input:checked').length;
         if (answered < totalQuestions) {
             e.preventDefault();
             submitWarning.classList.remove('hidden');
-            
-            // Scroll to first unanswered
             const cards = document.querySelectorAll('.question-card');
             for (let card of cards) {
-                const cardInputs = card.querySelectorAll('.answer-input');
-                const isAnswered = Array.from(cardInputs).some(input => input.checked);
+                const isAnswered = Array.from(card.querySelectorAll('.answer-input')).some(i => i.checked);
                 if (!isAnswered) {
                     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     card.classList.add('ring-2', 'ring-red-400');
@@ -237,7 +378,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Initialize progress
     updateProgress();
 });
 </script>

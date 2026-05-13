@@ -247,6 +247,238 @@ class AssessmentsController extends Controller
     }
 
     /**
+     * Get Career Fit test questions (based on careertestfree.com - 42 questions)
+     */
+    private function getCareerFitQuestions()
+    {
+        return [
+            ['text' => 'أحب العمل ضمن فريق', 'dimension' => 'S'],
+            ['text' => 'أستمتع بحل الألغاز والمسائل', 'dimension' => 'I'],
+            ['text' => 'أنا شخص طموح وأضع أهدافاً لنفسي', 'dimension' => 'E'],
+            ['text' => 'أحب تنظيم الأشياء (الملفات، المكاتب)', 'dimension' => 'C'],
+            ['text' => 'أجيد العمل باستقلالية دون توجيه', 'dimension' => 'I'],
+            ['text' => 'أحب بناء الأشياء وصنعها', 'dimension' => 'R'],
+            ['text' => 'أحب القراءة عن الفن والموسيقى', 'dimension' => 'A'],
+            ['text' => 'أحب العمل في السيارات والمركبات', 'dimension' => 'R'],
+            ['text' => 'أفضل أن تكون لديّ تعليمات واضحة في عملي', 'dimension' => 'C'],
+            ['text' => 'أحب التأثير على الآخرين وإقناعهم', 'dimension' => 'E'],
+            ['text' => 'أستمتع بإجراء التجارب والاستكشاف', 'dimension' => 'I'],
+            ['text' => 'أحب تعليم الآخرين أو تدريبهم', 'dimension' => 'S'],
+            ['text' => 'أحب مساعدة الناس في حل مشكلاتهم', 'dimension' => 'S'],
+            ['text' => 'أحب الاعتناء بالحيوانات', 'dimension' => 'R'],
+            ['text' => 'لا يضايقني العمل 8 ساعات يومياً في مكتب', 'dimension' => 'C'],
+            ['text' => 'أحب البيع والتسويق', 'dimension' => 'E'],
+            ['text' => 'أستمتع بالكتابة الإبداعية', 'dimension' => 'A'],
+            ['text' => 'أستمتع بمجال العلوم', 'dimension' => 'I'],
+            ['text' => 'أتحمل المسؤوليات الجديدة بسرعة', 'dimension' => 'E'],
+            ['text' => 'أهتم بمساعدة المرضى والمحتاجين', 'dimension' => 'S'],
+            ['text' => 'أستمتع بمعرفة كيفية عمل الأشياء', 'dimension' => 'I'],
+            ['text' => 'أحب تجميع الأشياء وتركيبها', 'dimension' => 'R'],
+            ['text' => 'أنا شخص مبدع', 'dimension' => 'A'],
+            ['text' => 'أنتبه للتفاصيل الدقيقة', 'dimension' => 'C'],
+            ['text' => 'أحب حفظ السجلات والأرشفة', 'dimension' => 'C'],
+            ['text' => 'أحب تحليل المشكلات والمواقف', 'dimension' => 'I'],
+            ['text' => 'أحب العزف على الآلات الموسيقية أو الغناء', 'dimension' => 'A'],
+            ['text' => 'أستمتع بتعلم الثقافات الأخرى', 'dimension' => 'A'],
+            ['text' => 'أودّ تأسيس مشروعي الخاص', 'dimension' => 'E'],
+            ['text' => 'أحب الطبخ وإعداد الطعام', 'dimension' => 'R'],
+            ['text' => 'أحب التمثيل والمسرح', 'dimension' => 'A'],
+            ['text' => 'أنا شخص عملي وبراغماتي', 'dimension' => 'R'],
+            ['text' => 'أحب العمل بالأرقام والجداول', 'dimension' => 'C'],
+            ['text' => 'أحب النقاش في القضايا والأفكار', 'dimension' => 'E'],
+            ['text' => 'أجيد الاحتفاظ بسجلات عملي', 'dimension' => 'C'],
+            ['text' => 'أحب القيادة وتوجيه الآخرين', 'dimension' => 'E'],
+            ['text' => 'أحب العمل في الهواء الطلق', 'dimension' => 'R'],
+            ['text' => 'أودّ العمل في بيئة مكتبية', 'dimension' => 'C'],
+            ['text' => 'أجيد الرياضيات', 'dimension' => 'I'],
+            ['text' => 'أحب مساعدة الناس', 'dimension' => 'S'],
+            ['text' => 'أحب الرسم والتصميم', 'dimension' => 'A'],
+            ['text' => 'أحب إلقاء الكلمات والخطابة', 'dimension' => 'E'],
+        ];
+    }
+
+    /**
+     * Get Work Values cards (based on ns3a.com - 20 cards)
+     */
+    private function getWorkValuesCards()
+    {
+        return [
+            ['id' => 'security',    'title' => 'الأمان الوظيفي',         'description' => 'الشعور بالاستقرار وعدم الخوف من فقدان العمل', 'category' => 'economic'],
+            ['id' => 'pay',         'title' => 'الأجر والمكافآت',        'description' => 'الحصول على راتب مرتفع ومكافآت مجزية',          'category' => 'economic'],
+            ['id' => 'balance',     'title' => 'التوازن بين العمل والحياة','description' => 'قضاء وقت كافٍ مع العائلة والأنشطة الشخصية',    'category' => 'autonomy'],
+            ['id' => 'autonomy',    'title' => 'الاستقلالية',             'description' => 'حرية اتخاذ القرارات وإدارة عملك بنفسك',          'category' => 'autonomy'],
+            ['id' => 'advancement', 'title' => 'التقدم والترقي',          'description' => 'فرص الترقية والتطور في المسار المهني',            'category' => 'economic'],
+            ['id' => 'creativity',  'title' => 'الإبداع والابتكار',       'description' => 'حرية تجربة أفكار جديدة وابتكار حلول',            'category' => 'autonomy'],
+            ['id' => 'teamwork',    'title' => 'العمل الجماعي',           'description' => 'التعاون مع زملاء داعمين وبيئة عمل مترابطة',      'category' => 'social'],
+            ['id' => 'helping',     'title' => 'مساعدة الآخرين',          'description' => 'التأثير الإيجابي في حياة الناس والمجتمع',         'category' => 'social'],
+            ['id' => 'prestige',    'title' => 'المكانة والتقدير',        'description' => 'الحصول على احترام الآخرين والاعتراف بإنجازاتك',   'category' => 'social'],
+            ['id' => 'challenge',   'title' => 'التحدي والمنافسة',        'description' => 'مواجهة مهام صعبة ومتطلبة تحفز على التفكير',      'category' => 'development'],
+            ['id' => 'variety',     'title' => 'التنوع والتجديد',         'description' => 'أداء مهام متنوعة وعدم الانغماس في الروتين',       'category' => 'autonomy'],
+            ['id' => 'stability',   'title' => 'الاستقرار والنظام',       'description' => 'بيئة عمل منتظمة ومتوقعة بعيدة عن الفوضى',        'category' => 'economic'],
+            ['id' => 'learning',    'title' => 'التعلم والنمو',           'description' => 'اكتساب مهارات ومعارف جديدة باستمرار',             'category' => 'development'],
+            ['id' => 'flexibility', 'title' => 'المرونة في العمل',        'description' => 'حرية تحديد أوقات ومكان العمل',                    'category' => 'autonomy'],
+            ['id' => 'belonging',   'title' => 'الانتماء والثقافة',       'description' => 'الانتماء لمنظمة تتوافق قيمها مع قيمك',            'category' => 'social'],
+            ['id' => 'achievement', 'title' => 'الإنجاز وتحقيق الأهداف', 'description' => 'الشعور بالرضا عند إتمام مهام ذات قيمة',           'category' => 'development'],
+            ['id' => 'leadership',  'title' => 'القيادة واتخاذ القرار',   'description' => 'قيادة فريق والتأثير في مسار المنظمة',              'category' => 'development'],
+            ['id' => 'fairness',    'title' => 'العدالة والنزاهة',        'description' => 'العمل في بيئة عادلة تقدّر الشفافية والأمانة',     'category' => 'social'],
+            ['id' => 'interaction', 'title' => 'التواصل الاجتماعي',       'description' => 'التفاعل المستمر مع الناس والعملاء',                'category' => 'social'],
+            ['id' => 'impact',      'title' => 'التأثير والإلهام',        'description' => 'ترك أثر إيجابي وإلهام من حولك',                   'category' => 'development'],
+        ];
+    }
+
+    /**
+     * Calculate Career Fit result (RIASEC-based checkbox scoring)
+     */
+    private function calculateCareerFitResult($answers)
+    {
+        $questions = $this->getCareerFitQuestions();
+        $scores = ['R' => 0, 'I' => 0, 'A' => 0, 'S' => 0, 'E' => 0, 'C' => 0];
+
+        foreach ($answers as $index => $value) {
+            if (isset($questions[$index]) && $value == '1') {
+                $dimension = $questions[$index]['dimension'];
+                $scores[$dimension]++;
+            }
+        }
+
+        arsort($scores);
+        $topThree = array_slice(array_keys($scores), 0, 3);
+        $typeCode = implode('', $topThree);
+
+        $interpretation = $this->getCareerFitInterpretation($typeCode, $scores);
+
+        return [
+            'scores'      => $scores,
+            'type_code'   => $typeCode,
+            'interpretation' => $interpretation,
+        ];
+    }
+
+    /**
+     * Calculate Work Values result
+     */
+    private function calculateWorkValuesResult($answers)
+    {
+        $cards = $this->getWorkValuesCards();
+        $scores = [];
+
+        foreach ($cards as $index => $card) {
+            $scores[$card['id']] = isset($answers[$index]) ? (int)$answers[$index] : 1;
+        }
+
+        arsort($scores);
+        $topFive = array_slice(array_keys($scores), 0, 5);
+        $typeCode = implode('-', $topFive);
+
+        $interpretation = $this->getWorkValuesInterpretation($scores, $cards);
+
+        return [
+            'scores'      => $scores,
+            'type_code'   => $typeCode,
+            'interpretation' => $interpretation,
+        ];
+    }
+
+    /**
+     * Get Career Fit interpretation (RIASEC)
+     */
+    private function getCareerFitInterpretation($typeCode, $scores)
+    {
+        $dimensions = [
+            'R' => [
+                'name'        => 'الواقعي (Realistic)',
+                'description' => 'تفضل العمل اليدوي والتقني وتستمتع بالأنشطة العملية.',
+                'careers'     => ['مهندس ميكانيكي', 'كهربائي', 'طيار', 'مزارع', 'نجار', 'سائق معدات', 'فني صيانة'],
+            ],
+            'I' => [
+                'name'        => 'الباحث (Investigative)',
+                'description' => 'تحب التحليل والبحث العلمي وحل المشكلات المعقدة.',
+                'careers'     => ['طبيب', 'باحث علمي', 'مهندس برمجيات', 'محلل بيانات', 'صيدلاني', 'عالم', 'أخصائي مختبرات'],
+            ],
+            'A' => [
+                'name'        => 'الفني (Artistic)',
+                'description' => 'تميل للإبداع والتعبير الفني وتقدر الجمال.',
+                'careers'     => ['مصمم جرافيك', 'كاتب', 'مخرج', 'موسيقي', 'مصور', 'معماري', 'منتج إعلامي'],
+            ],
+            'S' => [
+                'name'        => 'الاجتماعي (Social)',
+                'description' => 'تستمتع بمساعدة الناس والتواصل معهم.',
+                'careers'     => ['معلم', 'مرشد نفسي', 'طبيب', 'أخصائي اجتماعي', 'ممرض', 'موارد بشرية', 'مدرب'],
+            ],
+            'E' => [
+                'name'        => 'الريادي (Enterprising)',
+                'description' => 'تحب القيادة والتأثير وتطمح للنجاح التجاري.',
+                'careers'     => ['رجل أعمال', 'مدير تنفيذي', 'مسوق', 'محامي', 'مستشار', 'مندوب مبيعات', 'سياسي'],
+            ],
+            'C' => [
+                'name'        => 'التقليدي (Conventional)',
+                'description' => 'تفضل النظام والدقة وتجيد إدارة البيانات.',
+                'careers'     => ['محاسب', 'مدقق حسابات', 'إداري', 'أمين مكتبة', 'موظف بنك', 'سكرتير تنفيذي', 'محلل مالي'],
+            ],
+        ];
+
+        $topType  = substr($typeCode, 0, 1);
+        $mainDim  = $dimensions[$topType] ?? $dimensions['S'];
+        $maxScore = max(array_values($scores)) ?: 1;
+
+        return [
+            'main_type'   => $mainDim,
+            'dimensions'  => $dimensions,
+            'max_score'   => $maxScore,
+            'summary'     => "نمطك المهني: {$typeCode} — النمط السائد لديك هو {$mainDim['name']}.",
+        ];
+    }
+
+    /**
+     * Get Work Values interpretation
+     */
+    private function getWorkValuesInterpretation($scores, $cards)
+    {
+        $cardMap = [];
+        foreach ($cards as $card) {
+            $cardMap[$card['id']] = $card;
+        }
+
+        arsort($scores);
+        $topFive   = array_slice(array_keys($scores), 0, 5);
+        $topCards  = array_map(fn($id) => $cardMap[$id] ?? [], $topFive);
+
+        $categories = [
+            'economic'    => ['name' => 'القيم الاقتصادية',   'description' => 'تهتم بالاستقرار المادي والتقدم الوظيفي'],
+            'social'      => ['name' => 'القيم الاجتماعية',   'description' => 'تقدر العلاقات والتأثير الإيجابي في الآخرين'],
+            'autonomy'    => ['name' => 'قيم الاستقلالية',    'description' => 'تحتاج الحرية والمرونة في بيئة عملك'],
+            'development' => ['name' => 'قيم التطوير والإنجاز','description' => 'تسعى للتعلم والنمو المستمر'],
+        ];
+
+        $categoryScores = ['economic' => 0, 'social' => 0, 'autonomy' => 0, 'development' => 0];
+        $categoryCounts = ['economic' => 0, 'social' => 0, 'autonomy' => 0, 'development' => 0];
+
+        foreach ($cards as $card) {
+            $cat = $card['category'];
+            $categoryScores[$cat] += $scores[$card['id']] ?? 1;
+            $categoryCounts[$cat]++;
+        }
+
+        $categoryAverages = [];
+        foreach ($categoryScores as $cat => $total) {
+            $categoryAverages[$cat] = $categoryCounts[$cat] > 0
+                ? round($total / $categoryCounts[$cat], 1)
+                : 0;
+        }
+
+        arsort($categoryAverages);
+        $dominantCategory = array_key_first($categoryAverages);
+
+        return [
+            'top_cards'          => $topCards,
+            'categories'         => $categories,
+            'category_averages'  => $categoryAverages,
+            'dominant_category'  => $dominantCategory,
+            'summary'            => 'أهم قيمك المهنية: ' . implode('، ', array_column($topCards, 'title')),
+        ];
+    }
+
+    /**
      * Display list of all assessments
      */
     public function index()
@@ -280,8 +512,14 @@ class AssessmentsController extends Controller
             case 'mi':
                 $questions = $this->getMIQuestions();
                 break;
+            case 'career-fit':
+                $questions = $this->getCareerFitQuestions();
+                break;
+            case 'work-values':
+                $questions = $this->getWorkValuesCards();
+                break;
             default:
-                $questions = $this->getHollandQuestions(); // Default to Holland
+                $questions = $this->getHollandQuestions();
         }
 
         return view('assessments.show', compact('assessment', 'questions'));
@@ -310,6 +548,12 @@ class AssessmentsController extends Controller
                 break;
             case 'mi':
                 $result = $this->calculateMIResult($answers);
+                break;
+            case 'career-fit':
+                $result = $this->calculateCareerFitResult($answers);
+                break;
+            case 'work-values':
+                $result = $this->calculateWorkValuesResult($answers);
                 break;
             default:
                 $result = $this->calculateHollandResult($answers);

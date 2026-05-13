@@ -69,6 +69,10 @@
                         <p class="text-brand-dark/80 text-xl">{{ $result['interpretation']['type_info']['name'] }}</p>
                     @elseif(isset($slug) && $slug === 'mi' && isset($result['interpretation']['summary']))
                         <p class="text-brand-dark/80">{{ $result['interpretation']['summary'] }}</p>
+                    @elseif(isset($slug) && $slug === 'career-fit' && isset($result['interpretation']['summary']))
+                        <p class="text-brand-dark/80">{{ $result['interpretation']['summary'] }}</p>
+                    @elseif(isset($slug) && $slug === 'work-values' && isset($result['interpretation']['summary']))
+                        <p class="text-brand-dark/80 text-lg">{{ $result['interpretation']['summary'] }}</p>
                     @endif
                 </div>
 
@@ -229,6 +233,118 @@
                             </div>
                         </div>
                         @endif
+                    @elseif(isset($slug) && $slug === 'career-fit' && isset($result['interpretation']['dimensions']))
+                        {{-- Career Fit Results (RIASEC checkbox-based) --}}
+                        @php
+                            $dims     = $result['interpretation']['dimensions'];
+                            $cfScores = $result['scores'];
+                            $cfMax    = max(array_values($cfScores)) ?: 1;
+                            $topType  = substr($result['type_code'], 0, 1);
+                        @endphp
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                            @foreach($dims as $code => $dim)
+                                @php
+                                    $sc  = $cfScores[$code] ?? 0;
+                                    $pct = $cfMax > 0 ? round(($sc / $cfMax) * 100) : 0;
+                                @endphp
+                                <div class="bg-brand-bg rounded-xl p-4 {{ $topType === $code ? 'ring-2 ring-brand-gold' : '' }}">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-bold text-brand-dark text-sm">{{ $dim['name'] }}</span>
+                                        <span class="text-brand-gold font-bold text-lg">{{ $sc }}</span>
+                                    </div>
+                                    <div class="h-3 bg-gray-200 rounded-full overflow-hidden mb-2">
+                                        <div class="h-full bg-gradient-to-l from-brand-gold to-brand-orange rounded-full"
+                                             style="width: {{ $pct }}%"></div>
+                                    </div>
+                                    <p class="text-xs text-brand-textMuted">{{ $dim['description'] }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        {{-- Career Suggestions --}}
+                        @php $mainCf = $dims[$topType] ?? null; @endphp
+                        @if($mainCf)
+                        <div class="bg-brand-bg rounded-xl p-6 mb-4">
+                            <h4 class="font-bold text-brand-dark mb-4 flex items-center gap-2">
+                                <i class="fas fa-briefcase text-brand-gold"></i>
+                                الوظائف المقترحة — {{ $mainCf['name'] }}
+                            </h4>
+                            <p class="text-brand-textMuted text-sm mb-4">{{ $mainCf['description'] }}</p>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($mainCf['careers'] as $career)
+                                    <span class="bg-white px-4 py-2 rounded-full text-brand-dark border border-brand-border text-sm">
+                                        {{ $career }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+
+                    @elseif(isset($slug) && $slug === 'work-values' && isset($result['interpretation']['top_cards']))
+                        {{-- Work Values Results --}}
+                        @php
+                            $interp     = $result['interpretation'];
+                            $topCards   = $interp['top_cards'];
+                            $categories = $interp['categories'];
+                            $catAvgs    = $interp['category_averages'];
+                            $dominant   = $interp['dominant_category'];
+                            $maxAvg     = max(array_values($catAvgs)) ?: 1;
+                        @endphp
+
+                        {{-- Top 5 Values --}}
+                        <div class="mb-8">
+                            <h3 class="font-bold text-brand-dark text-lg mb-4 flex items-center gap-2">
+                                <i class="fas fa-star text-brand-gold"></i>
+                                أهم 5 قيم مهنية لديك
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                @foreach($topCards as $rank => $card)
+                                @if(!empty($card))
+                                <div class="bg-brand-bg rounded-xl p-5 flex items-start gap-4
+                                            {{ $rank === 0 ? 'ring-2 ring-brand-gold' : '' }}">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-lg
+                                                {{ $rank === 0 ? 'bg-brand-gold text-brand-dark' : 'bg-brand-DEFAULT/10 text-brand-DEFAULT' }}">
+                                        {{ $rank + 1 }}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-brand-dark">{{ $card['title'] }}</h4>
+                                        <p class="text-sm text-brand-textMuted mt-1">{{ $card['description'] }}</p>
+                                    </div>
+                                </div>
+                                @endif
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Category Breakdown --}}
+                        <div class="bg-brand-bg rounded-xl p-6">
+                            <h3 class="font-bold text-brand-dark mb-5 flex items-center gap-2">
+                                <i class="fas fa-chart-bar text-brand-gold"></i>
+                                توزيع قيمك المهنية
+                            </h3>
+                            <div class="space-y-4">
+                                @foreach($catAvgs as $catKey => $avg)
+                                @php $catInfo = $categories[$catKey] ?? ['name' => $catKey, 'description' => '']; @endphp
+                                <div class="{{ $catKey === $dominant ? 'bg-brand-gold/10 rounded-xl p-4' : '' }}">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="font-bold text-brand-dark text-sm">
+                                            {{ $catInfo['name'] }}
+                                            @if($catKey === $dominant)
+                                                <span class="text-brand-gold text-xs mr-2">(الأقوى)</span>
+                                            @endif
+                                        </span>
+                                        <span class="text-brand-gold font-bold">{{ number_format($avg, 1) }}/5</span>
+                                    </div>
+                                    <div class="h-3 bg-gray-200 rounded-full overflow-hidden mb-1">
+                                        <div class="h-full bg-gradient-to-l from-brand-gold to-brand-orange rounded-full"
+                                             style="width: {{ round(($avg / 5) * 100) }}%"></div>
+                                    </div>
+                                    <p class="text-xs text-brand-textMuted">{{ $catInfo['description'] }}</p>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+
                     @endif
                 </div>
             </div>
