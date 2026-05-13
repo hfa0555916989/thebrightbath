@@ -30,17 +30,17 @@ class LogoController extends Controller
             File::makeDirectory($imagesPath, 0755, true);
         }
 
-        // Main Logo
+        // Main Logo — save under the name all views reference
         if ($request->hasFile('logo')) {
             $logo = $request->file('logo');
-            $logo->move($imagesPath, 'logo.png');
+            $logo->move($imagesPath, 'bright-path-logo.png');
             $uploaded = true;
         }
 
         // White Logo
         if ($request->hasFile('logo_white')) {
             $logoWhite = $request->file('logo_white');
-            $logoWhite->move($imagesPath, 'logo-white.png');
+            $logoWhite->move($imagesPath, 'bright-path-logo-white.png');
             $uploaded = true;
         }
 

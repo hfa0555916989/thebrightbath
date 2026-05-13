@@ -238,6 +238,21 @@ Route::prefix('control-panel')
         Route::get('logo', [LogoController::class, 'index'])->name('logo.index');
         Route::post('logo', [LogoController::class, 'upload'])->name('logo.upload');
 
+        // Storage Link (run once to fix image display on shared hosting)
+        Route::get('storage-link', function () {
+            $link   = public_path('storage');
+            $target = storage_path('app/public');
+            if (file_exists($link)) {
+                return back()->with('success', '✅ رابط التخزين موجود بالفعل — الصور تعمل بشكل صحيح.');
+            }
+            try {
+                symlink($target, $link);
+                return back()->with('success', '✅ تم إنشاء رابط التخزين بنجاح! الصور ستظهر الآن.');
+            } catch (\Exception $e) {
+                return back()->with('error', '❌ فشل إنشاء الرابط: ' . $e->getMessage());
+            }
+        })->name('storage.link');
+
         // ===== Site Settings (CMS) =====
         Route::get('site-settings', [SiteSettingsController::class, 'index'])->name('site-settings.index');
         Route::put('site-settings/visual',       [SiteSettingsController::class, 'updateVisual'])->name('site-settings.visual');

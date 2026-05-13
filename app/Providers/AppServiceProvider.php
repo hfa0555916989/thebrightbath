@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use App\Models\SiteSetting;
+use Illuminate\Support\Facades\File;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,17 @@ class AppServiceProvider extends ServiceProvider
         // Force HTTPS in production
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
+        }
+
+        // Auto-create storage symlink if missing (needed on shared hosting)
+        $storageLink = public_path('storage');
+        $storageTarget = storage_path('app/public');
+        if (!file_exists($storageLink) && File::isDirectory($storageTarget)) {
+            try {
+                symlink($storageTarget, $storageLink);
+            } catch (\Exception $e) {
+                // Symlink may already exist or permissions insufficient — handled by admin route
+            }
         }
 
         // Share site settings with all views

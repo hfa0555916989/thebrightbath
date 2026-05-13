@@ -25,6 +25,19 @@
         </div>
     @endif
 
+    {{-- Storage Link Fix --}}
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between gap-4">
+        <div>
+            <p class="font-bold text-blue-800 text-sm">إذا كانت الصور ترفع لكن لا تظهر في الموقع</p>
+            <p class="text-blue-600 text-xs mt-1">اضغط الزر لإصلاح رابط التخزين (مرة واحدة فقط)</p>
+        </div>
+        <a href="{{ route('admin.storage.link') }}"
+           class="flex-shrink-0 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition">
+            <i class="fas fa-link ml-1"></i>
+            إصلاح ظهور الصور
+        </a>
+    </div>
+
     <form action="{{ route('admin.logo.upload') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
