@@ -17,7 +17,7 @@
     </div>
 
     {{-- Form --}}
-    <form action="#" method="POST" class="space-y-6">
+    <form action="{{ route('admin.book-chapters.update', $chapter) }}" method="POST" class="space-y-6">
         @csrf
         @method('PUT')
         

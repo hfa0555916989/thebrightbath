@@ -17,7 +17,7 @@
     </div>
 
     {{-- Form --}}
-    <form action="#" method="POST" class="space-y-6">
+    <form action="{{ route('admin.book-chapters.store') }}" method="POST" class="space-y-6">
         @csrf
         
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

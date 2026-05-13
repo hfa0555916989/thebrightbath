@@ -52,14 +52,14 @@ class AssessmentsController extends Controller
                 'name_en' => 'Work Values Test',
                 'description' => 'تعرف على قيمك المهنية وما يحفزك في العمل',
                 'duration' => '10-15 دقيقة',
-                'questions_count' => 30,
+                'questions_count' => 20,
             ],
             'career-fit' => [
                 'name' => 'اختبار الملاءمة المهنية',
                 'name_en' => 'Career Fit Test',
                 'description' => 'اكتشف المجالات المهنية الأكثر ملاءمة لك',
                 'duration' => '15-20 دقيقة',
-                'questions_count' => 35,
+                'questions_count' => 42,
             ],
         ];
     }

@@ -305,7 +305,7 @@
                             </li>
                             <li class="flex items-center gap-2">
                                 <i class="fas fa-question-circle text-brand-gold"></i>
-                                <span>40 سؤال</span>
+                                <span>20 بطاقة</span>
                             </li>
                             <li class="flex items-center gap-2">
                                 <i class="fas fa-file-pdf text-brand-gold"></i>
@@ -350,7 +350,7 @@
                             </li>
                             <li class="flex items-center gap-2">
                                 <i class="fas fa-question-circle text-brand-gold"></i>
-                                <span>50 سؤال</span>
+                                <span>42 سؤال</span>
                             </li>
                             <li class="flex items-center gap-2">
                                 <i class="fas fa-file-pdf text-brand-gold"></i>

@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\LogoController;
 use App\Http\Controllers\Admin\ConsultantController;
 use App\Http\Controllers\Admin\SiteSettingsController;
 use App\Http\Controllers\Admin\ContentItemController;
+use App\Http\Controllers\Admin\BookChapterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -190,13 +191,7 @@ Route::prefix('control-panel')
         Route::put('bookings/{booking}', [App\Http\Controllers\Admin\BookingController::class, 'update'])->name('bookings.update');
         
         // Book Chapters
-        Route::get('book-chapters', function () {
-            return view('admin.book-chapters.index');
-        })->name('book-chapters.index');
-        
-        Route::get('book-chapters/create', function () {
-            return view('admin.book-chapters.create');
-        })->name('book-chapters.create');
+        Route::resource('book-chapters', BookChapterController::class);
         
         // Security
         Route::get('security/logs', function () {
