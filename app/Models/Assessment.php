@@ -76,6 +76,11 @@ class Assessment extends Model
         return $this->config_json['interpretations'] ?? [];
     }
 
+    public function getImageUrlAttribute(): string
+    {
+        return storage_asset($this->image);
+    }
+
     /**
      * Scope to get active assessments
      */

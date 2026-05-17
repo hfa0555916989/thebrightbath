@@ -60,6 +60,11 @@ class BookChapter extends Model
         return $user->has_book_access || $user->isAdmin();
     }
 
+    public function getCoverUrlAttribute(): string
+    {
+        return storage_asset($this->cover);
+    }
+
     /**
      * Get access status label
      */

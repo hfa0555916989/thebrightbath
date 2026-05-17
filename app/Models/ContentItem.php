@@ -40,13 +40,7 @@ class ContentItem extends Model
 
     public function getImageUrlAttribute(): string
     {
-        if (!$this->image) {
-            return '';
-        }
-        if (str_starts_with($this->image, 'http')) {
-            return $this->image;
-        }
-        return asset('storage/' . $this->image);
+        return storage_asset($this->image);
     }
 
     public function getMeta(string $key, $default = null): mixed

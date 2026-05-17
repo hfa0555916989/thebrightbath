@@ -88,7 +88,7 @@
 
                     @if($chapter->cover)
                         <div class="mb-4 rounded-lg overflow-hidden border border-brand-border">
-                            <img src="{{ asset('storage/' . $chapter->cover) }}" alt="صورة الغلاف الحالية" class="w-full h-40 object-cover">
+                            <img src="{{ $chapter->cover_url }}" alt="صورة الغلاف الحالية" class="w-full h-40 object-cover">
                         </div>
                         <p class="text-xs text-brand-textMuted mb-3">لاستبدال الصورة اختر صورة جديدة:</p>
                     @endif

@@ -119,6 +119,11 @@ class Consultant extends Model
         return !$hasConflict;
     }
 
+    public function getPhotoUrlAttribute(): string
+    {
+        return storage_asset($this->photo);
+    }
+
     /**
      * Scope for active consultants.
      */

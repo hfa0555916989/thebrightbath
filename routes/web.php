@@ -276,7 +276,7 @@ Route::prefix('control-panel')
             }
         })->name('clear.cache');
 
-        // Storage Link (run once to fix image display on shared hosting)
+        // Storage Setup (creates required upload directories)
         Route::get('storage-link', function () {
             $results = [];
 
@@ -292,22 +292,13 @@ Route::prefix('control-panel')
             ];
             foreach ($dirs as $dir) {
                 if (!is_dir($dir)) {
-                    mkdir($dir, 0775, true);
-                    $results[] = 'تم إنشاء المجلد: ' . basename($dir);
-                }
-            }
-
-            // Create storage symlink
-            $link   = public_path('storage');
-            $target = storage_path('app/public');
-            if (file_exists($link) || is_link($link)) {
-                $results[] = 'رابط التخزين موجود بالفعل.';
-            } else {
-                try {
-                    symlink($target, $link);
-                    $results[] = 'تم إنشاء رابط التخزين بنجاح!';
-                } catch (\Exception $e) {
-                    $results[] = 'تعذّر إنشاء السيملنك: ' . $e->getMessage();
+                    if (mkdir($dir, 0775, true)) {
+                        $results[] = 'تم إنشاء المجلد: ' . basename($dir);
+                    } else {
+                        $results[] = 'فشل إنشاء: ' . basename($dir);
+                    }
+                } else {
+                    $results[] = basename($dir) . ': موجود ✓';
                 }
             }
 
