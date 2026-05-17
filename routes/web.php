@@ -265,15 +265,33 @@ Route::prefix('control-panel')
 
         // Clear all caches (fixes stale route/config/view cache issues after deployment)
         Route::get('clear-cache', function () {
-            try {
-                \Illuminate\Support\Facades\Artisan::call('cache:clear');
-                \Illuminate\Support\Facades\Artisan::call('route:clear');
-                \Illuminate\Support\Facades\Artisan::call('config:clear');
-                \Illuminate\Support\Facades\Artisan::call('view:clear');
-                return back()->with('success', 'تم مسح جميع ملفات الكاش بنجاح.');
-            } catch (\Exception $e) {
-                return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+            $cleared = [];
+            $errors  = [];
+
+            // Artisan cache commands
+            try { \Illuminate\Support\Facades\Artisan::call('cache:clear');  $cleared[] = 'cache'; }  catch (\Exception $e) { $errors[] = 'cache: ' . $e->getMessage(); }
+            try { \Illuminate\Support\Facades\Artisan::call('route:clear');  $cleared[] = 'routes'; } catch (\Exception $e) { $errors[] = 'routes: ' . $e->getMessage(); }
+            try { \Illuminate\Support\Facades\Artisan::call('config:clear'); $cleared[] = 'config'; } catch (\Exception $e) { $errors[] = 'config: ' . $e->getMessage(); }
+            try { \Illuminate\Support\Facades\Artisan::call('view:clear');   $cleared[] = 'views'; }  catch (\Exception $e) { $errors[] = 'views: ' . $e->getMessage(); }
+
+            // Manual view cache deletion (fallback)
+            $viewCachePath = storage_path('framework/views');
+            if (is_dir($viewCachePath)) {
+                $files = glob($viewCachePath . '/*.php');
+                $deleted = 0;
+                foreach ($files as $file) {
+                    if (@unlink($file)) $deleted++;
+                }
+                $cleared[] = "views-manual({$deleted})";
             }
+
+            // Clear SiteSetting cache
+            try { \App\Models\SiteSetting::clearCache(); $cleared[] = 'settings'; } catch (\Exception $e) {}
+
+            $msg = '✅ تم مسح: ' . implode(', ', $cleared);
+            if ($errors) $msg .= ' | ⚠️ ' . implode(', ', $errors);
+
+            return back()->with('success', $msg);
         })->name('clear.cache');
 
         // Storage Setup (creates required upload directories)

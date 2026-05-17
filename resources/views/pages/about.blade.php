@@ -196,6 +196,16 @@
     </section>
 
     {{-- Team Section --}}
+    @php
+        // Fetch team data directly in view as fallback (in case controller didn't pass it)
+        if (empty($teamItems) || count($teamItems) === 0) {
+            try {
+                $teamItems = \App\Models\ContentItem::ofType('team')->forPage('about')->active()->ordered()->get();
+            } catch (\Exception $e) {
+                $teamItems = collect([]);
+            }
+        }
+    @endphp
     <section class="py-20 bg-brand-bg">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
