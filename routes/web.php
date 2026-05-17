@@ -83,8 +83,40 @@ Route::prefix('analysis-models')->group(function () {
 
 // Career Book / Library
 Route::prefix('library')->group(function () {
-    Route::get('/', [App\Http\Controllers\BookController::class, 'index'])->name('career-book.index');
-    Route::get('/{slug}', [App\Http\Controllers\BookController::class, 'show'])->name('career-book.show');
+    Route::get('/', function () {
+        try {
+            $chapters = \App\Models\BookChapter::published()->ordered()->get();
+        } catch (\Exception $e) {
+            $chapters = collect([]);
+        }
+        return view('book.index', compact('chapters'));
+    })->name('career-book.index');
+
+    Route::get('/{slug}', function ($slug) {
+        try {
+            $chapter = \App\Models\BookChapter::where('slug', $slug)
+                ->where('is_published', true)
+                ->firstOrFail();
+            $user = auth()->user();
+            if (!$chapter->canAccess($user)) {
+                return view('book.locked', compact('chapter'));
+            }
+            $chapters = \App\Models\BookChapter::published()->ordered()->get();
+            $prevChapter = \App\Models\BookChapter::published()
+                ->where('order', '<', $chapter->order)
+                ->orderBy('order', 'desc')->first();
+            $nextChapter = \App\Models\BookChapter::published()
+                ->where('order', '>', $chapter->order)
+                ->orderBy('order')->first();
+            return view('book.show', compact('chapter', 'chapters', 'prevChapter', 'nextChapter'));
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            abort(404);
+        } catch (\Exception $e) {
+            $chapter = (object) ['id' => 0, 'title' => 'فصل غير متاح', 'slug' => $slug, 'order' => 1, 'is_free' => false, 'content_html' => null];
+            $chapters = collect([]);
+            return view('book.locked', compact('chapter'));
+        }
+    })->name('career-book.show');
 });
 
 // Contact
