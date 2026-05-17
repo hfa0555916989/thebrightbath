@@ -280,25 +280,26 @@ Route::prefix('control-panel')
         Route::get('storage-link', function () {
             $results = [];
 
-            // Create all required storage directories
-            $dirs = [
-                storage_path('app/public'),
-                storage_path('app/public/content'),
-                storage_path('app/public/chapters'),
-                storage_path('app/public/assessments'),
-                storage_path('app/public/consultants'),
-                storage_path('app/public/site'),
-                storage_path('app/public/analysis-models'),
+            // Create uploads/ directories directly in web root (public_path)
+            $uploadDirs = [
+                'chapters',
+                'content',
+                'assessments',
+                'consultants',
+                'site',
+                'analysis-models',
             ];
-            foreach ($dirs as $dir) {
+
+            foreach ($uploadDirs as $folder) {
+                $dir = public_path('uploads/' . $folder);
                 if (!is_dir($dir)) {
                     if (mkdir($dir, 0775, true)) {
-                        $results[] = 'تم إنشاء المجلد: ' . basename($dir);
+                        $results[] = 'تم إنشاء: uploads/' . $folder;
                     } else {
-                        $results[] = 'فشل إنشاء: ' . basename($dir);
+                        $results[] = 'فشل: uploads/' . $folder;
                     }
                 } else {
-                    $results[] = basename($dir) . ': موجود ✓';
+                    $results[] = 'uploads/' . $folder . ' ✓';
                 }
             }
 

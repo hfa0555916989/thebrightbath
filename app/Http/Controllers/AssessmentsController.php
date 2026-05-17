@@ -484,7 +484,16 @@ class AssessmentsController extends Controller
     public function index()
     {
         $assessments = $this->getAssessments();
-        return view('assessments.index', compact('assessments'));
+
+        // Load DB images for assessments (keyed by slug)
+        try {
+            $dbImages = \App\Models\Assessment::whereIn('slug', array_keys($assessments))
+                ->pluck('image', 'slug');
+        } catch (\Exception $e) {
+            $dbImages = collect([]);
+        }
+
+        return view('assessments.index', compact('assessments', 'dbImages'));
     }
 
     /**

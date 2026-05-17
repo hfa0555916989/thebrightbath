@@ -68,7 +68,7 @@ class ConsultantController extends Controller
         // Handle photo upload
         $photoPath = null;
         if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('consultants', 'public');
+            $photoPath = store_upload($request->file('photo'), 'consultants');
         }
 
         // Create consultant profile
@@ -150,11 +150,8 @@ class ConsultantController extends Controller
 
         // Handle photo upload
         if ($request->hasFile('photo')) {
-            // Delete old photo
-            if ($consultant->photo) {
-                Storage::disk('public')->delete($consultant->photo);
-            }
-            $photoPath = $request->file('photo')->store('consultants', 'public');
+            delete_upload($consultant->photo);
+            $photoPath = store_upload($request->file('photo'), 'consultants');
         } else {
             $photoPath = $consultant->photo;
         }
@@ -184,9 +181,7 @@ class ConsultantController extends Controller
     public function destroy(Consultant $consultant)
     {
         // Delete photo
-        if ($consultant->photo) {
-            Storage::disk('public')->delete($consultant->photo);
-        }
+        delete_upload($consultant->photo);
 
         // Delete user (will cascade to consultant)
         $consultant->user->delete();

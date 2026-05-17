@@ -48,7 +48,7 @@ class ContentItemController extends Controller
         $data['order'] = ContentItem::ofType($config['type'])->forPage($config['page'])->max('order') + 1;
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('content', 'public');
+            $data['image'] = store_upload($request->file('image'), 'content');
         } elseif ($request->filled('image_url')) {
             $data['image'] = $request->input('image_url');
         }
@@ -71,10 +71,8 @@ class ContentItemController extends Controller
         $data = $this->buildData($request, $config);
 
         if ($request->hasFile('image')) {
-            if ($item->image && !str_starts_with($item->image, 'http')) {
-                Storage::disk('public')->delete($item->image);
-            }
-            $data['image'] = $request->file('image')->store('content', 'public');
+            delete_upload($item->image);
+            $data['image'] = store_upload($request->file('image'), 'content');
         } elseif ($request->filled('image_url')) {
             $data['image'] = $request->input('image_url');
         }
@@ -86,9 +84,7 @@ class ContentItemController extends Controller
     public function destroy(string $type, string|int $id)
     {
         $item = ContentItem::findOrFail($id);
-        if ($item->image && !str_starts_with($item->image, 'http')) {
-            Storage::disk('public')->delete($item->image);
-        }
+        delete_upload($item->image);
         $item->delete();
         return back()->with('success', 'تم حذف العنصر بنجاح.');
     }

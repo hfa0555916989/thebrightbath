@@ -7,6 +7,10 @@
 # vendor/ committed for Hostinger Git deploy (no composer install on server)
 /node_modules/
 
+# ─── Uploads (user uploaded files - keep folder, ignore files) ───────────────
+/uploads/*
+!/uploads/.gitkeep
+
 # ─── Storage (user uploads, logs, cache) ─────────────────────────────────────
 /storage/app/analysis-models/
 /storage/app/private/

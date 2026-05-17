@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\BookChapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 
 class BookChapterController extends Controller
 {
@@ -31,7 +30,7 @@ class BookChapterController extends Controller
 
         $coverPath = null;
         if ($request->hasFile('cover')) {
-            $coverPath = $request->file('cover')->store('chapters', 'public');
+            $coverPath = store_upload($request->file('cover'), 'chapters');
         }
 
         BookChapter::create([
@@ -72,10 +71,8 @@ class BookChapterController extends Controller
         ];
 
         if ($request->hasFile('cover')) {
-            if ($bookChapter->cover) {
-                Storage::disk('public')->delete($bookChapter->cover);
-            }
-            $data['cover'] = $request->file('cover')->store('chapters', 'public');
+            delete_upload($bookChapter->cover);
+            $data['cover'] = store_upload($request->file('cover'), 'chapters');
         }
 
         $bookChapter->update($data);

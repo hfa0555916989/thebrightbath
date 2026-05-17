@@ -92,10 +92,8 @@ class AssessmentController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if ($assessment->image) {
-                Storage::disk('public')->delete($assessment->image);
-            }
-            $validated['image'] = $request->file('image')->store('assessments', 'public');
+            delete_upload($assessment->image);
+            $validated['image'] = store_upload($request->file('image'), 'assessments');
         }
 
         $validated['is_active'] = $request->boolean('is_active');

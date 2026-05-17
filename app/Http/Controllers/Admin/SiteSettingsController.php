@@ -56,14 +56,12 @@ class SiteSettingsController extends Controller
         $this->saveKeys($request, $keys);
 
         if ($request->hasFile('hero_image')) {
-            $path = $request->file('hero_image')->store('site', 'public');
-            SiteSetting::set('hero_image', $path);
+            SiteSetting::set('hero_image', store_upload($request->file('hero_image'), 'site'));
         } elseif ($request->filled('hero_image_url')) {
             SiteSetting::set('hero_image', $request->input('hero_image_url'));
         }
         if ($request->hasFile('home_cta_image')) {
-            $path = $request->file('home_cta_image')->store('site', 'public');
-            SiteSetting::set('home_cta_image', $path);
+            SiteSetting::set('home_cta_image', store_upload($request->file('home_cta_image'), 'site'));
         } elseif ($request->filled('home_cta_image_url')) {
             SiteSetting::set('home_cta_image', $request->input('home_cta_image_url'));
         }
@@ -77,12 +75,10 @@ class SiteSettingsController extends Controller
         $this->saveKeys($request, $keys);
 
         if ($request->hasFile('about_hero_image')) {
-            $path = $request->file('about_hero_image')->store('site', 'public');
-            SiteSetting::set('about_hero_image', $path);
+            SiteSetting::set('about_hero_image', store_upload($request->file('about_hero_image'), 'site'));
         }
         if ($request->hasFile('about_story_image')) {
-            $path = $request->file('about_story_image')->store('site', 'public');
-            SiteSetting::set('about_story_image', $path);
+            SiteSetting::set('about_story_image', store_upload($request->file('about_story_image'), 'site'));
         }
 
         return back()->with('success', 'تم حفظ إعدادات صفحة "من نحن" بنجاح.');
@@ -94,12 +90,10 @@ class SiteSettingsController extends Controller
         $this->saveKeys($request, $keys);
 
         if ($request->hasFile('vision_image')) {
-            $path = $request->file('vision_image')->store('site', 'public');
-            SiteSetting::set('vision_image', $path);
+            SiteSetting::set('vision_image', store_upload($request->file('vision_image'), 'site'));
         }
         if ($request->hasFile('mission_image')) {
-            $path = $request->file('mission_image')->store('site', 'public');
-            SiteSetting::set('mission_image', $path);
+            SiteSetting::set('mission_image', store_upload($request->file('mission_image'), 'site'));
         }
 
         return back()->with('success', 'تم حفظ الرؤية والرسالة بنجاح.');

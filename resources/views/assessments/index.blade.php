@@ -143,9 +143,10 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 
                 {{-- Holland Test --}}
+                @php $hollandImg = $dbImages['holland'] ?? null; @endphp
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 group">
                     <div class="relative h-56 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                        <img src="{{ $hollandImg ? storage_asset($hollandImg) : 'https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}" 
                              alt="اختبار هولاند للميول المهنية" 
                              class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                         <div class="absolute top-4 right-4 bg-brand-gold text-brand-dark text-xs px-3 py-1 rounded-full font-bold">
@@ -191,9 +192,10 @@
                 </div>
 
                 {{-- MBTI Test --}}
+                @php $mbtiImg = $dbImages['mbti'] ?? null; @endphp
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 group">
                     <div class="relative h-56 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                        <img src="{{ $mbtiImg ? storage_asset($mbtiImg) : 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}" 
                              alt="اختبار الشخصية MBTI" 
                              class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -236,9 +238,10 @@
                 </div>
 
                 {{-- Multiple Intelligences --}}
+                @php $miImg = $dbImages['mi'] ?? null; @endphp
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 group">
                     <div class="relative h-56 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                        <img src="{{ $miImg ? storage_asset($miImg) : 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}" 
                              alt="اختبار الذكاءات المتعددة" 
                              class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -281,9 +284,10 @@
                 </div>
 
                 {{-- Work Values --}}
+                @php $wvImg = $dbImages['work-values'] ?? null; @endphp
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 group">
                     <div class="relative h-56 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                        <img src="{{ $wvImg ? storage_asset($wvImg) : 'https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}" 
                              alt="اختبار القيم المهنية" 
                              class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                         <div class="absolute top-4 right-4 bg-brand-DEFAULT text-white text-xs px-3 py-1 rounded-full font-bold">
@@ -329,9 +333,10 @@
                 </div>
 
                 {{-- Career Fit --}}
+                @php $cfImg = $dbImages['career-fit'] ?? null; @endphp
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 group">
                     <div class="relative h-56 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                        <img src="{{ $cfImg ? storage_asset($cfImg) : 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}" 
                              alt="اختبار الملاءمة المهنية" 
                              class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
