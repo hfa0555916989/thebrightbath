@@ -89,9 +89,9 @@
                             @if($chapter->cover ?? null)
                                 <img src="{{ $chapter->cover_url }}"
                                      alt="{{ $chapter->title }}"
-                                     class="w-24 h-24 object-cover flex-shrink-0">
+                                     class="w-28 h-28 md:w-36 md:h-36 object-cover flex-shrink-0">
                             @else
-                                <div class="w-24 h-24 bg-gradient-to-br {{ $chapter->is_free ? 'from-brand-gold to-brand-orange' : 'from-gray-400 to-gray-500' }} flex items-center justify-center flex-shrink-0">
+                                <div class="w-28 h-28 md:w-36 md:h-36 bg-gradient-to-br {{ $chapter->is_free ? 'from-brand-gold to-brand-orange' : 'from-gray-400 to-gray-500' }} flex items-center justify-center flex-shrink-0">
                                     <span class="text-3xl font-bold text-white">{{ $index + 1 }}</span>
                                 </div>
                             @endif

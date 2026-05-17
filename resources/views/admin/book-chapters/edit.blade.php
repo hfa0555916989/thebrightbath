@@ -51,6 +51,14 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Save button (visible on mobile below content) --}}
+                <div class="lg:hidden">
+                    <button type="submit"
+                            class="w-full bg-brand-gold text-brand-dark py-3 rounded-lg font-bold hover:bg-brand-goldDeep transition text-lg">
+                        <i class="fas fa-save ml-2"></i>حفظ التعديلات
+                    </button>
+                </div>
             </div>
 
             {{-- Sidebar --}}
@@ -87,19 +95,26 @@
                     <h3 class="text-lg font-bold text-brand-dark mb-6">صورة الغلاف</h3>
 
                     @if($chapter->cover)
-                        <div class="mb-4 rounded-lg overflow-hidden border border-brand-border">
-                            <img src="{{ $chapter->cover_url }}" alt="صورة الغلاف الحالية" class="w-full h-40 object-cover">
+                        <div class="mb-4 rounded-xl overflow-hidden border border-brand-border shadow">
+                            <img src="{{ $chapter->cover_url }}"
+                                 alt="صورة الغلاف الحالية"
+                                 class="w-full object-cover"
+                                 style="max-height: 280px;">
                         </div>
                         <p class="text-xs text-brand-textMuted mb-3">لاستبدال الصورة اختر صورة جديدة:</p>
                     @endif
 
-                    <div class="border-2 border-dashed border-brand-border rounded-lg p-6 text-center">
+                    <div class="border-2 border-dashed border-brand-border rounded-lg p-6 text-center" id="cover-drop-zone">
                         <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
                         <p class="text-sm text-brand-textMuted mb-2">اسحب الصورة هنا أو</p>
                         <label class="inline-block px-4 py-2 bg-brand-light text-brand-dark rounded-lg cursor-pointer hover:bg-gray-200 transition">
                             <span>اختر صورة</span>
-                            <input type="file" name="cover" accept="image/*" class="hidden">
+                            <input type="file" name="cover" accept="image/*" class="hidden"
+                                   onchange="previewCover(this)">
                         </label>
+                        <img id="cover-preview" src="" alt=""
+                             class="hidden mt-4 mx-auto rounded-lg max-w-full"
+                             style="max-height:280px;">
                     </div>
                 </div>
 
@@ -119,5 +134,15 @@
         </div>
     </form>
 </div>
+
+<script>
+function previewCover(input) {
+    if (input.files && input.files[0]) {
+        const preview = document.getElementById('cover-preview');
+        preview.src = URL.createObjectURL(input.files[0]);
+        preview.classList.remove('hidden');
+    }
+}
+</script>
 @endsection
 

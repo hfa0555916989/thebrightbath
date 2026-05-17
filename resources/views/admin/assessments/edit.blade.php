@@ -75,7 +75,8 @@
                     <div class="mb-4">
                         <p class="text-sm text-brand-textMuted mb-2">الصورة الحالية:</p>
                         <img src="{{ $assessment->image_url }}" alt="{{ $assessment->name }}"
-                             class="w-48 h-32 object-cover rounded-lg border border-brand-border">
+                             class="w-full max-w-sm rounded-xl border border-brand-border shadow-sm object-cover"
+                             style="max-height:220px;">
                     </div>
                     @endif
 
@@ -87,9 +88,17 @@
                             <p class="text-brand-dark font-medium">اضغط لرفع صورة</p>
                             <p class="text-brand-textMuted text-sm mt-1">PNG, JPG حتى 2MB</p>
                         </label>
-                        <img id="image-preview" src="" alt="" class="hidden mt-4 mx-auto w-48 h-32 object-cover rounded-lg">
+                        <img id="image-preview" src="" alt="" class="hidden mt-4 mx-auto rounded-lg max-w-full" style="max-height:240px;">
                     </div>
                     @error('image') <p class="text-red-500 text-sm mt-2">{{ $message }}</p> @enderror
+
+                    {{-- Save button inside main column for easy access --}}
+                    <div class="pt-4 border-t border-brand-border mt-4">
+                        <button type="submit"
+                                class="w-full bg-brand-primary text-white py-3 rounded-lg font-bold hover:bg-brand-primaryDark transition text-lg">
+                            <i class="fas fa-save ml-2"></i>حفظ التغييرات
+                        </button>
+                    </div>
                 </div>
             </div>
 

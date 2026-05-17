@@ -26,15 +26,9 @@
         
         <div class="container mx-auto px-6 relative z-10">
             <div class="flex items-center gap-6">
-                @if($chapter->cover ?? null)
-                    <img src="{{ $chapter->cover_url }}"
-                         alt="{{ $chapter->title ?? '' }}"
-                         class="w-20 h-20 object-cover rounded-2xl shadow-lg border-2 border-white/30">
-                @else
-                    <div class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                        <span class="text-3xl font-bold text-white">{{ $chapter->order ?? 1 }}</span>
-                    </div>
-                @endif
+                <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <span class="text-3xl font-bold text-white">{{ $chapter->order ?? 1 }}</span>
+                </div>
                 <div>
                     <h1 class="text-3xl md:text-4xl font-display font-bold text-white mb-2">
                         {{ $chapter->title ?? 'عنوان الفصل' }}
@@ -49,6 +43,20 @@
             </div>
         </div>
     </section>
+
+    {{-- Cover Image Section --}}
+    @if($chapter->cover ?? null)
+    <section class="bg-white border-b border-gray-100">
+        <div class="container mx-auto px-6 py-6">
+            <div class="max-w-2xl mx-auto">
+                <img src="{{ $chapter->cover_url }}"
+                     alt="{{ $chapter->title }}"
+                     class="w-full rounded-2xl shadow-xl object-cover"
+                     style="max-height: 420px;">
+            </div>
+        </div>
+    </section>
+    @endif
 
     {{-- Chapter Content --}}
     <section class="py-12 bg-brand-bg">
