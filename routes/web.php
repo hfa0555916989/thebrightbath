@@ -263,6 +263,19 @@ Route::prefix('control-panel')
             }
         })->name('run.migrations');
 
+        // Clear all caches (fixes stale route/config/view cache issues after deployment)
+        Route::get('clear-cache', function () {
+            try {
+                \Illuminate\Support\Facades\Artisan::call('cache:clear');
+                \Illuminate\Support\Facades\Artisan::call('route:clear');
+                \Illuminate\Support\Facades\Artisan::call('config:clear');
+                \Illuminate\Support\Facades\Artisan::call('view:clear');
+                return back()->with('success', 'تم مسح جميع ملفات الكاش بنجاح.');
+            } catch (\Exception $e) {
+                return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+            }
+        })->name('clear.cache');
+
         // Storage Link (run once to fix image display on shared hosting)
         Route::get('storage-link', function () {
             $link   = public_path('storage');

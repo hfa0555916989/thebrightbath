@@ -33,17 +33,23 @@
         </h3>
         <p class="text-sm text-amber-700 mb-4">هذه الأزرار تُستخدم لإعداد السيرفر لأول مرة أو بعد رفع تحديثات جديدة.</p>
         <div class="flex flex-wrap gap-3">
-            <a href="{{ route('admin.run.migrations') }}"
+            <a href="/control-panel/run-migrations"
                onclick="return confirm('سيتم تحديث قاعدة البيانات وإنشاء الجداول الناقصة. هل أنت متأكد؟')"
                class="inline-flex items-center gap-2 bg-amber-600 text-white px-5 py-2.5 rounded-lg font-bold hover:bg-amber-700 transition">
                 <i class="fas fa-database"></i>
                 تحديث قاعدة البيانات (Migrate)
             </a>
-            <a href="{{ route('admin.storage.link') }}"
+            <a href="/control-panel/storage-link"
                onclick="return confirm('سيتم إنشاء رابط التخزين لعرض الصور المرفوعة. هل أنت متأكد؟')"
                class="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition">
                 <i class="fas fa-link"></i>
                 إنشاء رابط التخزين (Storage Link)
+            </a>
+            <a href="/control-panel/clear-cache"
+               onclick="return confirm('سيتم مسح جميع ملفات الكاش. هل أنت متأكد؟')"
+               class="inline-flex items-center gap-2 bg-gray-600 text-white px-5 py-2.5 rounded-lg font-bold hover:bg-gray-700 transition">
+                <i class="fas fa-broom"></i>
+                مسح الكاش (Clear Cache)
             </a>
         </div>
     </div>
