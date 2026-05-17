@@ -85,7 +85,14 @@
 
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-brand-border">
                     <h3 class="text-lg font-bold text-brand-dark mb-6">صورة الغلاف</h3>
-                    
+
+                    @if($chapter->cover)
+                        <div class="mb-4 rounded-lg overflow-hidden border border-brand-border">
+                            <img src="{{ asset('storage/' . $chapter->cover) }}" alt="صورة الغلاف الحالية" class="w-full h-40 object-cover">
+                        </div>
+                        <p class="text-xs text-brand-textMuted mb-3">لاستبدال الصورة اختر صورة جديدة:</p>
+                    @endif
+
                     <div class="border-2 border-dashed border-brand-border rounded-lg p-6 text-center">
                         <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
                         <p class="text-sm text-brand-textMuted mb-2">اسحب الصورة هنا أو</p>

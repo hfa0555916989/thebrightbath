@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BookChapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class BookChapterController extends Controller
 {
@@ -28,6 +29,11 @@ class BookChapterController extends Controller
             'order'   => 'nullable|integer|min:1',
         ]);
 
+        $coverPath = null;
+        if ($request->hasFile('cover')) {
+            $coverPath = $request->file('cover')->store('chapters', 'public');
+        }
+
         BookChapter::create([
             'title'        => $request->title,
             'slug'         => Str::slug($request->title) . '-' . time(),
@@ -36,6 +42,7 @@ class BookChapterController extends Controller
             'order'        => $request->order ?? 1,
             'is_free'      => $request->has('is_free'),
             'is_published' => $request->status === 'published',
+            'cover'        => $coverPath,
         ]);
 
         return redirect()->route('admin.book-chapters.index')
@@ -55,14 +62,23 @@ class BookChapterController extends Controller
             'order'   => 'nullable|integer|min:1',
         ]);
 
-        $bookChapter->update([
+        $data = [
             'title'        => $request->title,
             'excerpt'      => $request->description,
             'content_html' => $request->content,
             'order'        => $request->order ?? $bookChapter->order,
             'is_free'      => $request->has('is_free'),
             'is_published' => $request->status === 'published',
-        ]);
+        ];
+
+        if ($request->hasFile('cover')) {
+            if ($bookChapter->cover) {
+                Storage::disk('public')->delete($bookChapter->cover);
+            }
+            $data['cover'] = $request->file('cover')->store('chapters', 'public');
+        }
+
+        $bookChapter->update($data);
 
         return redirect()->route('admin.book-chapters.index')
             ->with('success', 'تم تحديث الفصل بنجاح');

@@ -17,6 +17,7 @@ class BookChapter extends Model
         'is_free',
         'content_html',
         'is_published',
+        'cover',
     ];
 
     protected function casts(): array

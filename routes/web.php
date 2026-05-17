@@ -278,17 +278,40 @@ Route::prefix('control-panel')
 
         // Storage Link (run once to fix image display on shared hosting)
         Route::get('storage-link', function () {
+            $results = [];
+
+            // Create all required storage directories
+            $dirs = [
+                storage_path('app/public'),
+                storage_path('app/public/content'),
+                storage_path('app/public/chapters'),
+                storage_path('app/public/assessments'),
+                storage_path('app/public/consultants'),
+                storage_path('app/public/site'),
+                storage_path('app/public/analysis-models'),
+            ];
+            foreach ($dirs as $dir) {
+                if (!is_dir($dir)) {
+                    mkdir($dir, 0775, true);
+                    $results[] = 'تم إنشاء المجلد: ' . basename($dir);
+                }
+            }
+
+            // Create storage symlink
             $link   = public_path('storage');
             $target = storage_path('app/public');
-            if (file_exists($link)) {
-                return back()->with('success', '✅ رابط التخزين موجود بالفعل — الصور تعمل بشكل صحيح.');
+            if (file_exists($link) || is_link($link)) {
+                $results[] = 'رابط التخزين موجود بالفعل.';
+            } else {
+                try {
+                    symlink($target, $link);
+                    $results[] = 'تم إنشاء رابط التخزين بنجاح!';
+                } catch (\Exception $e) {
+                    $results[] = 'تعذّر إنشاء السيملنك: ' . $e->getMessage();
+                }
             }
-            try {
-                symlink($target, $link);
-                return back()->with('success', '✅ تم إنشاء رابط التخزين بنجاح! الصور ستظهر الآن.');
-            } catch (\Exception $e) {
-                return back()->with('error', '❌ فشل إنشاء الرابط: ' . $e->getMessage());
-            }
+
+            return back()->with('success', '✅ ' . implode(' | ', $results));
         })->name('storage.link');
 
         // ===== Site Settings (CMS) =====
