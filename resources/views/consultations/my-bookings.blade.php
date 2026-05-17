@@ -33,7 +33,7 @@
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div class="flex items-center gap-4">
                                 @if($booking->consultant->photo)
-                                    <img src="{{ asset('storage/' . $booking->consultant->photo) }}" class="w-16 h-16 rounded-full object-cover">
+                                    <img src="{{ $booking->consultant->photo_url }}" class="w-16 h-16 rounded-full object-cover">
                                 @else
                                     <div class="w-16 h-16 rounded-full bg-brand-gold/10 flex items-center justify-center">
                                         <i class="fas fa-user text-2xl text-brand-gold"></i>
@@ -104,7 +104,7 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 @if($booking->consultant->photo)
-                                    <img src="{{ asset('storage/' . $booking->consultant->photo) }}" class="w-12 h-12 rounded-full object-cover grayscale">
+                                    <img src="{{ $booking->consultant->photo_url }}" class="w-12 h-12 rounded-full object-cover grayscale">
                                 @else
                                     <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
                                         <i class="fas fa-user text-gray-400"></i>

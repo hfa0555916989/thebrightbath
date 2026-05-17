@@ -99,7 +99,7 @@
                     {{-- Photo & Info --}}
                     <div class="flex items-center gap-4 mb-6">
                         @if($consultant->photo)
-                            <img src="{{ asset('storage/' . $consultant->photo) }}" alt="{{ $consultant->user->name }}" 
+                            <img src="{{ $consultant->photo_url }}" alt="{{ $consultant->user->name }}" 
                                  class="w-20 h-20 rounded-full object-cover border-4 border-brand-gold/20">
                         @else
                             <div class="w-20 h-20 rounded-full bg-brand-gold/10 flex items-center justify-center border-4 border-brand-gold/20">

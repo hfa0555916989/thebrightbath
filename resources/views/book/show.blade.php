@@ -26,9 +26,15 @@
         
         <div class="container mx-auto px-6 relative z-10">
             <div class="flex items-center gap-6">
-                <div class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                    <span class="text-3xl font-bold text-white">{{ $chapter->order ?? 1 }}</span>
-                </div>
+                @if($chapter->cover ?? null)
+                    <img src="{{ $chapter->cover_url }}"
+                         alt="{{ $chapter->title ?? '' }}"
+                         class="w-20 h-20 object-cover rounded-2xl shadow-lg border-2 border-white/30">
+                @else
+                    <div class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                        <span class="text-3xl font-bold text-white">{{ $chapter->order ?? 1 }}</span>
+                    </div>
+                @endif
                 <div>
                     <h1 class="text-3xl md:text-4xl font-display font-bold text-white mb-2">
                         {{ $chapter->title ?? 'عنوان الفصل' }}

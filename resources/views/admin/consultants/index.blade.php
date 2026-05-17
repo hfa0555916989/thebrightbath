@@ -83,7 +83,7 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
                                 @if($consultant->photo)
-                                    <img src="{{ asset('storage/' . $consultant->photo) }}" alt="{{ $consultant->user->name }}" class="w-12 h-12 rounded-full object-cover">
+                                    <img src="{{ $consultant->photo_url }}" alt="{{ $consultant->user->name }}" class="w-12 h-12 rounded-full object-cover">
                                 @else
                                     <div class="w-12 h-12 rounded-full bg-brand-gold/20 flex items-center justify-center">
                                         <i class="fas fa-user text-brand-gold"></i>

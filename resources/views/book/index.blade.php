@@ -85,10 +85,16 @@
                 @forelse($chapters ?? [] as $index => $chapter)
                     <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition group">
                         <div class="flex items-center">
-                            {{-- Chapter Number --}}
-                            <div class="w-24 h-24 bg-gradient-to-br {{ $chapter->is_free ? 'from-brand-gold to-brand-orange' : 'from-gray-400 to-gray-500' }} flex items-center justify-center flex-shrink-0">
-                                <span class="text-3xl font-bold text-white">{{ $index + 1 }}</span>
-                            </div>
+                            {{-- Chapter Cover / Number --}}
+                            @if($chapter->cover ?? null)
+                                <img src="{{ $chapter->cover_url }}"
+                                     alt="{{ $chapter->title }}"
+                                     class="w-24 h-24 object-cover flex-shrink-0">
+                            @else
+                                <div class="w-24 h-24 bg-gradient-to-br {{ $chapter->is_free ? 'from-brand-gold to-brand-orange' : 'from-gray-400 to-gray-500' }} flex items-center justify-center flex-shrink-0">
+                                    <span class="text-3xl font-bold text-white">{{ $index + 1 }}</span>
+                                </div>
+                            @endif
                             
                             {{-- Chapter Info --}}
                             <div class="flex-1 p-6">

@@ -108,7 +108,7 @@
         {{-- Background Image - Career Counseling/Mentoring --}}
         <div class="absolute inset-0 z-0">
             @php $heroImg = setting('hero_image','https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); @endphp
-            <img src="{{ str_starts_with($heroImg,'http') ? $heroImg : asset('storage/'.$heroImg) }}"
+            <img src="{{ storage_asset($heroImg) }}"
                  alt="جلسة إرشاد مهني"
                  class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-l from-brand-dark/95 via-brand-dark/85 to-brand-dark/70"></div>
@@ -600,7 +600,7 @@
     <section class="py-20 relative overflow-hidden">
         <div class="absolute inset-0">
             @php $ctaImg = setting('home_cta_image','https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); @endphp
-            <img src="{{ str_starts_with($ctaImg,'http') ? $ctaImg : asset('storage/'.$ctaImg) }}"
+            <img src="{{ storage_asset($ctaImg) }}"
                  alt="مكتب احترافي"
                  class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-brand-dark/90"></div>

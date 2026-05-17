@@ -96,7 +96,7 @@
                 {{-- Vision --}}
                 <div class="relative rounded-2xl overflow-hidden h-[400px] group">
                     @php $vImg = setting('vision_image','https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'); @endphp
-                    <img src="{{ str_starts_with($vImg,'http') ? $vImg : asset('storage/'.$vImg) }}"
+                    <img src="{{ storage_asset($vImg) }}"
                          alt="الرؤية"
                          class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/60 to-transparent"></div>
@@ -206,10 +206,30 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                @forelse($teamItems ?? [] as $member)
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg group">
                     <div class="relative h-64 overflow-hidden">
-                        <img src="https://images.pexels.com/photos/5669619/pexels-photo-5669619.jpeg?auto=compress&cs=tinysrgb&w=400" 
-                             alt="مستشار مهني سعودي" 
+                        @if($member->image)
+                            <img src="{{ $member->image_url }}"
+                                 alt="{{ $member->title }}"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        @else
+                            <div class="w-full h-full bg-brand-gold/10 flex items-center justify-center">
+                                <i class="fas fa-user text-5xl text-brand-gold/40"></i>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="text-lg font-bold text-brand-dark mb-1">{{ $member->title }}</h3>
+                        <p class="text-brand-textMuted text-sm">{{ $member->body }}</p>
+                    </div>
+                </div>
+                @empty
+                {{-- fallback static cards if no DB data --}}
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg group">
+                    <div class="relative h-64 overflow-hidden">
+                        <img src="https://images.pexels.com/photos/5669619/pexels-photo-5669619.jpeg?auto=compress&cs=tinysrgb&w=400"
+                             alt="مستشار مهني"
                              class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                     </div>
                     <div class="p-6 text-center">
@@ -217,11 +237,10 @@
                         <p class="text-brand-textMuted text-sm">متخصصون في توجيه الأفراد نحو المسار المهني الأمثل</p>
                     </div>
                 </div>
-
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg group">
                     <div class="relative h-64 overflow-hidden">
-                        <img src="https://images.pexels.com/photos/7504837/pexels-photo-7504837.jpeg?auto=compress&cs=tinysrgb&w=400" 
-                             alt="مدرب سعودي معتمد" 
+                        <img src="https://images.pexels.com/photos/7504837/pexels-photo-7504837.jpeg?auto=compress&cs=tinysrgb&w=400"
+                             alt="مدرب معتمد"
                              class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                     </div>
                     <div class="p-6 text-center">
@@ -229,11 +248,10 @@
                         <p class="text-brand-textMuted text-sm">خبراء في تقديم البرامج التدريبية المتخصصة</p>
                     </div>
                 </div>
-
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg group">
                     <div class="relative h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                             alt="خبير قياس نفسي" 
+                        <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+                             alt="خبير قياس"
                              class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                     </div>
                     <div class="p-6 text-center">
@@ -241,6 +259,7 @@
                         <p class="text-brand-textMuted text-sm">متخصصون في تطبيق وتحليل الاختبارات النفسية</p>
                     </div>
                 </div>
+                @endforelse
             </div>
         </div>
     </section>

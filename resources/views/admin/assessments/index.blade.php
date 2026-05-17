@@ -94,7 +94,7 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
                                 @if($assessment->image)
-                                <img src="{{ Storage::url($assessment->image) }}" alt="{{ $assessment->name }}"
+                                <img src="{{ $assessment->image_url }}" alt="{{ $assessment->name }}"
                                      class="w-10 h-10 object-cover rounded-lg border border-brand-border">
                                 @else
                                 <div class="w-10 h-10 bg-brand-gold/20 rounded-lg flex items-center justify-center">

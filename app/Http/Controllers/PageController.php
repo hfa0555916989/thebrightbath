@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ContentItem;
+
 class PageController extends Controller
 {
     /**
@@ -9,7 +11,13 @@ class PageController extends Controller
      */
     public function about()
     {
-        return view('pages.about');
+        try {
+            $teamItems = ContentItem::ofType('team')->forPage('about')->active()->ordered()->get();
+        } catch (\Exception $e) {
+            $teamItems = collect([]);
+        }
+
+        return view('pages.about', compact('teamItems'));
     }
 
     /**

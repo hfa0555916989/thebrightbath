@@ -38,7 +38,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">صورة المستشار</label>
                     @if($consultant->photo)
                         <div class="mb-2">
-                            <img src="{{ asset('storage/' . $consultant->photo) }}" class="w-20 h-20 rounded-full object-cover">
+                            <img src="{{ $consultant->photo_url }}" class="w-20 h-20 rounded-full object-cover">
                         </div>
                     @endif
                     <input type="file" name="photo" accept="image/*"

@@ -49,7 +49,7 @@
                         <div class="space-y-3">
                             <div class="flex items-center gap-4">
                                 @if($booking->consultant->photo)
-                                    <img src="{{ asset('storage/' . $booking->consultant->photo) }}" class="w-14 h-14 rounded-full object-cover">
+                                    <img src="{{ $booking->consultant->photo_url }}" class="w-14 h-14 rounded-full object-cover">
                                 @else
                                     <div class="w-14 h-14 rounded-full bg-brand-gold/10 flex items-center justify-center">
                                         <i class="fas fa-user text-xl text-brand-gold"></i>

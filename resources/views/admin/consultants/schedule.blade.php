@@ -12,7 +12,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <div class="flex items-center gap-4 mb-6">
                 @if($consultant->photo)
-                    <img src="{{ asset('storage/' . $consultant->photo) }}" class="w-16 h-16 rounded-full object-cover">
+                    <img src="{{ $consultant->photo_url }}" class="w-16 h-16 rounded-full object-cover">
                 @else
                     <div class="w-16 h-16 rounded-full bg-brand-gold/20 flex items-center justify-center">
                         <i class="fas fa-user text-2xl text-brand-gold"></i>

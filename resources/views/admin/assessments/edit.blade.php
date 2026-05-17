@@ -74,7 +74,7 @@
                     @if($assessment->image)
                     <div class="mb-4">
                         <p class="text-sm text-brand-textMuted mb-2">الصورة الحالية:</p>
-                        <img src="{{ Storage::url($assessment->image) }}" alt="{{ $assessment->name }}"
+                        <img src="{{ $assessment->image_url }}" alt="{{ $assessment->name }}"
                              class="w-48 h-32 object-cover rounded-lg border border-brand-border">
                     </div>
                     @endif

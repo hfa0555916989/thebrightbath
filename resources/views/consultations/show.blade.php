@@ -39,7 +39,7 @@
             <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
                 <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
                     @if($consultant->photo)
-                        <img src="{{ asset('storage/' . $consultant->photo) }}" alt="{{ $consultant->user->name }}" 
+                        <img src="{{ $consultant->photo_url }}" alt="{{ $consultant->user->name }}" 
                              class="w-32 h-32 rounded-2xl object-cover shadow-lg">
                     @else
                         <div class="w-32 h-32 rounded-2xl bg-brand-gold/10 flex items-center justify-center shadow-lg">
