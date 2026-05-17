@@ -252,6 +252,17 @@ Route::prefix('control-panel')
         Route::get('logo', [LogoController::class, 'index'])->name('logo.index');
         Route::post('logo', [LogoController::class, 'upload'])->name('logo.upload');
 
+        // Run Migrations (run once to create missing database tables)
+        Route::get('run-migrations', function () {
+            try {
+                \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+                $output = \Illuminate\Support\Facades\Artisan::output();
+                return back()->with('success', 'تم تنفيذ التحديثات على قاعدة البيانات بنجاح. ' . $output);
+            } catch (\Exception $e) {
+                return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+            }
+        })->name('run.migrations');
+
         // Storage Link (run once to fix image display on shared hosting)
         Route::get('storage-link', function () {
             $link   = public_path('storage');
