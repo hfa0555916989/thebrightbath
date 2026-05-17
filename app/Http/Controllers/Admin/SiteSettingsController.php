@@ -58,10 +58,14 @@ class SiteSettingsController extends Controller
         if ($request->hasFile('hero_image')) {
             $path = $request->file('hero_image')->store('site', 'public');
             SiteSetting::set('hero_image', $path);
+        } elseif ($request->filled('hero_image_url')) {
+            SiteSetting::set('hero_image', $request->input('hero_image_url'));
         }
         if ($request->hasFile('home_cta_image')) {
             $path = $request->file('home_cta_image')->store('site', 'public');
             SiteSetting::set('home_cta_image', $path);
+        } elseif ($request->filled('home_cta_image_url')) {
+            SiteSetting::set('home_cta_image', $request->input('home_cta_image_url'));
         }
 
         return back()->with('success', 'تم حفظ إعدادات Hero بنجاح.');

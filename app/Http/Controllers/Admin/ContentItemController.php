@@ -49,6 +49,8 @@ class ContentItemController extends Controller
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('content', 'public');
+        } elseif ($request->filled('image_url')) {
+            $data['image'] = $request->input('image_url');
         }
 
         ContentItem::create($data);

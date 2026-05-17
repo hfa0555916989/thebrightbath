@@ -17,7 +17,7 @@
     </div>
 
     {{-- Form --}}
-    <form action="{{ route('admin.book-chapters.update', $chapter) }}" method="POST" class="space-y-6">
+    <form action="{{ route('admin.book-chapters.update', $chapter) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
         
@@ -31,6 +31,7 @@
                         <div>
                             <label class="block text-sm font-medium text-brand-dark mb-2">عنوان الفصل <span class="text-red-500">*</span></label>
                             <input type="text" name="title" required
+                                   value="{{ old('title', $chapter->title) }}"
                                    class="w-full px-4 py-3 border border-brand-border rounded-lg focus:ring-2 focus:ring-brand-gold/20"
                                    placeholder="عنوان الفصل">
                         </div>
@@ -39,14 +40,14 @@
                             <label class="block text-sm font-medium text-brand-dark mb-2">الوصف المختصر</label>
                             <textarea name="description" rows="3"
                                       class="w-full px-4 py-3 border border-brand-border rounded-lg focus:ring-2 focus:ring-brand-gold/20 resize-none"
-                                      placeholder="وصف مختصر لمحتوى الفصل..."></textarea>
+                                      placeholder="وصف مختصر لمحتوى الفصل...">{{ old('description', $chapter->excerpt) }}</textarea>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-brand-dark mb-2">محتوى الفصل <span class="text-red-500">*</span></label>
                             <textarea name="content" rows="15" required
                                       class="w-full px-4 py-3 border border-brand-border rounded-lg focus:ring-2 focus:ring-brand-gold/20"
-                                      placeholder="محتوى الفصل..."></textarea>
+                                      placeholder="محتوى الفصل...">{{ old('content', $chapter->content_html) }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -61,20 +62,21 @@
                         <div>
                             <label class="block text-sm font-medium text-brand-dark mb-2">الحالة</label>
                             <select name="status" class="w-full px-4 py-2 border border-brand-border rounded-lg focus:ring-2 focus:ring-brand-gold/20">
-                                <option value="draft">مسودة</option>
-                                <option value="published">منشور</option>
+                                <option value="draft" {{ old('status', $chapter->is_published ? 'published' : 'draft') === 'draft' ? 'selected' : '' }}>مسودة</option>
+                                <option value="published" {{ old('status', $chapter->is_published ? 'published' : 'draft') === 'published' ? 'selected' : '' }}>منشور</option>
                             </select>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-brand-dark mb-2">ترتيب الفصل</label>
-                            <input type="number" name="order" value="1" min="1"
+                            <input type="number" name="order" value="{{ old('order', $chapter->order) }}" min="1"
                                    class="w-full px-4 py-2 border border-brand-border rounded-lg focus:ring-2 focus:ring-brand-gold/20">
                         </div>
 
                         <div>
                             <label class="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" name="is_free" class="w-5 h-5 rounded text-brand-gold focus:ring-brand-gold/20">
+                                <input type="checkbox" name="is_free" class="w-5 h-5 rounded text-brand-gold focus:ring-brand-gold/20"
+                                       {{ old('is_free', $chapter->is_free) ? 'checked' : '' }}>
                                 <span class="text-sm text-brand-dark">فصل مجاني</span>
                             </label>
                         </div>

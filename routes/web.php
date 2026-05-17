@@ -83,26 +83,8 @@ Route::prefix('analysis-models')->group(function () {
 
 // Career Book / Library
 Route::prefix('library')->group(function () {
-    Route::get('/', function () {
-        $chapters = collect([
-            (object) ['id' => 1, 'title' => 'مقدمة في الإرشاد المهني', 'slug' => 'introduction', 'order' => 1, 'is_free' => true, 'excerpt' => 'تعرف على أساسيات الإرشاد المهني وأهميته'],
-            (object) ['id' => 2, 'title' => 'اكتشاف الذات والميول', 'slug' => 'self-discovery', 'order' => 2, 'is_free' => true, 'excerpt' => 'كيف تكتشف ميولك وقدراتك الحقيقية'],
-            (object) ['id' => 3, 'title' => 'اختبارات الميول المهنية', 'slug' => 'assessments', 'order' => 3, 'is_free' => false, 'excerpt' => 'تعرف على أهم اختبارات الميول وكيفية الاستفادة منها'],
-        ]);
-        return view('book.index', compact('chapters'));
-    })->name('career-book.index');
-    
-    Route::get('/{slug}', function ($slug) {
-        $chaptersData = [
-            'introduction' => ['title' => 'مقدمة في الإرشاد المهني', 'is_free' => true, 'content_html' => '<h2>ما هو الإرشاد المهني؟</h2><p>الإرشاد المهني هو عملية مساعدة الأفراد على اكتشاف ميولهم وقدراتهم.</p>'],
-            'self-discovery' => ['title' => 'اكتشاف الذات والميول', 'is_free' => true, 'content_html' => '<h2>رحلة اكتشاف الذات</h2><p>تبدأ رحلة الإرشاد المهني الناجحة باكتشاف الذات.</p>'],
-        ];
-        
-        $chapterData = $chaptersData[$slug] ?? null;
-        $chapter = $chapterData ? (object) array_merge(['id' => 1, 'slug' => $slug, 'order' => 1], $chapterData) : (object) ['id' => 1, 'title' => 'فصل مقفل', 'slug' => $slug, 'order' => 1, 'is_free' => false, 'content_html' => null];
-        $chapters = collect([]);
-        return view('book.show', compact('chapter', 'chapters'));
-    })->name('career-book.show');
+    Route::get('/', [App\Http\Controllers\BookController::class, 'index'])->name('career-book.index');
+    Route::get('/{slug}', [App\Http\Controllers\BookController::class, 'show'])->name('career-book.show');
 });
 
 // Contact
