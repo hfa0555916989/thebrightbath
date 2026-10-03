@@ -149,7 +149,7 @@
 <body>
     <div class="email-wrapper">
         <div class="email-header">
-            <img src="{{ asset('images/logo-white.png') }}" alt="الطريق المشرق">
+            <img src="{{ site_image('site_logo_white', 'images/logo-white.png') }}" alt="الطريق المشرق">
             <h1>@yield('header-title', 'الطريق المشرق للتدريب والتطوير')</h1>
         </div>
         

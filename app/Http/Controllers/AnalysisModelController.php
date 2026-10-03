@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AnalysisModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AnalysisModelController extends Controller
 {
@@ -44,14 +45,12 @@ class AnalysisModelController extends Controller
             abort(404);
         }
 
-        $model->incrementDownloads();
-
-        $path = storage_path('app/' . $model->file_path);
-        
-        if (!file_exists($path)) {
+        if (!Storage::disk('private')->exists($model->file_path)) {
             abort(404, 'الملف غير موجود');
         }
 
-        return response()->download($path, $model->original_file_name);
+        $model->incrementDownloads();
+
+        return Storage::disk('private')->download($model->file_path, $model->original_file_name);
     }
 }

@@ -25,19 +25,6 @@
         </div>
     @endif
 
-    {{-- Storage Link Fix --}}
-    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between gap-4">
-        <div>
-            <p class="font-bold text-blue-800 text-sm">إذا كانت الصور ترفع لكن لا تظهر في الموقع</p>
-            <p class="text-blue-600 text-xs mt-1">اضغط الزر لإصلاح رابط التخزين (مرة واحدة فقط)</p>
-        </div>
-        <a href="{{ route('admin.storage.link') }}"
-           class="flex-shrink-0 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition">
-            <i class="fas fa-link ml-1"></i>
-            إصلاح ظهور الصور
-        </a>
-    </div>
-
     <form action="{{ route('admin.logo.upload') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
@@ -51,11 +38,7 @@
             <div class="flex items-start gap-6">
                 <div class="flex-shrink-0">
                     <div class="w-32 h-32 bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-brand-border">
-                        @if(file_exists(public_path('images/bright-path-logo.png')))
-                            <img src="{{ asset('images/bright-path-logo.png') }}?v={{ time() }}" alt="الشعار" class="max-h-28 max-w-28 object-contain">
-                        @else
-                            <i class="fas fa-image text-4xl text-gray-300"></i>
-                        @endif
+                            <img src="{{ site_image('site_logo', 'images/bright-path-logo.png') }}?v={{ time() }}" alt="الشعار" class="max-h-28 max-w-28 object-contain">
                     </div>
                 </div>
                 <div class="flex-1">
@@ -77,11 +60,7 @@
             <div class="flex items-start gap-6">
                 <div class="flex-shrink-0">
                     <div class="w-32 h-32 bg-brand-dark rounded-xl flex items-center justify-center border-2 border-dashed border-brand-border">
-                        @if(file_exists(public_path('images/logo-white.png')))
-                            <img src="{{ asset('images/logo-white.png') }}?v={{ time() }}" alt="الشعار الأبيض" class="max-h-28 max-w-28 object-contain">
-                        @else
-                            <i class="fas fa-image text-4xl text-gray-500"></i>
-                        @endif
+                            <img src="{{ site_image('site_logo_white', 'images/logo-white.png') }}?v={{ time() }}" alt="الشعار الأبيض" class="max-h-28 max-w-28 object-contain">
                     </div>
                 </div>
                 <div class="flex-1">
@@ -103,11 +82,7 @@
             <div class="flex items-start gap-6">
                 <div class="flex-shrink-0">
                     <div class="w-20 h-20 bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-brand-border">
-                        @if(file_exists(public_path('favicon.png')))
-                            <img src="{{ asset('favicon.png') }}?v={{ time() }}" alt="Favicon" class="w-12 h-12 object-contain">
-                        @else
-                            <i class="fas fa-globe text-2xl text-gray-300"></i>
-                        @endif
+                            <img src="{{ site_image('site_favicon', 'favicon.png') }}?v={{ time() }}" alt="Favicon" class="w-12 h-12 object-contain">
                     </div>
                 </div>
                 <div class="flex-1">
@@ -129,11 +104,7 @@
             <div class="flex items-start gap-6">
                 <div class="flex-shrink-0">
                     <div class="w-48 h-28 bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-brand-border">
-                        @if(file_exists(public_path('images/og-image.jpg')))
-                            <img src="{{ asset('images/og-image.jpg') }}?v={{ time() }}" alt="OG Image" class="max-h-24 max-w-44 object-contain">
-                        @else
-                            <i class="fas fa-share-alt text-3xl text-gray-300"></i>
-                        @endif
+                            <img src="{{ site_image('site_og_image', 'images/og-image.jpg') }}?v={{ time() }}" alt="OG Image" class="max-h-24 max-w-44 object-contain">
                     </div>
                 </div>
                 <div class="flex-1">
@@ -152,23 +123,6 @@
             </button>
         </div>
     </form>
-
-    {{-- Manual Upload Instructions --}}
-    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
-        <h4 class="font-bold text-blue-800 mb-3 flex items-center gap-2">
-            <i class="fas fa-info-circle"></i>
-            الرفع اليدوي عبر مدير الملفات
-        </h4>
-        <p class="text-blue-700 text-sm mb-3">
-            يمكنك أيضاً رفع الملفات يدوياً عبر cPanel أو FTP إلى المسارات التالية:
-        </p>
-        <ul class="text-sm text-blue-700 space-y-1 list-disc list-inside mr-4">
-            <li><code class="bg-blue-100 px-1 rounded">public_html/images/bright-path-logo.png</code> - الشعار الرئيسي</li>
-            <li><code class="bg-blue-100 px-1 rounded">public_html/images/logo-white.png</code> - الشعار الأبيض</li>
-            <li><code class="bg-blue-100 px-1 rounded">public_html/favicon.png</code> - أيقونة الموقع</li>
-            <li><code class="bg-blue-100 px-1 rounded">public_html/images/og-image.jpg</code> - صورة المشاركة</li>
-        </ul>
-    </div>
 </div>
 @endsection
 

@@ -5,12 +5,13 @@
 !.env.example
 
 # ─── Vendor & Dependencies ────────────────────────────────────────────────────
-# vendor/ committed for Hostinger Git deploy (no composer install on server)
+/vendor/
 /node_modules/
 
 # ─── Uploads (user uploaded files - keep folder, ignore files) ───────────────
-/uploads/*
-!/uploads/.gitkeep
+/public/uploads/*
+!/public/uploads/.gitkeep
+/public/storage
 
 # ─── Storage (user uploads, logs, cache) ─────────────────────────────────────
 /storage/app/analysis-models/
@@ -65,7 +66,6 @@ yarn-error.log
 # ─── Duplicate/extracted nested folder (do not commit) ───────────────────────
 /thebrightbath/
 /.sixth/
-/public/
 /public_html/
 /storage_pub/
 /images_pub/

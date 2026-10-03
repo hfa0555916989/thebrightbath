@@ -34,6 +34,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\IsAdmin::class,
         ]);
         
+        // Behind Laravel Cloud's load balancer: read the real client IP/scheme from
+        // X-Forwarded-* (the payment gateway requires the customer IP).
+        $middleware->trustProxies(at: '*');
+
         // Payment gateway posts results from its own servers/pages
         $middleware->validateCsrfTokens(except: [
             'payment/neoleap/*',

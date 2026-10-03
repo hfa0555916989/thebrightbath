@@ -87,7 +87,7 @@
             {{-- Logo --}}
             <div class="h-16 flex items-center justify-between px-6 border-b border-white/10">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center">
-                    <img src="{{ asset('images/bright-path-logo.png') }}" alt="الطريق المشرق - Bright Path" class="h-14 w-auto">
+                    <img src="{{ site_image('site_logo', 'images/bright-path-logo.png') }}" alt="الطريق المشرق - Bright Path" class="h-14 w-auto">
                 </a>
                 <button @click="mobileSidebar = false" class="lg:hidden text-gray-400 hover:text-white">
                     <i class="fas fa-times"></i>

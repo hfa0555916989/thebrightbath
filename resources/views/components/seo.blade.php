@@ -11,7 +11,7 @@
     $defaultTitle = 'الطريق المشرق للتدريب والتطوير - Bright Path';
     $defaultDescription = 'الطريق المشرق للتدريب والتطوير - اختبارات الميول المهنية والإرشاد الوظيفي في المملكة العربية السعودية';
     $defaultKeywords = 'اختبار الميول المهنية، هولاند، MBTI، الذكاءات المتعددة، الإرشاد المهني، التدريب، التطوير، الطريق المشرق';
-    $defaultImage = asset('images/og-image.jpg');
+    $defaultImage = site_image('site_og_image', 'images/og-image.jpg');
     
     $pageTitle = $title ?? $defaultTitle;
     $pageDescription = $description ?? $defaultDescription;
@@ -52,7 +52,7 @@
 <meta name="twitter:image" content="{{ $pageImage }}">
 
 {{-- Favicon --}}
-<link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+<link rel="icon" type="image/png" href="{{ site_image('site_favicon', 'favicon.png') }}">
 <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
 
 {{-- Theme Color --}}

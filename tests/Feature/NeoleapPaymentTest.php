@@ -152,6 +152,19 @@ class NeoleapPaymentTest extends TestCase
         $this->assertSame('approved', $booking->fresh()->status);
     }
 
+    public function test_real_customer_ip_behind_the_cloud_proxy_is_sent_to_the_bank(): void
+    {
+        $booking = Booking::factory()->approved()->create();
+
+        $this->actingAs($booking->user)
+            ->withServerVariables(['REMOTE_ADDR' => '10.0.0.5'])
+            ->withHeader('X-Forwarded-For', '203.0.113.195')
+            ->post(route('payment.initiate', $booking));
+
+        Http::assertSent(fn (HttpRequest $request) => str_starts_with($request->header('X-FORWARDED-FOR')[0], '203.0.113.195'));
+        $this->assertSame('203.0.113.195', PaymentTransaction::sole()->gateway_response['customer_ip']);
+    }
+
     public function test_gateway_validation_error_is_shown_and_nothing_is_recorded(): void
     {
         PaymentSetting::where('gateway', 'neoleap')->first()->update(['endpoint_url' => 'https://pg-reject.test/hosted.htm']);

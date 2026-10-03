@@ -107,7 +107,7 @@
                 {{-- Form Header --}}
                 <div class="p-6 text-center border-b-4" style="border-color: {{ $model->color }}; background: linear-gradient(135deg, {{ $model->color }}15, {{ $model->color }}05);">
                     <div class="flex items-center justify-center gap-4 mb-4">
-                        <img src="{{ asset('images/bright-path-logo.png') }}" alt="الطريق المشرق" class="h-16 print:h-12">
+                        <img src="{{ site_image('site_logo', 'images/bright-path-logo.png') }}" alt="الطريق المشرق" class="h-16 print:h-12">
                     </div>
                     <h2 class="text-2xl font-bold" style="color: {{ $model->color }};">{{ $sheet['title'] }}</h2>
                 </div>

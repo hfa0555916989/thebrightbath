@@ -196,7 +196,7 @@
                 {{-- Image Side --}}
                 <div class="relative">
                     <div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl bg-white flex items-center justify-center h-[500px]">
-                        <img src="{{ asset('images/bright-path-logo.png') }}" 
+                        <img src="{{ site_image('site_logo', 'images/bright-path-logo.png') }}" 
                              alt="الطريق المشرق - Bright Path" 
                              class="w-auto h-[400px] object-contain">
                     </div>

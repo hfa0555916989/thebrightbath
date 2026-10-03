@@ -3,11 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 
 class LogoController extends Controller
 {
+    /**
+     * Form field => site setting key read by site_image() in the views.
+     */
+    private const IMAGES = [
+        'logo' => 'site_logo',
+        'logo_white' => 'site_logo_white',
+        'favicon' => 'site_favicon',
+        'og_image' => 'site_og_image',
+    ];
+
     public function index()
     {
         return view('admin.logo-upload');
@@ -24,38 +34,12 @@ class LogoController extends Controller
 
         $uploaded = false;
 
-        // Ensure images directory exists
-        $imagesPath = public_path('images');
-        if (!File::isDirectory($imagesPath)) {
-            File::makeDirectory($imagesPath, 0755, true);
-        }
-
-        // Main Logo — save under the name all views reference
-        if ($request->hasFile('logo')) {
-            $logo = $request->file('logo');
-            $logo->move($imagesPath, 'bright-path-logo.png');
-            $uploaded = true;
-        }
-
-        // White Logo
-        if ($request->hasFile('logo_white')) {
-            $logoWhite = $request->file('logo_white');
-            $logoWhite->move($imagesPath, 'bright-path-logo-white.png');
-            $uploaded = true;
-        }
-
-        // Favicon
-        if ($request->hasFile('favicon')) {
-            $favicon = $request->file('favicon');
-            $favicon->move(public_path(), 'favicon.png');
-            $uploaded = true;
-        }
-
-        // OG Image
-        if ($request->hasFile('og_image')) {
-            $ogImage = $request->file('og_image');
-            $ogImage->move($imagesPath, 'og-image.jpg');
-            $uploaded = true;
+        foreach (self::IMAGES as $field => $settingKey) {
+            if ($request->hasFile($field)) {
+                delete_upload(setting($settingKey));
+                SiteSetting::set($settingKey, store_upload($request->file($field), 'site'));
+                $uploaded = true;
+            }
         }
 
         if ($uploaded) {
@@ -65,5 +49,3 @@ class LogoController extends Controller
         return back()->with('error', 'لم يتم اختيار أي ملف للرفع');
     }
 }
-
-

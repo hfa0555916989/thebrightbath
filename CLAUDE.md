@@ -22,6 +22,8 @@
 ## المجلد والأدوات
 - اعمل داخل `thebrightbath/` فقط. المجلد الأب `thebrightbath.com/` نسخة قديمة، لا تلمسها.
 - PHP وComposer من Herd، ويعملان من PowerShell فقط (Git Bash لا يرى `php`).
+- `vendor/` غير مرفوع في Git. بعد السحب شغّل `composer install`. عند إضافة حزمة اكتب القيد كاملًا (مثل `"^3.0"`)، لأن cmd يحذف `^` من الأوامر.
+- هيكل Laravel القياسي: نقطة الدخول `public/index.php`، والملفات الثابتة في `public/` (images، favicon، robots).
 - الاختبارات:
   ```
   php vendor/bin/phpunit
@@ -45,4 +47,9 @@
   - `BookingPaymentService::confirm()` هو المكان الوحيد الذي يجعل الحجز مدفوعًا ومؤكدًا.
   - الاسترداد: `NeoleapService::refundBooking()` (action 2). الاستعلام: `reconcilePending()` (action 8)، عبر الأمر المجدول `payments:reconcile`.
   - بيانات الربط تُدخل من لوحة الإدارة، وتُخزن في `payment_settings` (صف `gateway = neoleap`). كلمة المرور والمفتاح مشفرة بـ `APP_KEY`.
+- **الملفات المرفوعة:** عبر `store_upload()` و`delete_upload()` و`storage_asset()` في `app/Helpers/settings.php` فقط، على قرص `uploads`. القاعدة تحفظ المسار بصيغة `uploads/<folder>/<file>`.
+  - الملفات الخاصة (نماذج التحليل) على قرص `private`.
+  - على Laravel Cloud تحل الـ buckets بنفس الاسمين محل القرصين تلقائيًا.
+  - لا تكتب ملفات مباشرة في `public_path()`: نظام ملفات Cloud يُمسح مع كل نشر.
+- **صور الموقع** (الشعار، favicon، og): عبر `site_image('site_logo', 'images/...')` من إعدادات الموقع، مع ملف افتراضي في `public/`.
 - **Factories** موجودة للمستخدم والمستشار والحجز والدفعة، بحالات جاهزة.

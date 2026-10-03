@@ -3,7 +3,7 @@
 آخر تحديث: 2026-10-04
 
 ## المهمة التالية
-**المهمة 3: تجهيز Laravel Cloud** (التفاصيل في الخطة أدناه).
+**المهمة 4: Resend والطوابير** (التفاصيل في الخطة أدناه).
 
 ## القرارات المعتمدة
 | القرار | التاريخ |
@@ -20,8 +20,8 @@
 | 1 | بنية الاختبارات (PHPUnit، Factories، حارس القاعدة) | ✅ تم | `chore/test-setup` |
 | 2 | أمان الدفع والجلسات | ✅ تم | `fix/payment-security` |
 | 2b | بوابة الراجحي (نيوليب) بدل Paymob | ✅ تم | `feat/neoleap-payment` |
-| 3 | تجهيز Laravel Cloud | ⏳ التالية | |
-| 4 | Resend والطوابير | — | |
+| 3 | تجهيز Laravel Cloud | ✅ تم (لا يُدمج قبل يوم الانتقال) | `chore/laravel-cloud` |
+| 4 | Resend والطوابير | ⏳ التالية | |
 | 5 | اجتماعات Daily.co | — | |
 | 6 | تذكيرات الجلسات | — | |
 | 7 | تنظيف وإصلاحات متبقية | — | |
@@ -73,8 +73,41 @@
 - بيانات بوابة الراجحي (إنتاج)، ومفاتيح Daily وResend.
 - عملية دفع تجريبية كاملة في بيئة UAT للبنك، ثم اعتماد البنك قبل التحويل للإنتاج.
 
+## دليل إعداد Laravel Cloud (للمهمة 8)
+**تنبيه:** فرع `chore/laravel-cloud` يغيّر هيكل المشروع (`public/`)، فيتوقف الموقع على Hostinger إن نُشر هناك. لا يُدمج في `main` إلا يوم الانتقال.
+
+**1. التطبيق والبيئة**
+- اربط مستودع GitHub، الفرع `main` بعد الدمج.
+- PHP 8.4.
+
+**2. الأوامر**
+- Build: `composer install --no-dev --optimize-autoloader` (لا يوجد npm build؛ Tailwind من CDN).
+- Deploy: `php artisan migrate --force`.
+
+**3. الموارد**
+- قاعدة بيانات MySQL 8.
+- Bucket عام باسم قرص `uploads`.
+- Bucket خاص باسم قرص `private`.
+- **Scheduler مفعّل**، لـ `payments:reconcile`.
+- Queue worker على `database`، للمهمة 4.
+
+**4. متغيرات البيئة**
+- `APP_KEY`: **نفس المفتاح الحالي من Hostinger**.
+- `APP_URL=https://thebrightbath.com`، `APP_ENV=production`، `APP_DEBUG=false`، `APP_TIMEZONE=Asia/Riyadh`، `APP_LOCALE=ar`.
+- `SESSION_DRIVER=database`، `CACHE_STORE=database`، `QUEUE_CONNECTION=database`، `SESSION_SAME_SITE=lax`، `SESSION_SECURE_COOKIE=true`.
+- متغيرات البريد (المهمة 4)، و`SUPERVISOR_EMAIL`.
+
+**5. نقل البيانات**
+- تصدير قاعدة Hostinger ثم استيرادها.
+- محتوى `public_html/uploads/` يُرفع إلى bucket `uploads` بنفس المسارات بدون بادئة `uploads/`.
+- محتوى `storage/app/analysis-models/` يُرفع إلى bucket `private` تحت `analysis-models/`.
+- الشعار: إن كان قد تغيّر يدويًا على Hostinger، يُرفع من جديد من لوحة الإدارة.
+
+**6. الدومين:** ربط `thebrightbath.com`، ثم تحديث روابط الاستجابة لدى بنك الراجحي إن طلبها البنك مسبقًا.
+
 ## مشاكل معروفة (خارج نطاق ما تم)
-- ملفات جلسات الفيديو على قرص `public` (تُعالج في المهمة 3 أو 5).
+- ملفات جلسات الفيديو على قرص `public` المحلي، فتضيع على Cloud. تُحذف مع نظام WebRTC في المهمة 5.
+- `composer install` أظهر 62 تنبيهًا أمنيًا في 18 حزمة (إصدارات قديمة في `composer.lock`). مهمة مقترحة: تحديث الحزم (`composer update`) مع تشغيل الاختبارات.
 - صفحة الدفع فيها أزرار اختيار (مدى، فيزا، Apple Pay) لا تفعل شيئًا. صفحة البنك هي التي تعرض طرق الدفع.
 - `SESSION_SAME_SITE=strict`: عند العودة من صفحة البنك تظهر صفحة النتيجة للعميل كزائر غير مسجل (الدفع نفسه يُسجَّل سليمًا). يُحل بـ `lax`.
 - صفحة تفاصيل الحجز في الإدارة (`admin.bookings.show`) مربوطة لكن الـ view غير موجود، فتعطي خطأ 500.
@@ -82,7 +115,6 @@
 - نموذج التواصل لا يحفظ شيئًا. إعدادات الإدارة (`admin.settings.update`) لا تحفظ شيئًا.
 - المهام المجدولة `security:cleanup` و`database:backup` و`log:clear` تشير لأوامر غير موجودة.
 - صفحات الأمان في الإدارة (السجلات، النشاط، IPs المحظورة) واجهات فارغة.
-- مسارات الصيانة في لوحة الإدارة (`run-migrations`، `clear-cache`، `storage-link`) تعمل بـ GET، فهي معرضة لـ CSRF، ومتاحة للمستشارين أيضًا. تُحذف مع الانتقال لـ Laravel Cloud.
 
 ## سجل الإنجاز
 - **2026-10-03:** المهمة 1. PHPUnit مع MySQL في Docker، وFactories، وحارس يمنع لمس قاعدة التطوير أو الإنتاج.
@@ -101,3 +133,9 @@
   - حقل جديد في الإعدادات لرابط Tranportal (الاسترداد والاستعلام).
   - 52 اختبارًا ناجحًا.
   - **ملاحظة:** الأمر المجدول يحتاج Scheduler يعمل (Laravel Cloud، أو cron على Hostinger).
+- **2026-10-04:** المهمة 3 (`chore/laravel-cloud`، مبني فوق `feat/neoleap-payment`):
+  - **الهيكل القياسي:** `public/` و`public/index.php`، وحذف `.htaccess` وسكربتات Hostinger وأدوات الصيانة على الويب.
+  - **`vendor/`** خارج Git، وسكربتات composer القياسية، وإضافة `league/flysystem-aws-s3-v3`.
+  - **التخزين:** قرصا `uploads` و`private` يحل محلهما Cloud تلقائيًا. الشعار وصور الموقع صارت في الإعدادات (وأُصلح خطأ الشعار الأبيض). رفع الملفات بامتدادات آمنة فقط.
+  - **الإعدادات:** Trusted proxies، و`.env.example` جاهز لـ Cloud (database للجلسات والكاش والطوابير، و`SESSION_SAME_SITE=lax`).
+  - 61 اختبارًا ناجحًا.

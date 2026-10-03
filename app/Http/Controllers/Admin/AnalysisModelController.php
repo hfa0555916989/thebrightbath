@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AnalysisModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -54,10 +55,10 @@ class AnalysisModelController extends Controller
         // Process Excel file
         $file = $request->file('excel_file');
         $originalFileName = $file->getClientOriginalName();
-        $path = $file->store('analysis-models');
+        $path = $file->store('analysis-models', 'private');
 
-        // Parse Excel structure and data
-        $excelData = $this->parseExcelFile(storage_path('app/' . $path));
+        // Parse Excel structure and data (from the upload itself: the disk may be remote)
+        $excelData = $this->parseExcelFile($file->getRealPath());
 
         // Create model
         $model = AnalysisModel::create([
@@ -115,16 +116,16 @@ class AnalysisModelController extends Controller
         // If new Excel file uploaded
         if ($request->hasFile('excel_file')) {
             // Delete old file
-            if ($analysisModel->file_path && file_exists(storage_path('app/' . $analysisModel->file_path))) {
-                unlink(storage_path('app/' . $analysisModel->file_path));
+            if ($analysisModel->file_path) {
+                Storage::disk('private')->delete($analysisModel->file_path);
             }
 
             $file = $request->file('excel_file');
             $data['original_file_name'] = $file->getClientOriginalName();
-            $data['file_path'] = $file->store('analysis-models');
+            $data['file_path'] = $file->store('analysis-models', 'private');
 
             // Parse Excel
-            $excelData = $this->parseExcelFile(storage_path('app/' . $data['file_path']));
+            $excelData = $this->parseExcelFile($file->getRealPath());
             $data['structure'] = $excelData['structure'];
             $data['data'] = $excelData['data'];
         }
@@ -142,8 +143,8 @@ class AnalysisModelController extends Controller
     public function destroy(AnalysisModel $analysisModel)
     {
         // Delete file
-        if ($analysisModel->file_path && file_exists(storage_path('app/' . $analysisModel->file_path))) {
-            unlink(storage_path('app/' . $analysisModel->file_path));
+        if ($analysisModel->file_path) {
+            Storage::disk('private')->delete($analysisModel->file_path);
         }
 
         $name = $analysisModel->name;

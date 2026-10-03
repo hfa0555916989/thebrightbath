@@ -248,7 +248,7 @@
             <div class="flex justify-between items-center">
                 {{-- Logo --}}
                 <a href="{{ route('home') }}" class="flex items-center flex-shrink-0">
-                    <img src="{{ asset('images/bright-path-logo.png') }}" alt="الطريق المشرق - Bright Path" class="h-20 sm:h-24 lg:h-32 w-auto">
+                    <img src="{{ site_image('site_logo', 'images/bright-path-logo.png') }}" alt="الطريق المشرق - Bright Path" class="h-20 sm:h-24 lg:h-32 w-auto">
                 </a>
 
                 {{-- Desktop Menu --}}
@@ -334,7 +334,7 @@
         {{-- Header --}}
         <div class="p-4 bg-gradient-to-l from-brand-DEFAULT to-brand-dark flex-shrink-0">
             <div class="flex justify-between items-center">
-                <img src="{{ asset('images/bright-path-logo.png') }}" alt="الطريق المشرق - Bright Path" class="h-14 w-auto">
+                <img src="{{ site_image('site_logo', 'images/bright-path-logo.png') }}" alt="الطريق المشرق - Bright Path" class="h-14 w-auto">
                 <button id="mobile-menu-close" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition">
                     <i class="fas fa-times"></i>
                 </button>
@@ -492,7 +492,7 @@
                 {{-- Brand Info --}}
                 <div class="col-span-2 md:col-span-2 lg:col-span-1">
                     <a href="{{ route('home') }}" class="inline-block mb-4 lg:mb-6">
-                        <img src="{{ asset('images/bright-path-logo.png') }}" alt="الطريق المشرق - Bright Path" class="h-20 lg:h-28 w-auto">
+                        <img src="{{ site_image('site_logo', 'images/bright-path-logo.png') }}" alt="الطريق المشرق - Bright Path" class="h-20 lg:h-28 w-auto">
                     </a>
                     <p class="text-gray-400 leading-relaxed mb-4 lg:mb-6 text-sm lg:text-base">
                         الطريق المشرق للتدريب والتطوير - رواد في التدريب والتطوير المهني والإرشاد الوظيفي.
