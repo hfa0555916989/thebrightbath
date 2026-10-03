@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\BookingConfirmation;
-use App\Mail\ConsultantEarnings;
-use App\Mail\InvoiceEmail;
 use App\Models\Booking;
 use App\Models\Consultant;
-use App\Models\Payment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -201,92 +197,6 @@ class ConsultationController extends Controller
         $booking->load(['consultant.user']);
 
         return view('consultations.payment', compact('booking'));
-    }
-
-    /**
-     * Process payment (placeholder for payment gateway).
-     */
-    public function processPayment(Request $request, Booking $booking)
-    {
-        // Ensure user owns this booking
-        if ($booking->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $booking->load(['consultant.user', 'user']);
-
-        // Calculate consultant earnings (after commission)
-        $consultant = $booking->consultant;
-        $commissionRate = $consultant->commission_rate ?? 20; // Default 20%
-        $consultantEarnings = $booking->price * (1 - ($commissionRate / 100));
-        $adminEarnings = $booking->price - $consultantEarnings;
-
-        // This is a placeholder for actual payment gateway integration
-        // In production, this would integrate with Moyasar, Tap, or HyperPay
-
-        // Simulate successful payment
-        $payment = Payment::create([
-            'booking_id' => $booking->id,
-            'user_id' => Auth::id(),
-            'amount' => $booking->price,
-            'currency' => 'SAR',
-            'status' => 'completed',
-            'payment_method' => 'card',
-            'gateway' => 'placeholder', // Will be replaced with actual gateway
-            'completed_at' => now(),
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-
-        // Update booking with earnings breakdown
-        $booking->update([
-            'status' => 'confirmed',
-            'payment_status' => 'paid',
-            'paid_at' => now(),
-            'transaction_id' => $payment->payment_id,
-            'consultant_earnings' => $consultantEarnings,
-            'admin_earnings' => $adminEarnings,
-        ]);
-
-        // Increment consultant sessions
-        $booking->consultant->increment('total_sessions');
-
-        // Send confirmation emails
-        $this->sendBookingNotifications($booking, $payment);
-
-        return redirect()->route('consultations.confirmation', $booking)
-            ->with('success', 'تم الدفع بنجاح! تم تأكيد حجزك.');
-    }
-
-    /**
-     * Send booking notification emails.
-     */
-    private function sendBookingNotifications(Booking $booking, Payment $payment): void
-    {
-        $booking->load(['consultant.user', 'user']);
-
-        try {
-            // Send confirmation to client
-            Mail::to($booking->user->email)
-                ->send(new BookingConfirmation($booking, 'client'));
-
-            // Send notification to consultant
-            Mail::to($booking->consultant->user->email)
-                ->send(new BookingConfirmation($booking, 'consultant'));
-
-            // Send invoice to client
-            Mail::to($booking->user->email)
-                ->send(new InvoiceEmail($payment));
-
-            // Send earnings notification to consultant
-            $consultantEarnings = $booking->consultant_earnings ?? $booking->price * 0.8;
-            Mail::to($booking->consultant->user->email)
-                ->send(new ConsultantEarnings($booking->consultant, $booking, $consultantEarnings));
-
-        } catch (\Exception $e) {
-            // Log error but don't fail the payment process
-            \Log::error('Failed to send booking notification emails: ' . $e->getMessage());
-        }
     }
 
     /**

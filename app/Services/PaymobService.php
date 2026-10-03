@@ -141,7 +141,7 @@ class PaymobService
         $consultant = $booking->consultant;
         
         // Get amount from booking
-        $amount = $booking->total_amount ?? $consultant->hourly_rate ?? 0;
+        $amount = (float) $booking->price;
         
         if ($amount <= 0) {
             throw new Exception('مبلغ الدفع غير صحيح');
@@ -160,7 +160,7 @@ class PaymobService
             [
                 'name' => 'استشارة مع ' . ($consultant->user->name ?? 'المستشار'),
                 'amount' => (int) round($amount * 100),
-                'description' => 'حجز استشارة - ' . $booking->scheduled_at?->format('Y-m-d H:i'),
+                'description' => 'حجز استشارة - ' . $booking->booking_date->format('Y-m-d') . ' ' . $booking->start_time,
                 'quantity' => 1,
             ]
         ];
@@ -291,7 +291,11 @@ class PaymobService
     }
 
     /**
-     * Verify HMAC from webhook (V2 format)
+     * Verify HMAC of a transaction callback.
+     *
+     * Webhook (POST): fields are read from the JSON "obj" payload ("order.id", "source_data.pan"...).
+     * Redirect (GET): Paymob flattens them into the query string, and PHP turns the dots into
+     * underscores ("source_data_pan"), while "order.id" arrives as plain "order".
      */
     public function verifyHmac(array $data, string $receivedHmac): bool
     {
@@ -299,6 +303,8 @@ class PaymobService
             Log::warning('Paymob HMAC secret not configured');
             return false;
         }
+
+        $obj = is_array($data['obj'] ?? null) ? $data['obj'] : null;
 
         // V2 HMAC calculation - fields in specific order
         $hmacFields = [
@@ -326,16 +332,18 @@ class PaymobService
 
         $concatenatedString = '';
         foreach ($hmacFields as $field) {
-            $value = data_get($data, str_replace('.', '_', $field), '');
+            $value = $obj !== null
+                ? data_get($obj, $field)
+                : ($data[$field === 'order.id' ? 'order' : str_replace('.', '_', $field)] ?? null);
             if (is_bool($value)) {
                 $value = $value ? 'true' : 'false';
             }
-            $concatenatedString .= $value;
+            $concatenatedString .= $value ?? '';
         }
 
         $calculatedHmac = hash_hmac('sha512', $concatenatedString, $this->settings->hmac_secret);
 
-        return hash_equals($calculatedHmac, $receivedHmac);
+        return hash_equals($calculatedHmac, strtolower($receivedHmac));
     }
 
     /**
@@ -358,8 +366,8 @@ class PaymobService
         }
 
         // Find transaction by intention ID or special reference
-        $transaction = PaymentTransaction::where('order_id', $intentionId)
-            ->orWhere('transaction_id', $intentionId)
+        $transaction = PaymentTransaction::where('order_id', (string) $intentionId)
+            ->orWhere('transaction_id', (string) $intentionId)
             ->first();
 
         if (!$transaction && $specialReference) {
@@ -375,6 +383,11 @@ class PaymobService
             return null;
         }
 
+        // Gateway retries: a successful transaction is final.
+        if ($transaction->status === 'success') {
+            return $transaction;
+        }
+
         // Update transaction
         $transaction->update([
             'transaction_id' => $transactionId ?? $transaction->transaction_id,
@@ -384,24 +397,24 @@ class PaymobService
             'gateway_response' => array_merge($transaction->gateway_response ?? [], ['callback' => $data]),
         ]);
 
-        if ($success === true) {
-            $transaction->markAsSuccessful($data);
+        $paidCents = (int) data_get($obj, 'amount_cents');
+        $paidCurrency = data_get($obj, 'currency', $transaction->currency);
 
-            // Update booking status
-            if ($transaction->payable_type === Booking::class) {
-                $booking = Booking::find($transaction->payable_id);
-                if ($booking) {
-                    $booking->update([
-                        'payment_status' => 'paid',
-                        'status' => 'confirmed',
-                        'payment_method' => 'paymob',
-                        'payment_data' => [
-                            'transaction_id' => $transactionId,
-                            'intention_id' => $intentionId,
-                            'paid_at' => now()->toISOString(),
-                        ],
-                    ]);
-                }
+        if ($success === true && ($paidCents !== (int) $transaction->amount_cents || $paidCurrency !== $transaction->currency)) {
+            $transaction->markAsFailed('المبلغ المدفوع لا يطابق مبلغ الطلب', $transaction->gateway_response);
+
+            Log::critical('Paymob V2: Paid amount does not match transaction', [
+                'transaction_id' => $transactionId,
+                'expected_cents' => $transaction->amount_cents,
+                'paid_cents' => $paidCents,
+                'paid_currency' => $paidCurrency,
+            ]);
+
+        } elseif ($success === true) {
+            $transaction->markAsSuccessful($transaction->gateway_response);
+
+            if ($transaction->payable_type === Booking::class && $booking = Booking::find($transaction->payable_id)) {
+                app(BookingPaymentService::class)->confirm($booking, $transaction);
             }
 
             Log::info('Paymob V2: Payment successful', [

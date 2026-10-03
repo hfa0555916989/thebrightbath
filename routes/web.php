@@ -145,7 +145,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/consultations/{consultant}/book', [ConsultationController::class, 'book'])->name('consultations.book');
     Route::get('/booking/{booking}/waiting-approval', [ConsultationController::class, 'waitingApproval'])->name('consultations.waiting-approval');
     Route::get('/booking/{booking}/payment', [ConsultationController::class, 'payment'])->name('consultations.payment');
-    Route::post('/booking/{booking}/process', [ConsultationController::class, 'processPayment'])->name('consultations.process-payment');
     Route::get('/booking/{booking}/confirmation', [ConsultationController::class, 'confirmation'])->name('consultations.confirmation');
     Route::get('/my-bookings', [ConsultationController::class, 'myBookings'])->name('consultations.my-bookings');
     Route::delete('/booking/{booking}/cancel', [ConsultationController::class, 'cancel'])->name('consultations.cancel');
@@ -351,13 +350,15 @@ Route::prefix('control-panel')
         Route::patch('analysis-models/{analysisModel}/toggle-active', [App\Http\Controllers\Admin\AnalysisModelController::class, 'toggleActive'])->name('analysis-models.toggle-active');
         Route::post('analysis-models/reorder', [App\Http\Controllers\Admin\AnalysisModelController::class, 'reorder'])->name('analysis-models.reorder');
         
-        // Financial Reports
-        Route::get('finance', [App\Http\Controllers\Admin\FinanceController::class, 'index'])->name('finance.index');
-        Route::get('finance/settings', [App\Http\Controllers\Admin\FinanceController::class, 'settings'])->name('finance.settings');
-        Route::put('finance/settings', [App\Http\Controllers\Admin\FinanceController::class, 'updateSettings'])->name('finance.settings.update');
-        
-        // Payment Settings
-        Route::prefix('payment-settings')->name('payment-settings.')->group(function () {
+        // Financial Reports (admins only — counselors also pass the 'admin' middleware)
+        Route::middleware('admin:strict')->group(function () {
+            Route::get('finance', [App\Http\Controllers\Admin\FinanceController::class, 'index'])->name('finance.index');
+            Route::get('finance/settings', [App\Http\Controllers\Admin\FinanceController::class, 'settings'])->name('finance.settings');
+            Route::put('finance/settings', [App\Http\Controllers\Admin\FinanceController::class, 'updateSettings'])->name('finance.settings.update');
+        });
+
+        // Payment Settings (admins only)
+        Route::prefix('payment-settings')->name('payment-settings.')->middleware('admin:strict')->group(function () {
             Route::get('/', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'index'])->name('index');
             Route::put('/', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'update'])->name('update');
             Route::post('/test', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'testConnection'])->name('test');

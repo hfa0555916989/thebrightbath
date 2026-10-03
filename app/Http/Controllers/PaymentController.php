@@ -37,6 +37,11 @@ class PaymentController extends Controller
             return back()->with('error', 'تم دفع هذا الحجز مسبقاً');
         }
 
+        // Only bookings the consultant has approved can be paid
+        if ($booking->status !== 'approved') {
+            return back()->with('error', 'لا يمكن الدفع لهذا الحجز قبل موافقة المستشار');
+        }
+
         try {
             $paymentData = $this->paymobService->createPaymentForBooking($booking);
 
@@ -79,11 +84,16 @@ class PaymentController extends Controller
      */
     public function paymentSuccess(Request $request)
     {
-        $transactionId = $request->get('merchant_order_id');
-        
-        if ($transactionId) {
-            $transaction = PaymentTransaction::where('transaction_id', $transactionId)->first();
-            
+        // Paymob redirects with its transaction "id" (stored on our record once the webhook
+        // has landed) and our special reference as "merchant_order_id".
+        $transactionId = $request->get('id');
+        $reference = $request->get('merchant_order_id');
+
+        if ($transactionId || $reference) {
+            $transaction = PaymentTransaction::when($transactionId, fn ($q) => $q->where('transaction_id', (string) $transactionId))
+                ->when(!$transactionId, fn ($q) => $q->whereJsonContains('gateway_response->special_reference', (string) $reference))
+                ->first();
+
             if ($transaction && $transaction->status === 'success') {
                 return view('payment.success', [
                     'transaction' => $transaction,
@@ -110,7 +120,11 @@ class PaymentController extends Controller
     {
         $transaction = PaymentTransaction::where('transaction_id', $transactionId)->first();
 
-        if (!$transaction) {
+        $ownsTransaction = $transaction
+            && $transaction->payable_type === Booking::class
+            && Booking::whereKey($transaction->payable_id)->where('user_id', auth()->id())->exists();
+
+        if (!$ownsTransaction) {
             return response()->json([
                 'success' => false,
                 'message' => 'المعاملة غير موجودة',

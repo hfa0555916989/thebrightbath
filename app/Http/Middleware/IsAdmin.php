@@ -13,9 +13,14 @@ class IsAdmin
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, ?string $level = null): Response
     {
-        if (!$request->user() || !$request->user()->canAccessAdmin()) {
+        // 'admin' lets admins and counselors in; 'admin:strict' is for admins only.
+        $allowed = $level === 'strict'
+            ? $request->user()?->isAdmin()
+            : $request->user()?->canAccessAdmin();
+
+        if (!$allowed) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'غير مصرح بالوصول'], 403);
             }

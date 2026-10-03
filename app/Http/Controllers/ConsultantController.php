@@ -253,25 +253,7 @@ class ConsultantController extends Controller
             return back()->with('error', 'لا يمكن تغيير حالة هذا الحجز');
         }
         
-        // التحقق من المستشار التجريبي (السعر = 0 أو الإيميل التجريبي)
-        $isTestConsultant = $consultant->price_per_30_min == 0 || 
-                           $consultant->user->email === 'consultant@test.com' ||
-                           str_contains(strtolower($consultant->user->email), 'test');
-        
-        if ($isTestConsultant) {
-            // تجاوز الدفع للمستشار التجريبي
-            $booking->update([
-                'status' => 'confirmed',
-                'payment_status' => 'paid',
-                'paid_at' => now(),
-            ]);
-            
-            $this->sendApprovalNotification($booking, true);
-            
-            return back()->with('success', 'تم قبول الحجز وتأكيده تلقائياً (مستشار تجريبي)');
-        }
-        
-        // للمستشارين العاديين - يجب الدفع
+        // كل الحجوزات تمر بالدفع قبل التأكيد
         $booking->update([
             'status' => 'approved',
         ]);

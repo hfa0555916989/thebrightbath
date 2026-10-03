@@ -26,20 +26,21 @@ class PaymobWebhookController extends Controller
             'headers' => $request->headers->all(),
         ]);
 
-        try {
-            // Get the transaction data
-            $data = $request->all();
+        // Get the transaction data
+        $data = $request->all();
 
-            // V2 HMAC verification - check header first, then query param
-            $receivedHmac = $request->header('HMAC') ?? $request->get('hmac');
-            if ($receivedHmac) {
-                if (!$this->paymobService->verifyHmac($data, $receivedHmac)) {
-                    Log::warning('Paymob V2 webhook HMAC verification failed', [
-                        'received_hmac' => substr($receivedHmac, 0, 20) . '...',
-                    ]);
-                    // Continue processing but log the warning
-                }
-            }
+        // V2 HMAC verification - check header first, then query param.
+        // Unsigned or wrongly signed callbacks are rejected before anything is touched.
+        $receivedHmac = $request->header('HMAC') ?? $request->query('hmac');
+        if (!is_string($receivedHmac) || !$this->paymobService->verifyHmac($data, $receivedHmac)) {
+            Log::warning('Paymob V2 webhook rejected: missing or invalid HMAC', [
+                'ip' => $request->ip(),
+            ]);
+
+            return response()->json(['status' => 'invalid signature'], 401);
+        }
+
+        try {
 
             // Process the callback (V2 format supported in PaymobService)
             $transaction = $this->paymobService->processCallback($data);

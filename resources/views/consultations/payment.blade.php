@@ -118,7 +118,7 @@
                     </div>
 
                     {{-- Payment Button --}}
-                    <form action="{{ route('consultations.process-payment', $booking) }}" method="POST">
+                    <form action="{{ route('payment.initiate', $booking) }}" method="POST">
                         @csrf
                         <button type="submit" 
                                 class="w-full bg-brand-gold text-brand-dark py-4 rounded-xl font-bold hover:bg-brand-goldDeep transition">

@@ -70,11 +70,21 @@ class VideoCallController extends Controller
      */
     public function sendSignal(Request $request, VideoCall $videoCall)
     {
+        $booking = $this->authorizeParticipant($videoCall);
+
         $request->validate([
             'type' => 'required|in:offer,answer,ice_candidate',
             'data' => 'required',
             'to_user_id' => 'required|exists:users,id',
         ]);
+
+        // الإشارة لا تُرسل إلا للطرف الآخر في نفس الجلسة
+        $participants = [$booking->user_id, $booking->consultant->user_id];
+        abort_unless(
+            in_array((int) $request->to_user_id, $participants, true) && (int) $request->to_user_id !== Auth::id(),
+            422,
+            'المستلم ليس طرفًا في هذه الجلسة.'
+        );
 
         VideoCallSignal::create([
             'video_call_id' => $videoCall->id,
@@ -96,6 +106,8 @@ class VideoCallController extends Controller
      */
     public function getSignals(VideoCall $videoCall)
     {
+        $this->authorizeParticipant($videoCall);
+
         $signals = VideoCallSignal::where('video_call_id', $videoCall->id)
             ->where('to_user_id', Auth::id())
             ->where('is_read', false)
@@ -123,6 +135,8 @@ class VideoCallController extends Controller
      */
     public function sendMessage(Request $request, VideoCall $videoCall)
     {
+        $this->authorizeParticipant($videoCall);
+
         $request->validate([
             'content' => 'required|string|max:2000',
         ]);
@@ -152,6 +166,8 @@ class VideoCallController extends Controller
      */
     public function getMessages(VideoCall $videoCall, Request $request)
     {
+        $this->authorizeParticipant($videoCall);
+
         $lastId = $request->get('last_id', 0);
 
         $messages = VideoCallMessage::where('video_call_id', $videoCall->id)
@@ -182,6 +198,8 @@ class VideoCallController extends Controller
      */
     public function uploadFile(Request $request, VideoCall $videoCall)
     {
+        $this->authorizeParticipant($videoCall);
+
         $request->validate([
             'file' => 'required|file|max:10240', // Max 10MB
         ]);
@@ -219,6 +237,8 @@ class VideoCallController extends Controller
      */
     public function checkStatus(VideoCall $videoCall)
     {
+        $this->authorizeParticipant($videoCall);
+
         return response()->json([
             'status' => $videoCall->status,
             'started_at' => $videoCall->started_at,
@@ -253,5 +273,22 @@ class VideoCallController extends Controller
 
         $redirectRoute = $isConsultant ? 'consultant.dashboard' : 'client.dashboard';
         return redirect()->route($redirectRoute)->with('success', 'تم إنهاء الجلسة بنجاح.');
+    }
+
+    /**
+     * السماح فقط لطرفي الجلسة (العميل والمستشار) بالوصول لبياناتها
+     */
+    private function authorizeParticipant(VideoCall $videoCall): Booking
+    {
+        $booking = $videoCall->booking()->with('consultant')->first();
+        $userId = Auth::id();
+
+        abort_unless(
+            $booking && ($booking->user_id === $userId || $booking->consultant?->user_id === $userId),
+            403,
+            'ليس لديك صلاحية الوصول لهذه الجلسة.'
+        );
+
+        return $booking;
     }
 }

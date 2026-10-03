@@ -15,7 +15,6 @@
     RewriteRule ^artisan$ - [F,L]
     RewriteRule ^composer\.(json|lock)$ - [F,L]
     RewriteRule ^package\.json$ - [F,L]
-    RewriteRule ^run-setup\.php$ - [L]
 
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
