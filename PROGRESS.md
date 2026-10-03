@@ -90,7 +90,7 @@
 - عملية دفع تجريبية كاملة في بيئة UAT للبنك، ثم اعتماد البنك قبل التحويل للإنتاج.
 
 ## دليل إعداد Laravel Cloud (للمهمة 8)
-**الحالة (2026-10-04):** البيئة تعمل على `https://thebrightbath-production-scv4tp.laravel.cloud`، من فرع `feat/resend-mail`. بعد دمج الفروع في `main` يُحوَّل فرع البيئة إلى `main`.
+**الحالة (2026-10-04):** البيئة تعمل على `https://thebrightbath-production-scv4tp.laravel.cloud`. كل الفروع مدموجة في `main`، وفرع البيئة يُحوَّل إلى `main`.
 
 **1. التطبيق والبيئة**
 - اربط مستودع GitHub، الفرع `main` بعد الدمج.
@@ -172,3 +172,4 @@
   - الإعداد: فرع `feat/resend-mail`، وMySQL 8.4 (Dev)، وbucketان `uploads` و`private`، وScheduler، وعامل طابور.
   - **إصلاح:** `AnalysisModelSeeder` كان ينسخ ملفًا من مسار على جهاز المطور ففشل على السيرفر. صار يتخطاه بتحذير، ويحفظ على القرص الخاص.
 - **2026-10-04:** تبيّن أن الموقع لم يُطلق، وأن `thebrightbath.com` يعرض صفحة Parked من Hostinger. أُلغي نقل البيانات من الخطة.
+- **2026-10-04:** دمج `chore/laravel-cloud` و`feat/resend-mail` في `main` ورفعه، بموافقة المستخدم.

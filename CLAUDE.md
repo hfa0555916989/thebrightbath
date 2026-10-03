@@ -23,7 +23,6 @@
 - اعمل داخل `thebrightbath/` فقط. المجلد الأب `thebrightbath.com/` نسخة قديمة، لا تلمسها.
 - PHP وComposer من Herd، ويعملان من PowerShell فقط (Git Bash لا يرى `php`).
 - `vendor/` غير مرفوع في Git. بعد السحب شغّل `composer install`. عند إضافة حزمة اكتب القيد كاملًا (مثل `"^3.0"`)، لأن cmd يحذف `^` من الأوامر.
-- **تنبيه:** حتى يوم الانتقال لـ Cloud، `vendor/` مرفوع في `main` وغير مرفوع في الفروع الجديدة. التنقل إلى `main` ثم العودة يحذف معظم `vendor/`، فشغّل `composer install` بعدها.
 - هيكل Laravel القياسي: نقطة الدخول `public/index.php`، والملفات الثابتة في `public/` (images، favicon، robots).
 - الاختبارات:
   ```
@@ -33,7 +32,9 @@
   - الاتصال في `.env.testing` (غير مرفوع)، وشرحه في `.env.example`.
   - `tests/TestCase.php` يرفض التشغيل على أي قاعدة غيرها؛ لا تُضعف هذا الحارس.
   - إذا لم تكن الحاوية تعمل: `docker start brightpath-testdb`.
-- **بيئة التجربة على Laravel Cloud:** تنشر تلقائيًا كل push على الفرع المرتبط بها (حاليًا `feat/resend-mail`)، فلا ترفع على ذلك الفرع شيئًا غير جاهز.
+- **Laravel Cloud** (`https://thebrightbath-production-scv4tp.laravel.cloud`): البيئة تنشر تلقائيًا كل push على `main`.
+  - العمل يتم في فروع، ولا يُدمج في `main` إلا ما نجحت اختباراته.
+  - الدمج والرفع إلى `main` بموافقة المستخدم فقط.
 - **لا تشغّل `db:seed` على الإنتاج:** `ContentItemsSeeder` يمسح جدول المحتوى.
 - ملف `.env` المحلي يحمل إعدادات الإنتاج (Hostinger). لا تشغّل `migrate` أو `db:seed` بدون `--env=testing`.
 
