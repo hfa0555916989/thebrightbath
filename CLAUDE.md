@@ -23,6 +23,7 @@
 - اعمل داخل `thebrightbath/` فقط. المجلد الأب `thebrightbath.com/` نسخة قديمة، لا تلمسها.
 - PHP وComposer من Herd، ويعملان من PowerShell فقط (Git Bash لا يرى `php`).
 - `vendor/` غير مرفوع في Git. بعد السحب شغّل `composer install`. عند إضافة حزمة اكتب القيد كاملًا (مثل `"^3.0"`)، لأن cmd يحذف `^` من الأوامر.
+- **تنبيه:** حتى يوم الانتقال لـ Cloud، `vendor/` مرفوع في `main` وغير مرفوع في الفروع الجديدة. التنقل إلى `main` ثم العودة يحذف معظم `vendor/`، فشغّل `composer install` بعدها.
 - هيكل Laravel القياسي: نقطة الدخول `public/index.php`، والملفات الثابتة في `public/` (images، favicon، robots).
 - الاختبارات:
   ```
@@ -52,4 +53,5 @@
   - على Laravel Cloud تحل الـ buckets بنفس الاسمين محل القرصين تلقائيًا.
   - لا تكتب ملفات مباشرة في `public_path()`: نظام ملفات Cloud يُمسح مع كل نشر.
 - **صور الموقع** (الشعار، favicon، og): عبر `site_image('site_logo', 'images/...')` من إعدادات الموقع، مع ملف افتراضي في `public/`.
+- **البريد:** عبر Resend (`MAIL_MAILER=resend` و`RESEND_KEY`). كل الـ Mailables تنفذ `ShouldQueue`، فاستخدم `Mail::assertQueued` في الاختبارات وليس `assertSent`. الروابط داخل الإيميلات عبر `route()` فقط.
 - **Factories** موجودة للمستخدم والمستشار والحجز والدفعة، بحالات جاهزة.

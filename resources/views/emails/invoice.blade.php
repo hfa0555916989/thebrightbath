@@ -133,7 +133,7 @@
     </div>
     
     <div style="text-align: center;">
-        <a href="{{ url('/client/invoices') }}" class="btn">📋 عرض جميع الفواتير</a>
+        <a href="{{ route('client.invoices') }}" class="btn">📋 عرض جميع الفواتير</a>
     </div>
     
     <p class="content" style="margin-top: 25px; text-align: center; color: #6c757d;">

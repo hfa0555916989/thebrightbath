@@ -51,7 +51,7 @@
     </div>
     
     <div style="text-align: center;">
-        <a href="{{ url('/consultant/dashboard') }}" class="btn">📊 عرض لوحة التحكم</a>
+        <a href="{{ route('consultant.dashboard') }}" class="btn">📊 عرض لوحة التحكم</a>
     </div>
     
     <p class="content" style="margin-top: 25px; text-align: center;">

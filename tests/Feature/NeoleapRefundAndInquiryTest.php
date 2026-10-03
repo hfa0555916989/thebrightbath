@@ -176,7 +176,7 @@ class NeoleapRefundAndInquiryTest extends TestCase
 
         $this->assertSame('confirmed', $booking->fresh()->status);
         $this->assertSame('success', $transaction->fresh()->status);
-        Mail::assertSent(BookingConfirmation::class, 2);
+        Mail::assertQueued(BookingConfirmation::class, 2);
     }
 
     public function test_pending_payment_reported_not_captured_is_marked_failed(): void

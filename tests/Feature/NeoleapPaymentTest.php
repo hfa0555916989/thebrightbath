@@ -207,9 +207,9 @@ class NeoleapPaymentTest extends TestCase
         $this->assertSame('success', $transaction->status);
         $this->assertSame('1112', $transaction->card_last_four);
 
-        Mail::assertSent(BookingConfirmation::class, 2);
-        Mail::assertSent(InvoiceEmail::class, 1);
-        Mail::assertSent(ConsultantEarnings::class, 1);
+        Mail::assertQueued(BookingConfirmation::class, 2);
+        Mail::assertQueued(InvoiceEmail::class, 1);
+        Mail::assertQueued(ConsultantEarnings::class, 1);
 
         $this->get(route('payment.success', ['payment_id' => self::PAYMENT_ID]))
             ->assertOk()
@@ -300,7 +300,7 @@ class NeoleapPaymentTest extends TestCase
 
         $this->assertSame(1, Payment::count());
         $this->assertSame($sessionsBefore + 1, $booking->consultant->fresh()->total_sessions);
-        Mail::assertSent(InvoiceEmail::class, 1);
+        Mail::assertQueued(InvoiceEmail::class, 1);
     }
 
     public function test_payment_for_a_booking_cancelled_meanwhile_is_recorded_but_not_confirmed(): void
@@ -313,7 +313,7 @@ class NeoleapPaymentTest extends TestCase
         $booking->refresh();
         $this->assertSame('cancelled', $booking->status);
         $this->assertSame('paid', $booking->payment_status);
-        Mail::assertNotSent(BookingConfirmation::class);
+        Mail::assertNotQueued(BookingConfirmation::class);
     }
 
     // ── Gateway result: server-to-server notification ────────────────────
@@ -437,6 +437,6 @@ class NeoleapPaymentTest extends TestCase
         $this->assertSame('approved', $booking->status);
         $this->assertSame('pending', $booking->payment_status);
         $this->assertSame(0, Payment::count());
-        Mail::assertNotSent(BookingConfirmation::class);
+        Mail::assertNotQueued(BookingConfirmation::class);
     }
 }

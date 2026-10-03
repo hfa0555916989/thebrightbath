@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\Booking;
 use App\Models\Consultant;
 use Illuminate\Bus\Queueable;
@@ -10,7 +11,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ConsultantEarnings extends Mailable
+class ConsultantEarnings extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

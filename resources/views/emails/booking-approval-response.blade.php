@@ -40,7 +40,7 @@
         </p>
         
         <div style="text-align: center;">
-            <a href="{{ url('/consultations/payment/' . $booking->id) }}" class="btn">💳 إتمام الدفع الآن</a>
+            <a href="{{ route('consultations.payment', $booking) }}" class="btn">💳 إتمام الدفع الآن</a>
         </div>
         
         <p class="warning-text" style="margin-top: 25px;">
@@ -78,7 +78,7 @@
         </p>
         
         <div style="text-align: center;">
-            <a href="{{ url('/consultations') }}" class="btn">🔍 البحث عن مستشار آخر</a>
+            <a href="{{ route('consultations.index') }}" class="btn">🔍 البحث عن مستشار آخر</a>
         </div>
         
         <p class="content" style="margin-top: 25px; font-size: 14px; color: #6c757d;">

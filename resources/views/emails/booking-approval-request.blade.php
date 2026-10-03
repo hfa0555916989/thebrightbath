@@ -96,7 +96,7 @@
 
     <!-- CTA Button -->
     <div style="text-align: center; margin: 30px 0;">
-        <a href="{{ url('/consultant/pending-requests') }}" 
+        <a href="{{ route('consultant.pending-requests') }}" 
            style="display: inline-block; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);">
             عرض طلبات الحجز
         </a>

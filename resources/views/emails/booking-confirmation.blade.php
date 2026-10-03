@@ -72,7 +72,7 @@
         </p>
     @else
         <div style="text-align: center;">
-            <a href="{{ url('/client/sessions') }}" class="btn">📋 عرض جلساتي</a>
+            <a href="{{ route('client.sessions') }}" class="btn">📋 عرض جلساتي</a>
         </div>
         
         <p class="warning-text">

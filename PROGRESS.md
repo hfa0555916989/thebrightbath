@@ -3,7 +3,7 @@
 آخر تحديث: 2026-10-04
 
 ## المهمة التالية
-**المهمة 4: Resend والطوابير** (التفاصيل في الخطة أدناه).
+**المهمة 5: اجتماعات Daily.co** (التفاصيل في الخطة أدناه). تحتاج قرارًا: هل نبقي رفع الملفات داخل الجلسة؟
 
 ## القرارات المعتمدة
 | القرار | التاريخ |
@@ -21,8 +21,8 @@
 | 2 | أمان الدفع والجلسات | ✅ تم | `fix/payment-security` |
 | 2b | بوابة الراجحي (نيوليب) بدل Paymob | ✅ تم | `feat/neoleap-payment` |
 | 3 | تجهيز Laravel Cloud | ✅ تم (لا يُدمج قبل يوم الانتقال) | `chore/laravel-cloud` |
-| 4 | Resend والطوابير | ⏳ التالية | |
-| 5 | اجتماعات Daily.co | — | |
+| 4 | Resend والطوابير | ✅ تم | `feat/resend-mail` |
+| 5 | اجتماعات Daily.co | ⏳ التالية | |
 | 6 | تذكيرات الجلسات | — | |
 | 7 | تنظيف وإصلاحات متبقية | — | |
 | 8 | النشر | — | |
@@ -89,13 +89,14 @@
 - Bucket عام باسم قرص `uploads`.
 - Bucket خاص باسم قرص `private`.
 - **Scheduler مفعّل**، لـ `payments:reconcile`.
-- Queue worker على `database`، للمهمة 4.
+- **Queue worker** على `database`. كل الإيميلات تمر عبره، فبدونه لا يُرسل أي إيميل.
 
 **4. متغيرات البيئة**
 - `APP_KEY`: **نفس المفتاح الحالي من Hostinger**.
 - `APP_URL=https://thebrightbath.com`، `APP_ENV=production`، `APP_DEBUG=false`، `APP_TIMEZONE=Asia/Riyadh`، `APP_LOCALE=ar`.
 - `SESSION_DRIVER=database`، `CACHE_STORE=database`، `QUEUE_CONNECTION=database`، `SESSION_SAME_SITE=lax`، `SESSION_SECURE_COOKIE=true`.
-- متغيرات البريد (المهمة 4)، و`SUPERVISOR_EMAIL`.
+- `MAIL_MAILER=resend`، `RESEND_KEY`، `MAIL_FROM_ADDRESS=noreply@thebrightbath.com`، و`SUPERVISOR_EMAIL`.
+- قبلها: توثيق نطاق `thebrightbath.com` في Resend، بإضافة سجلات DNS (SPF/DKIM) التي يعطيها Resend.
 
 **5. نقل البيانات**
 - تصدير قاعدة Hostinger ثم استيرادها.
@@ -139,3 +140,11 @@
   - **التخزين:** قرصا `uploads` و`private` يحل محلهما Cloud تلقائيًا. الشعار وصور الموقع صارت في الإعدادات (وأُصلح خطأ الشعار الأبيض). رفع الملفات بامتدادات آمنة فقط.
   - **الإعدادات:** Trusted proxies، و`.env.example` جاهز لـ Cloud (database للجلسات والكاش والطوابير، و`SESSION_SAME_SITE=lax`).
   - 61 اختبارًا ناجحًا.
+- **2026-10-04:** دمج `feat/neoleap-payment` في `main` ورفعه.
+  - **مطلوب على Hostinger:** تشغيل الـ migration الجديد من زر "تحديث قاعدة البيانات" في الإعدادات.
+- **2026-10-04:** المهمة 4 (`feat/resend-mail`، فوق `chore/laravel-cloud`):
+  - Resend كمرسل البريد (`resend/resend-php`، وتحققت أن الربط يصل لـ Resend فعليًا).
+  - كل الإيميلات الثمانية عبر الطابور (`ShouldQueue`).
+  - إصلاح 3 روابط مكسورة في الإيميلات (الجلسات، الفواتير، الدفع)، وكل الروابط صارت عبر `route()`.
+  - اختبار يتحقق أن كل رابط في كل إيميل يفتح صفحة موجودة.
+  - 67 اختبارًا ناجحًا.
