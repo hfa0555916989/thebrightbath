@@ -9,6 +9,7 @@
 | القرار | التاريخ |
 |---|---|
 | الاستضافة: Laravel Cloud (بدل Hostinger) | 2026-10-03 |
+| الموقع **لم يُطلق بعد**. Hostinger كان تجربة، والدومين متوقف (Parked) عليه: لا نقل بيانات، وبيئة Cloud تصبح الإنتاج مباشرة | 2026-10-04 |
 | الاختبارات على MySQL محلية منفصلة `brightpath_testing` (Docker) | 2026-10-03 |
 | الاجتماعات: Daily.co، تُضمَّن داخل الموقع، وتحل محل WebRTC الحالي وكود Jitsi | 2026-10-03 |
 | الإيميل: Resend، عبر Queue | 2026-10-03 |
@@ -22,7 +23,7 @@
 | 1 | بنية الاختبارات (PHPUnit، Factories، حارس القاعدة) | ✅ تم | `chore/test-setup` |
 | 2 | أمان الدفع والجلسات | ✅ تم | `fix/payment-security` |
 | 2b | بوابة الراجحي (نيوليب) بدل Paymob | ✅ تم | `feat/neoleap-payment` |
-| 3 | تجهيز Laravel Cloud | ✅ تم (لا يُدمج قبل يوم الانتقال) | `chore/laravel-cloud` |
+| 3 | تجهيز Laravel Cloud | ✅ تم | `chore/laravel-cloud` |
 | 4 | Resend والطوابير | ✅ تم | `feat/resend-mail` |
 | 5 | اجتماعات Daily.co | ⏳ التالية | |
 | 6 | تذكيرات الجلسات | — | |
@@ -89,7 +90,7 @@
 - عملية دفع تجريبية كاملة في بيئة UAT للبنك، ثم اعتماد البنك قبل التحويل للإنتاج.
 
 ## دليل إعداد Laravel Cloud (للمهمة 8)
-**تنبيه:** فرع `chore/laravel-cloud` يغيّر هيكل المشروع (`public/`)، فيتوقف الموقع على Hostinger إن نُشر هناك. لا يُدمج في `main` إلا يوم الانتقال.
+**الحالة (2026-10-04):** البيئة تعمل على `https://thebrightbath-production-scv4tp.laravel.cloud`، من فرع `feat/resend-mail`. بعد دمج الفروع في `main` يُحوَّل فرع البيئة إلى `main`.
 
 **1. التطبيق والبيئة**
 - اربط مستودع GitHub، الفرع `main` بعد الدمج.
@@ -113,13 +114,15 @@
 - `MAIL_MAILER=resend`، `RESEND_KEY`، `MAIL_FROM_ADDRESS=noreply@thebrightbath.com`، و`SUPERVISOR_EMAIL`.
 - قبلها: توثيق نطاق `thebrightbath.com` في Resend، بإضافة سجلات DNS (SPF/DKIM) التي يعطيها Resend.
 
-**5. نقل البيانات**
-- تصدير قاعدة Hostinger ثم استيرادها.
-- محتوى `public_html/uploads/` يُرفع إلى bucket `uploads` بنفس المسارات بدون بادئة `uploads/`.
-- محتوى `storage/app/analysis-models/` يُرفع إلى bucket `private` تحت `analysis-models/`.
-- الشعار: إن كان قد تغيّر يدويًا على Hostinger، يُرفع من جديد من لوحة الإدارة.
+**5. المحتوى:** لا نقل بيانات (الموقع لم يُطلق).
+- تعبئة البيئة بالأوامر: `db:seed --class=SiteSettingsSeeder`، ثم `ContentItemsSeeder`، ثم `AssessmentSeeder`. ✅ تم.
+- حساب الأدمن.
+- رفع المحتوى من لوحة الإدارة: نماذج التحليل (Excel)، والشعار، وصور المستشارين ونصوصهم.
 
-**6. الدومين:** ربط `thebrightbath.com`، ثم تحديث روابط الاستجابة لدى بنك الراجحي إن طلبها البنك مسبقًا.
+**6. الدومين:**
+- ربط `thebrightbath.com` من Settings ← Network، وتعديل DNS عند Hostinger كما يطلب Cloud. لا يهدم شيئًا، فالدومين متوقف أصلًا.
+- **تحديث `APP_URL`.**
+- **لا تلغِ الدومين عند Hostinger:** يُلغى فقط خطة الاستضافة إن وُجدت.
 
 ## مشاكل معروفة (خارج نطاق ما تم)
 - ⚠️ **`ContentItemsSeeder` يمسح جدول المحتوى (`truncate`)** قبل التعبئة. لا يُشغَّل `db:seed` ولا هذا الـ seeder على الإنتاج بعد الانتقال، وإلا يُحذف المحتوى المعدّل من الإدارة. تجعله المهمة 7 آمنًا (لا يمسح إن وُجد محتوى).
@@ -168,3 +171,4 @@
 - **2026-10-04:** بيئة تجربة على Laravel Cloud تعمل: `https://thebrightbath-production-scv4tp.laravel.cloud`.
   - الإعداد: فرع `feat/resend-mail`، وMySQL 8.4 (Dev)، وbucketان `uploads` و`private`، وScheduler، وعامل طابور.
   - **إصلاح:** `AnalysisModelSeeder` كان ينسخ ملفًا من مسار على جهاز المطور ففشل على السيرفر. صار يتخطاه بتحذير، ويحفظ على القرص الخاص.
+- **2026-10-04:** تبيّن أن الموقع لم يُطلق، وأن `thebrightbath.com` يعرض صفحة Parked من Hostinger. أُلغي نقل البيانات من الخطة.
