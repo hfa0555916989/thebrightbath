@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\AnalysisModel;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -14,19 +15,19 @@ class AnalysisModelSeeder extends Seeder
         $sourcePath = 'C:/Users/hassan/Downloads/نماذج_التحليل_الوظيفي_والكفاءات.xlsx';
         $originalFileName = 'نماذج_التحليل_الوظيفي_والكفاءات.xlsx';
 
-        // Copy file to storage
-        $storagePath = storage_path('app/analysis-models');
-        if (!is_dir($storagePath)) {
-            mkdir($storagePath, 0755, true);
+        // One-off import from a local file: skip anywhere it isn't present (servers, CI).
+        // Analysis models can always be uploaded from the admin panel instead.
+        if (!is_file($sourcePath)) {
+            $this->command->warn('تخطي نماذج التحليل: الملف المصدر غير موجود (' . $sourcePath . ')');
+            return;
         }
 
-        $destFileName = time() . '_' . $originalFileName;
-        $destPath = $storagePath . '/' . $destFileName;
-        copy($sourcePath, $destPath);
-        $relativePath = 'analysis-models/' . $destFileName;
+        // Copy file to the private disk (local folder, or a bucket on Laravel Cloud)
+        $relativePath = 'analysis-models/' . time() . '_' . $originalFileName;
+        Storage::disk('private')->put($relativePath, file_get_contents($sourcePath));
 
         // Parse the Excel file
-        $excelData = $this->parseExcelFile($destPath);
+        $excelData = $this->parseExcelFile($sourcePath);
 
         // Generate unique slug
         $name = 'نماذج التحليل الوظيفي والكفاءات';

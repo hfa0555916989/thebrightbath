@@ -127,6 +127,15 @@ class CloudStorageTest extends TestCase
         $this->assertSame(0, $model->fresh()->downloads_count);
     }
 
+    public function test_analysis_model_seeder_skips_when_its_local_source_file_is_missing(): void
+    {
+        Storage::fake('private');
+
+        $this->artisan('db:seed', ['--class' => 'AnalysisModelSeeder', '--force' => true])->assertSuccessful();
+
+        $this->assertSame(0, AnalysisModel::count());
+    }
+
     // ── Hostinger-only maintenance routes are gone ───────────────────────
 
     public function test_web_maintenance_routes_no_longer_exist(): void

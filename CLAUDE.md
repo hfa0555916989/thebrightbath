@@ -33,6 +33,8 @@
   - الاتصال في `.env.testing` (غير مرفوع)، وشرحه في `.env.example`.
   - `tests/TestCase.php` يرفض التشغيل على أي قاعدة غيرها؛ لا تُضعف هذا الحارس.
   - إذا لم تكن الحاوية تعمل: `docker start brightpath-testdb`.
+- **بيئة التجربة على Laravel Cloud:** تنشر تلقائيًا كل push على الفرع المرتبط بها (حاليًا `feat/resend-mail`)، فلا ترفع على ذلك الفرع شيئًا غير جاهز.
+- **لا تشغّل `db:seed` على الإنتاج:** `ContentItemsSeeder` يمسح جدول المحتوى.
 - ملف `.env` المحلي يحمل إعدادات الإنتاج (Hostinger). لا تشغّل `migrate` أو `db:seed` بدون `--env=testing`.
 
 ## حقائق في الكود يجب احترامها
