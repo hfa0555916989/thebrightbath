@@ -9,6 +9,10 @@ class PaymentSetting extends Model
 {
     protected $fillable = [
         'gateway',
+        'tranportal_id',
+        'tranportal_password',
+        'resource_key',
+        'endpoint_url',
         'api_key',
         'secret_key',
         'public_key',
@@ -24,6 +28,8 @@ class PaymentSetting extends Model
     ];
 
     protected $casts = [
+        'tranportal_password' => 'encrypted',
+        'resource_key' => 'encrypted',
         'is_sandbox' => 'boolean',
         'is_active' => 'boolean',
         'supported_methods' => 'array',
@@ -31,6 +37,8 @@ class PaymentSetting extends Model
     ];
 
     protected $hidden = [
+        'tranportal_password',
+        'resource_key',
         'api_key',
         'secret_key',
         'public_key',
@@ -48,12 +56,12 @@ class PaymentSetting extends Model
     }
 
     /**
-     * Get Paymob settings
+     * Get Neoleap (Al Rajhi payment gateway) settings
      */
-    public static function getPaymob(): ?self
+    public static function getNeoleap(): ?self
     {
-        return Cache::remember('payment_settings_paymob', 3600, function () {
-            return self::where('gateway', 'paymob')->where('is_active', true)->first();
+        return Cache::remember('payment_settings_neoleap', 3600, function () {
+            return self::where('gateway', 'neoleap')->where('is_active', true)->first();
         });
     }
 
@@ -63,7 +71,7 @@ class PaymentSetting extends Model
     public static function clearCache(): void
     {
         Cache::forget('payment_settings_active');
-        Cache::forget('payment_settings_paymob');
+        Cache::forget('payment_settings_neoleap');
     }
 
     /**
@@ -83,31 +91,17 @@ class PaymentSetting extends Model
     }
 
     /**
-     * Get the Paymob base URL (V2 KSA Intention API)
-     */
-    public function getPaymobBaseUrl(): string
-    {
-        return 'https://ksa.paymob.com/v1/intention';
-    }
-
-    /**
-     * Get the Paymob Checkout URL
-     */
-    public function getPaymobCheckoutUrl(): string
-    {
-        return 'https://ksa.paymob.com/unifiedcheckout/';
-    }
-
-    /**
-     * Check if gateway is configured (V2 requires secret_key)
+     * Check if the gateway has everything needed to take payments
      */
     public function isConfigured(): bool
     {
-        if ($this->gateway === 'paymob') {
-            // V2 Intention API requires secret_key
-            return !empty($this->secret_key);
+        if ($this->gateway === 'neoleap') {
+            return filled($this->tranportal_id)
+                && filled($this->tranportal_password)
+                && filled($this->resource_key)
+                && filled($this->endpoint_url);
         }
-        
+
         return !empty($this->api_key) || !empty($this->secret_key);
     }
 }

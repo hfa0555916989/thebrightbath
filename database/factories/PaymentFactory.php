@@ -19,7 +19,7 @@ class PaymentFactory extends Factory
             'currency' => 'SAR',
             'status' => 'pending',
             'payment_method' => 'card',
-            'gateway' => 'paymob',
+            'gateway' => 'neoleap',
         ];
     }
 

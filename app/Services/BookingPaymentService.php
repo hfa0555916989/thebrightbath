@@ -35,7 +35,7 @@ class BookingPaymentService
                 'currency' => $transaction->currency,
                 'status' => 'completed',
                 'payment_method' => $transaction->payment_method ?? 'card',
-                'gateway' => 'paymob',
+                'gateway' => 'neoleap',
                 'gateway_transaction_id' => $transaction->transaction_id,
                 'card_brand' => $transaction->card_type,
                 'card_last_four' => $transaction->card_last_four,
@@ -48,7 +48,7 @@ class BookingPaymentService
                 $booking->update([
                     'payment_status' => 'paid',
                     'paid_at' => now(),
-                    'payment_method' => 'paymob',
+                    'payment_method' => 'neoleap',
                     'transaction_id' => $transaction->transaction_id,
                 ]);
 
@@ -68,7 +68,7 @@ class BookingPaymentService
                 'status' => 'confirmed',
                 'payment_status' => 'paid',
                 'paid_at' => now(),
-                'payment_method' => 'paymob',
+                'payment_method' => 'neoleap',
                 'transaction_id' => $transaction->transaction_id,
                 'consultant_earnings' => $consultantEarnings,
                 'admin_earnings' => $booking->price - $consultantEarnings,

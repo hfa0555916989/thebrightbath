@@ -141,6 +141,11 @@ Route::get('/consultations/{consultant}', [ConsultationController::class, 'show'
 Route::get('/payment/success', [App\Http\Controllers\PaymentController::class, 'paymentSuccess'])->name('payment.success');
 Route::get('/payment/failed', [App\Http\Controllers\PaymentController::class, 'paymentFailed'])->name('payment.failed');
 
+// Al Rajhi / Neoleap gateway results: server notification (JSON) and customer redirect.
+// Excluded from CSRF in bootstrap/app.php; trust comes from the encrypted trandata.
+Route::match(['get', 'post'], '/payment/neoleap/response', [App\Http\Controllers\PaymentController::class, 'neoleapCallback'])->name('payment.neoleap.response');
+Route::match(['get', 'post'], '/payment/neoleap/error', [App\Http\Controllers\PaymentController::class, 'neoleapCallback'])->name('payment.neoleap.error');
+
 Route::middleware('auth')->group(function () {
     Route::post('/consultations/{consultant}/book', [ConsultationController::class, 'book'])->name('consultations.book');
     Route::get('/booking/{booking}/waiting-approval', [ConsultationController::class, 'waitingApproval'])->name('consultations.waiting-approval');
@@ -149,7 +154,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-bookings', [ConsultationController::class, 'myBookings'])->name('consultations.my-bookings');
     Route::delete('/booking/{booking}/cancel', [ConsultationController::class, 'cancel'])->name('consultations.cancel');
     
-    // Payment Routes (Paymob)
+    // Payment Routes (Al Rajhi / Neoleap)
     Route::post('/booking/{booking}/pay', [App\Http\Controllers\PaymentController::class, 'initiatePayment'])->name('payment.initiate');
     Route::get('/payment/status/{transactionId}', [App\Http\Controllers\PaymentController::class, 'getStatus'])->name('payment.status');
     

@@ -4,26 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\PaymentTransaction;
-use App\Services\PaymobService;
+use App\Services\NeoleapService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
-    protected PaymobService $paymobService;
+    protected NeoleapService $neoleap;
 
-    public function __construct(PaymobService $paymobService)
+    public function __construct(NeoleapService $neoleap)
     {
-        $this->paymobService = $paymobService;
+        $this->neoleap = $neoleap;
     }
 
     /**
-     * Initiate payment for a booking
+     * Initiate payment for a booking: send the customer to the bank's payment page.
      */
     public function initiatePayment(Request $request, Booking $booking)
     {
-        // Check if Paymob is configured
-        if (!$this->paymobService->isConfigured()) {
+        // Check if the gateway is configured
+        if (!$this->neoleap->isConfigured()) {
             return back()->with('error', 'بوابة الدفع غير متاحة حالياً');
         }
 
@@ -43,56 +43,58 @@ class PaymentController extends Controller
         }
 
         try {
-            $paymentData = $this->paymobService->createPaymentForBooking($booking);
+            $paymentUrl = $this->neoleap->createPaymentForBooking($booking->load('user'), $request->ips());
 
-            // Redirect to payment iframe or return iframe URL
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'iframe_url' => $paymentData['iframe_url'],
-                    'transaction_id' => $paymentData['transaction_id'],
-                ]);
-            }
-
-            // For web requests, redirect to a payment page
-            return view('payment.iframe', [
-                'iframeUrl' => $paymentData['iframe_url'],
-                'booking' => $booking,
-                'amount' => $paymentData['amount'],
-                'currency' => $paymentData['currency'],
-            ]);
-
+            return redirect()->away($paymentUrl);
         } catch (\Exception $e) {
             Log::error('Payment initiation failed', [
                 'booking_id' => $booking->id,
                 'error' => $e->getMessage(),
             ]);
 
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ], 500);
-            }
-
             return back()->with('error', $e->getMessage());
         }
     }
 
     /**
-     * Payment success callback (redirect from iframe)
+     * Result from the payment gateway (responseURL and errorURL).
+     *
+     * Two callers: the gateway server's notification (JSON), which must be acknowledged
+     * or the gateway voids the payment, and the customer's browser redirect.
+     */
+    public function neoleapCallback(Request $request)
+    {
+        if ($request->isJson()) {
+            $transaction = $this->neoleap->handleCallback($request->json()->all());
+
+            // Acknowledge only payments we accepted; anything else gets voided by the gateway.
+            if ($transaction && $transaction->status === 'success') {
+                return response()->json([['status' => '1', 'result' => route('payment.neoleap.response')]]);
+            }
+
+            return response()->json([['status' => '2', 'result' => null]]);
+        }
+
+        $transaction = $this->neoleap->handleCallback($request->all());
+
+        if ($transaction && $transaction->status === 'success') {
+            return redirect()->route('payment.success', ['payment_id' => $transaction->order_id]);
+        }
+
+        return redirect()->route('payment.failed', array_filter([
+            'error' => $transaction?->error_message,
+        ]));
+    }
+
+    /**
+     * Payment success page
      */
     public function paymentSuccess(Request $request)
     {
-        // Paymob redirects with its transaction "id" (stored on our record once the webhook
-        // has landed) and our special reference as "merchant_order_id".
-        $transactionId = $request->get('id');
-        $reference = $request->get('merchant_order_id');
+        $paymentId = $request->get('payment_id');
 
-        if ($transactionId || $reference) {
-            $transaction = PaymentTransaction::when($transactionId, fn ($q) => $q->where('transaction_id', (string) $transactionId))
-                ->when(!$transactionId, fn ($q) => $q->whereJsonContains('gateway_response->special_reference', (string) $reference))
-                ->first();
+        if ($paymentId) {
+            $transaction = PaymentTransaction::where('order_id', (string) $paymentId)->first();
 
             if ($transaction && $transaction->status === 'success') {
                 return view('payment.success', [
@@ -106,7 +108,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Payment failed callback
+     * Payment failed page
      */
     public function paymentFailed(Request $request)
     {

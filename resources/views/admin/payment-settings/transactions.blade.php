@@ -11,7 +11,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">سجل المعاملات المالية</h1>
-                    <p class="mt-2 text-gray-600">جميع عمليات الدفع عبر بوابة Paymob</p>
+                    <p class="mt-2 text-gray-600">جميع عمليات الدفع عبر بوابة مصرف الراجحي</p>
                 </div>
                 <a href="{{ route('admin.payment-settings.index') }}" 
                    class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition">

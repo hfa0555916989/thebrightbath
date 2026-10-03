@@ -37,7 +37,11 @@
   - middleware `admin` يسمح للأدمن والمستشار.
   - `admin:strict` للأدمن فقط (المالية وإعدادات الدفع).
 - **حالات الحجز:** `pending_approval` ← `approved` (وافق المستشار) ← `confirmed` (دُفع) ← `completed`. وأيضًا `rejected` و`cancelled` و`no_show`.
-- **الدفع:** Paymob KSA V2.
+- **الدفع:** بوابة مصرف الراجحي (تشغيل نيوليب)، تكامل Bank Hosted. المرجع: دليل "ARB Merchant Integration Guide – REST" v1.31.
+  - `App\Services\NeoleapService`: التشفير (URL-encode ثم AES-256-CBC بـ IV ثابت `PGKEYENCDECIVSPC` ثم hex)، وطلب صفحة الدفع، ومعالجة النتيجة.
+  - النتيجة تصل إلى `payment.neoleap.response` و`payment.neoleap.error`، كإشعار JSON من البنك أو كتحويل من متصفح العميل.
+  - لا يُقبل الدفع إلا إذا فُك التشفير بمفتاحنا وطابق كل من: paymentId وtrackId والمبلغ والنتيجة `CAPTURED`.
+  - الإشعار لا يُؤكَّد للبنك إلا بعد قبول الدفع؛ وبدون التأكيد يلغي البنك العملية.
   - `BookingPaymentService::confirm()` هو المكان الوحيد الذي يجعل الحجز مدفوعًا ومؤكدًا.
-  - الـ webhook يرفض أي إشعار بدون HMAC صحيح.
+  - بيانات الربط تُدخل من لوحة الإدارة، وتُخزن في `payment_settings` (صف `gateway = neoleap`). كلمة المرور والمفتاح مشفرة بـ `APP_KEY`.
 - **Factories** موجودة للمستخدم والمستشار والحجز والدفعة، بحالات جاهزة.

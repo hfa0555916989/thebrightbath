@@ -34,9 +34,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\IsAdmin::class,
         ]);
         
-        // Exclude Paymob webhook from CSRF verification
+        // Payment gateway posts results from its own servers/pages
         $middleware->validateCsrfTokens(except: [
-            'api/paymob/*',
+            'payment/neoleap/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

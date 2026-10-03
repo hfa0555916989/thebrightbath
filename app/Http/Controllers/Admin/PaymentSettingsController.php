@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\PaymentSetting;
 use App\Models\PaymentTransaction;
+use App\Services\NeoleapService;
 use Illuminate\Http\Request;
 
 class PaymentSettingsController extends Controller
@@ -14,8 +15,8 @@ class PaymentSettingsController extends Controller
      */
     public function index()
     {
-        $settings = PaymentSetting::where('gateway', 'paymob')->first();
-        
+        $settings = PaymentSetting::where('gateway', 'neoleap')->first();
+
         // Get recent transactions
         $transactions = PaymentTransaction::with('payable')
             ->latest()
@@ -35,45 +36,47 @@ class PaymentSettingsController extends Controller
     }
 
     /**
-     * Update payment settings (V2 Intention API)
+     * Update Al Rajhi / Neoleap gateway settings.
+     * Secret fields are only replaced when a new value is typed (they are never sent back to the page).
      */
     public function update(Request $request)
     {
         $request->validate([
-            'secret_key' => 'nullable|string|max:500',
-            'public_key' => 'nullable|string|max:500',
-            'integration_id' => 'nullable|string|max:200',
-            'hmac_secret' => 'nullable|string|max:500',
-            'currency' => 'required|string|in:SAR,EGP,AED,USD',
+            'tranportal_id' => 'nullable|string|max:100',
+            'tranportal_password' => 'nullable|string|max:255',
+            'resource_key' => 'nullable|string|size:32',
+            'endpoint_url' => 'nullable|url:https|max:500',
             'is_sandbox' => 'boolean',
             'is_active' => 'boolean',
+        ], [
+            'resource_key.size' => 'مفتاح Resource Key يجب أن يكون 32 حرفًا بالضبط',
+            'endpoint_url.url' => 'رابط البوابة يجب أن يبدأ بـ https://',
         ]);
 
-        $settings = PaymentSetting::firstOrNew(['gateway' => 'paymob']);
-        
-        // Only update non-empty values to preserve existing ones
-        $data = [
-            'gateway' => 'paymob',
-            'currency' => $request->currency,
+        $settings = PaymentSetting::firstOrNew(['gateway' => 'neoleap']);
+
+        $settings->fill([
+            'gateway' => 'neoleap',
+            'currency' => 'SAR',
+            'tranportal_id' => $request->filled('tranportal_id') ? trim($request->tranportal_id) : $settings->tranportal_id,
+            'endpoint_url' => $request->filled('endpoint_url') ? trim($request->endpoint_url) : $settings->endpoint_url,
             'is_sandbox' => $request->boolean('is_sandbox'),
             'is_active' => $request->boolean('is_active'),
-        ];
+        ]);
 
-        // Update credentials only if provided (not empty)
-        if ($request->filled('secret_key')) {
-            $data['secret_key'] = $request->secret_key;
+        if ($request->filled('tranportal_password')) {
+            $settings->tranportal_password = $request->tranportal_password;
         }
-        if ($request->filled('public_key')) {
-            $data['public_key'] = $request->public_key;
-        }
-        if ($request->filled('integration_id')) {
-            $data['integration_id'] = $request->integration_id;
-        }
-        if ($request->filled('hmac_secret')) {
-            $data['hmac_secret'] = $request->hmac_secret;
+        if ($request->filled('resource_key')) {
+            $settings->resource_key = $request->resource_key;
         }
 
-        $settings->fill($data);
+        if ($settings->is_active && !$settings->isConfigured()) {
+            return back()
+                ->withInput($request->except(['tranportal_password', 'resource_key']))
+                ->with('error', 'لا يمكن تفعيل البوابة قبل إدخال جميع بيانات الربط (Tranportal ID وكلمة المرور وResource Key ورابط البوابة)');
+        }
+
         $settings->save();
 
         return redirect()
@@ -82,31 +85,13 @@ class PaymentSettingsController extends Controller
     }
 
     /**
-     * Test connection (V2 Intention API)
+     * Test connection: ask the gateway for a payment page with the saved credentials.
      */
-    public function testConnection()
+    public function testConnection(Request $request)
     {
-        $settings = PaymentSetting::getPaymob();
+        $settings = PaymentSetting::where('gateway', 'neoleap')->first();
 
-        if (!$settings || !$settings->secret_key) {
-            return response()->json([
-                'success' => false,
-                'message' => 'لم يتم إدخال Secret Key',
-            ]);
-        }
-
-        try {
-            $service = new \App\Services\PaymobService();
-            $result = $service->testConnection();
-
-            return response()->json($result);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'خطأ: ' . $e->getMessage(),
-            ]);
-        }
+        return response()->json(app(NeoleapService::class)->usingSettings($settings)->testConnection($request->ips()));
     }
 
     /**
