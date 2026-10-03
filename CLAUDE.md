@@ -43,5 +43,6 @@
   - لا يُقبل الدفع إلا إذا فُك التشفير بمفتاحنا وطابق كل من: paymentId وtrackId والمبلغ والنتيجة `CAPTURED`.
   - الإشعار لا يُؤكَّد للبنك إلا بعد قبول الدفع؛ وبدون التأكيد يلغي البنك العملية.
   - `BookingPaymentService::confirm()` هو المكان الوحيد الذي يجعل الحجز مدفوعًا ومؤكدًا.
+  - الاسترداد: `NeoleapService::refundBooking()` (action 2). الاستعلام: `reconcilePending()` (action 8)، عبر الأمر المجدول `payments:reconcile`.
   - بيانات الربط تُدخل من لوحة الإدارة، وتُخزن في `payment_settings` (صف `gateway = neoleap`). كلمة المرور والمفتاح مشفرة بـ `APP_KEY`.
 - **Factories** موجودة للمستخدم والمستشار والحجز والدفعة، بحالات جاهزة.

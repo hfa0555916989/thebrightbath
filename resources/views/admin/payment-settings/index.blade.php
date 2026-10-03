@@ -163,6 +163,18 @@
                             <p class="mt-1 text-xs text-gray-500">رابط "Bank Hosted" الذي يرسله البنك بالبريد. رابط بيئة الاختبار يختلف عن رابط الإنتاج.</p>
                         </div>
 
+                        <!-- Support Endpoint URL (refund / inquiry) -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                رابط الاسترداد والاستعلام (Tranportal Endpoint)
+                            </label>
+                            <input type="url" name="support_endpoint_url" dir="ltr"
+                                   value="{{ old('support_endpoint_url', $settings?->support_endpoint_url) }}"
+                                   class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm"
+                                   placeholder="https://.../pg/payment/tranportal.htm">
+                            <p class="mt-1 text-xs text-gray-500">يرسله البنك بالبريد. مطلوب لاسترداد المبالغ عند الإلغاء، وللتحقق من الدفعات المعلقة (عميل دفع ثم أغلق الصفحة).</p>
+                        </div>
+
                         <!-- Mode -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">البيئة</label>

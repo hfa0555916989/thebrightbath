@@ -25,6 +25,13 @@ Artisan::command('inspire', function () {
 |--------------------------------------------------------------------------
 */
 
+// Payments still pending after 15 minutes: ask the bank for their final state
+Artisan::command('payments:reconcile', function (\App\Services\NeoleapService $neoleap) {
+    $this->info('Resolved: '.$neoleap->reconcilePending());
+})->purpose('Check pending gateway payments with the bank (inquiry)');
+
+Schedule::command('payments:reconcile')->everyTenMinutes()->withoutOverlapping();
+
 // Security cleanup - run daily at 2:00 AM
 Schedule::command('security:cleanup')->dailyAt('02:00');
 

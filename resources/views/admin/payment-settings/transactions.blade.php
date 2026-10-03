@@ -76,6 +76,7 @@
                             <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase">العميل</th>
                             <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase">الحالة</th>
                             <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase">التاريخ</th>
+                            <th class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase">إجراء</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -125,6 +126,20 @@
                             <td class="px-6 py-4">
                                 <div class="text-sm text-gray-900">{{ $transaction->created_at->format('Y-m-d') }}</div>
                                 <div class="text-xs text-gray-500">{{ $transaction->created_at->format('H:i') }}</div>
+                            </td>
+                            <td class="px-6 py-4" onclick="event.stopPropagation()">
+                                @php($refundStatus = $transaction->gateway_response['refund_status'] ?? null)
+                                @if($transaction->status === 'success' && !in_array($refundStatus, ['refunded', 'processing', 'requested'], true))
+                                <form method="POST" action="{{ route('admin.payment-settings.refund', $transaction) }}"
+                                      onsubmit="return confirm('استرداد {{ number_format($transaction->amount, 2) }} ر.س كاملة إلى بطاقة العميل وإلغاء الحجز؟')">
+                                    @csrf
+                                    <button type="submit" class="text-sm text-red-600 hover:text-red-800 font-medium">استرداد</button>
+                                </form>
+                                @elseif($refundStatus === 'processing')
+                                <span class="text-xs text-amber-600">استرداد قيد المعالجة</span>
+                                @elseif($refundStatus === 'failed')
+                                <span class="text-xs text-red-600">فشل الاسترداد</span>
+                                @endif
                             </td>
                         </tr>
                         @endforeach

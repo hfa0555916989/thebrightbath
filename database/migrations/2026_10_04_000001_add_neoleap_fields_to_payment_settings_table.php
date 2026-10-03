@@ -17,13 +17,14 @@ return new class extends Migration
             $table->text('tranportal_password')->nullable()->after('tranportal_id');
             $table->text('resource_key')->nullable()->after('tranportal_password');
             $table->string('endpoint_url', 500)->nullable()->after('resource_key');
+            $table->string('support_endpoint_url', 500)->nullable()->after('endpoint_url');
         });
     }
 
     public function down(): void
     {
         Schema::table('payment_settings', function (Blueprint $table) {
-            $table->dropColumn(['tranportal_id', 'tranportal_password', 'resource_key', 'endpoint_url']);
+            $table->dropColumn(['tranportal_id', 'tranportal_password', 'resource_key', 'endpoint_url', 'support_endpoint_url']);
         });
     }
 };

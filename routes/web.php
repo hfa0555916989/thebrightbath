@@ -368,6 +368,7 @@ Route::prefix('control-panel')
             Route::put('/', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'update'])->name('update');
             Route::post('/test', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'testConnection'])->name('test');
             Route::get('/transactions', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'transactions'])->name('transactions');
+            Route::post('/transactions/{transaction}/refund', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'refund'])->name('refund');
         });
     });
 

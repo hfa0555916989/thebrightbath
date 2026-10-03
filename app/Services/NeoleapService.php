@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\PaymentSetting;
 use App\Models\PaymentTransaction;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -27,6 +28,10 @@ class NeoleapService
     private const CURRENCY_SAR = '682';
 
     private const ACTION_PURCHASE = '1';
+
+    private const ACTION_REFUND = '2';
+
+    private const ACTION_INQUIRY = '8';
 
     protected ?PaymentSetting $settings;
 
@@ -69,7 +74,7 @@ class NeoleapService
             throw new Exception('مبلغ الدفع غير صحيح');
         }
 
-        $trackId = $booking->id.now()->format('ymdHis').random_int(10, 99);
+        $trackId = $this->newTrackId($booking->id);
 
         [$paymentId, $paymentUrl] = $this->requestPaymentToken($amount, $trackId, $customerIps, (string) $booking->id);
 
@@ -90,6 +95,9 @@ class NeoleapService
                 'gateway' => 'neoleap',
                 'track_id' => $trackId,
                 'payment_id' => $paymentId,
+                // Guide best practice: keep the customer IP with each transaction;
+                // also reused for later inquiry/refund calls.
+                'customer_ip' => $customerIps[0] ?? null,
             ],
         ]);
 
@@ -165,6 +173,160 @@ class NeoleapService
             return null;
         }
 
+        $this->applyResult($transaction, $data);
+
+        return $transaction->fresh();
+    }
+
+    /**
+     * Refund a paid booking in full (guide: "Refund" — action 2, by gateway transId).
+     *
+     * @return string 'refunded' | 'processing' (MADA manual refund accepted) | 'failed'
+     */
+    public function refundBooking(Booking $booking, string $reason, array $ips = []): string
+    {
+        $transaction = PaymentTransaction::where('payable_type', Booking::class)
+            ->where('payable_id', $booking->id)
+            ->whereIn('status', ['success', 'refunded'])
+            ->latest()
+            ->first();
+
+        if (!$transaction || !$this->canUseSupportApi()) {
+            Log::critical('Neoleap refund not possible — refund manually', [
+                'booking_id' => $booking->id,
+                'has_transaction' => (bool) $transaction,
+            ]);
+
+            return 'failed';
+        }
+
+        // Claim the refund under a lock so two requests can't refund twice.
+        $previous = DB::transaction(function () use ($transaction) {
+            $locked = PaymentTransaction::whereKey($transaction->id)->lockForUpdate()->first();
+            $status = $locked->gateway_response['refund_status'] ?? null;
+
+            if (!in_array($status, ['refunded', 'processing', 'requested'], true)) {
+                $locked->update(['gateway_response' => array_merge($locked->gateway_response ?? [], ['refund_status' => 'requested'])]);
+            }
+
+            return $status;
+        });
+
+        if (in_array($previous, ['refunded', 'processing'], true)) {
+            return $previous;
+        }
+        if ($previous === 'requested') {
+            return 'processing';
+        }
+
+        $data = $this->supportRequest([
+            'amt' => number_format((float) $transaction->amount, 2, '.', ''),
+            'action' => self::ACTION_REFUND,
+            'trackId' => $this->newTrackId($booking->id),
+            'udf5' => 'TRANID',
+            'transId' => (string) ($transaction->gateway_response['trans_id'] ?? $transaction->transaction_id),
+        ], $ips ?: [$transaction->gateway_response['customer_ip'] ?? '']);
+
+        $result = strtoupper(trim((string) ($data['result'] ?? '')));
+        $status = match ($result) {
+            'CAPTURED' => 'refunded',
+            'PROCESSING' => 'processing',
+            default => 'failed',
+        };
+
+        $transaction->refresh();
+        $transaction->update([
+            'status' => $status === 'refunded' ? 'refunded' : $transaction->status,
+            'gateway_response' => array_merge($transaction->gateway_response ?? [], [
+                'refund_status' => $status,
+                'refund_result' => $data['result'] ?? null,
+                'refund_trans_id' => $data['transid'] ?? null,
+                'refund_reason' => $reason,
+                'refund_at' => now()->toIso8601String(),
+            ]),
+        ]);
+
+        if ($status === 'refunded') {
+            $booking->update(['payment_status' => 'refunded']);
+            $booking->payment?->update([
+                'status' => 'refunded',
+                'refunded_at' => now(),
+                'refund_amount' => $transaction->amount,
+                'refund_reason' => $reason,
+            ]);
+            Log::info('Neoleap: booking refunded', ['booking_id' => $booking->id]);
+        } elseif ($status === 'processing') {
+            $booking->payment?->update(['refund_reason' => $reason]);
+            Log::info('Neoleap: refund accepted for manual processing (MADA)', ['booking_id' => $booking->id]);
+        } else {
+            Log::critical('Neoleap refund failed — refund manually', [
+                'booking_id' => $booking->id,
+                'result' => $data['result'] ?? null,
+            ]);
+        }
+
+        return $status;
+    }
+
+    /**
+     * Ask the gateway about payments still pending after 15 minutes — e.g. the customer
+     * paid and closed the page before coming back (guide: "Inquiry" — action 8).
+     * Returns how many were resolved.
+     */
+    public function reconcilePending(): int
+    {
+        if (!$this->canUseSupportApi()) {
+            return 0;
+        }
+
+        $resolved = 0;
+
+        $pending = PaymentTransaction::where('status', 'pending')
+            ->where('payable_type', Booking::class)
+            ->whereBetween('created_at', [now()->subDays(2), now()->subMinutes(15)])
+            ->get();
+
+        foreach ($pending as $transaction) {
+            $data = $this->supportRequest([
+                'amt' => number_format((float) $transaction->amount, 2, '.', ''),
+                'action' => self::ACTION_INQUIRY,
+                'trackId' => (string) ($transaction->gateway_response['track_id'] ?? ''),
+                'udf5' => 'PaymentID',
+                'transId' => (string) $transaction->order_id,
+            ], [$transaction->gateway_response['customer_ip'] ?? '']);
+
+            if ($data === null || (string) ($data['paymentid'] ?? $transaction->order_id) !== (string) $transaction->order_id) {
+                continue;
+            }
+
+            $result = strtoupper(trim((string) ($data['result'] ?? '')));
+
+            // Only act on answers we understand; anything else stays pending for a human.
+            if ($result === 'CAPTURED' && isset($data['amt'])) {
+                $this->applyResult($transaction, $data);
+                $resolved++;
+            } elseif (in_array($result, ['NOT CAPTURED', 'DENIED BY RISK', 'HOST TIMEOUT', 'NOT APPROVED'], true)) {
+                $this->applyResult($transaction, $data);
+                $resolved++;
+            } else {
+                Log::info('Neoleap inquiry: undetermined result, left pending', [
+                    'payment_id' => $transaction->order_id,
+                    'result' => $data['result'] ?? null,
+                ]);
+            }
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * Record a decrypted, matched gateway result on the transaction and confirm the
+     * booking when the full amount was captured.
+     */
+    private function applyResult(PaymentTransaction $transaction, array $data): void
+    {
+        $paymentId = $transaction->order_id;
+
         $gatewayResponse = array_merge($transaction->gateway_response ?? [], [
             'result' => $data['result'] ?? null,
             'trans_id' => $data['transid'] ?? null,
@@ -206,8 +368,62 @@ class NeoleapService
         } else {
             $transaction->markAsFailed((string) ($data['result'] ?? $data['errortext'] ?? 'فشل في عملية الدفع'), $gatewayResponse);
         }
+    }
 
-        return $transaction->fresh();
+    private function canUseSupportApi(): bool
+    {
+        return $this->settings && $this->settings->isConfigured() && filled($this->settings->support_endpoint_url);
+    }
+
+    private function newTrackId(int|string $prefix): string
+    {
+        return $prefix.now()->format('ymdHis').random_int(10, 99);
+    }
+
+    /**
+     * Refund / inquiry call to the Tranportal endpoint. Returns the decrypted trandata or null.
+     */
+    private function supportRequest(array $fields, array $ips): ?array
+    {
+        $plain = [array_merge([
+            'id' => $this->settings->tranportal_id,
+            'password' => $this->settings->tranportal_password,
+            'currencyCode' => self::CURRENCY_SAR,
+        ], $fields)];
+
+        try {
+            $response = Http::withHeaders(['X-FORWARDED-FOR' => implode(',', array_filter($ips))])
+                ->acceptJson()
+                ->timeout(30)
+                ->post($this->settings->support_endpoint_url, [[
+                    'id' => $this->settings->tranportal_id,
+                    'trandata' => $this->encrypt(json_encode($plain, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)),
+                ]]);
+        } catch (Exception $e) {
+            Log::error('Neoleap support request failed', ['action' => $fields['action'], 'error' => $e->getMessage()]);
+
+            return null;
+        }
+
+        $body = $response->json();
+        $body = $this->normalize(is_array($body) ? $body : []);
+
+        if (filled($body['trandata'] ?? null)) {
+            $data = $this->decryptTrandata((string) $body['trandata']);
+            if ($data !== null) {
+                return $data;
+            }
+        }
+
+        Log::error('Neoleap support request rejected', [
+            'action' => $fields['action'],
+            'http_status' => $response->status(),
+            'status' => $body['status'] ?? null,
+            'error' => $body['error'] ?? null,
+            'error_text' => $body['errortext'] ?? null,
+        ]);
+
+        return null;
     }
 
     // ── Gateway request ───────────────────────────────────────────────────

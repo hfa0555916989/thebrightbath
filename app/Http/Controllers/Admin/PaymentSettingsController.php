@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\PaymentSetting;
 use App\Models\PaymentTransaction;
 use App\Services\NeoleapService;
@@ -46,11 +47,13 @@ class PaymentSettingsController extends Controller
             'tranportal_password' => 'nullable|string|max:255',
             'resource_key' => 'nullable|string|size:32',
             'endpoint_url' => 'nullable|url:https|max:500',
+            'support_endpoint_url' => 'nullable|url:https|max:500',
             'is_sandbox' => 'boolean',
             'is_active' => 'boolean',
         ], [
             'resource_key.size' => 'مفتاح Resource Key يجب أن يكون 32 حرفًا بالضبط',
             'endpoint_url.url' => 'رابط البوابة يجب أن يبدأ بـ https://',
+            'support_endpoint_url.url' => 'رابط الاسترداد والاستعلام يجب أن يبدأ بـ https://',
         ]);
 
         $settings = PaymentSetting::firstOrNew(['gateway' => 'neoleap']);
@@ -60,6 +63,7 @@ class PaymentSettingsController extends Controller
             'currency' => 'SAR',
             'tranportal_id' => $request->filled('tranportal_id') ? trim($request->tranportal_id) : $settings->tranportal_id,
             'endpoint_url' => $request->filled('endpoint_url') ? trim($request->endpoint_url) : $settings->endpoint_url,
+            'support_endpoint_url' => $request->filled('support_endpoint_url') ? trim($request->support_endpoint_url) : $settings->support_endpoint_url,
             'is_sandbox' => $request->boolean('is_sandbox'),
             'is_active' => $request->boolean('is_active'),
         ]);
@@ -92,6 +96,36 @@ class PaymentSettingsController extends Controller
         $settings = PaymentSetting::where('gateway', 'neoleap')->first();
 
         return response()->json(app(NeoleapService::class)->usingSettings($settings)->testConnection($request->ips()));
+    }
+
+    /**
+     * Refund a successful booking payment in full and cancel the booking.
+     */
+    public function refund(Request $request, PaymentTransaction $transaction, NeoleapService $neoleap)
+    {
+        $booking = $transaction->payable_type === Booking::class ? Booking::find($transaction->payable_id) : null;
+
+        if (!$booking || $transaction->status !== 'success') {
+            return back()->with('error', 'لا يمكن استرداد هذه المعاملة');
+        }
+
+        $result = $neoleap->refundBooking($booking, 'استرداد من الإدارة', $request->ips());
+
+        if ($result === 'failed') {
+            return back()->with('error', 'فشل الاسترداد عبر البوابة. راجع السجلات أو نفّذه من بوابة التاجر لدى البنك.');
+        }
+
+        if (in_array($booking->status, ['approved', 'confirmed'], true)) {
+            $booking->update([
+                'status' => 'cancelled',
+                'cancelled_at' => now(),
+                'cancellation_reason' => 'إلغاء واسترداد من الإدارة',
+            ]);
+        }
+
+        return back()->with('success', $result === 'refunded'
+            ? 'تم استرداد المبلغ إلى بطاقة العميل وإلغاء الحجز'
+            : 'قبل البنك طلب الاسترداد وهو قيد المعالجة (مدى)، وتم إلغاء الحجز');
     }
 
     /**

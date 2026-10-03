@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Consultant;
+use App\Services\NeoleapService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -235,7 +236,7 @@ class ConsultationController extends Controller
     /**
      * Cancel a booking.
      */
-    public function cancel(Booking $booking)
+    public function cancel(Request $request, Booking $booking, NeoleapService $neoleap)
     {
         if ($booking->user_id !== Auth::id()) {
             abort(403);
@@ -251,10 +252,15 @@ class ConsultationController extends Controller
             'cancellation_reason' => 'إلغاء من قبل العميل',
         ]);
 
-        // Handle refund if paid
+        // Refund through the payment gateway if paid
         if ($booking->payment_status === 'paid') {
-            // Placeholder for refund logic
-            $booking->update(['payment_status' => 'refunded']);
+            $refund = $neoleap->refundBooking($booking, 'إلغاء من قبل العميل', $request->ips());
+
+            return back()->with('success', match ($refund) {
+                'refunded' => 'تم إلغاء الحجز واسترداد المبلغ إلى بطاقتك. قد يستغرق ظهوره بضعة أيام حسب البنك.',
+                'processing' => 'تم إلغاء الحجز، وطلب الاسترداد قيد المعالجة لدى البنك.',
+                default => 'تم إلغاء الحجز، وستتولى الإدارة استرداد المبلغ خلال أيام العمل.',
+            });
         }
 
         return back()->with('success', 'تم إلغاء الحجز بنجاح');

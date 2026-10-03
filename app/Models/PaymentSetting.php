@@ -13,6 +13,7 @@ class PaymentSetting extends Model
         'tranportal_password',
         'resource_key',
         'endpoint_url',
+        'support_endpoint_url',
         'api_key',
         'secret_key',
         'public_key',
