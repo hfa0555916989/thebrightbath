@@ -171,19 +171,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Record login
-     */
-    public function recordLogin(): void
-    {
-        $this->last_login_at = now();
-        $this->last_login_ip = request()->ip();
-        $this->save();
-
-        // Log activity
-        AdminActivityLog::log('login', "User {$this->email} logged in");
-    }
-
-    /**
      * Get user's consultant profile
      */
     public function consultant(): HasOne
@@ -205,14 +192,6 @@ class User extends Authenticatable
     public function assignedAttempts(): HasMany
     {
         return $this->hasMany(AssessmentAttempt::class, 'counselor_id');
-    }
-
-    /**
-     * Get admin activity logs
-     */
-    public function activityLogs(): HasMany
-    {
-        return $this->hasMany(AdminActivityLog::class);
     }
 
     /**

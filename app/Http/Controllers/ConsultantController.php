@@ -203,7 +203,6 @@ class ConsultantController extends Controller
             'specialization' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'bio' => 'nullable|string|max:1000',
-            'meeting_link' => 'nullable|url|max:500',
             'bank_name' => 'nullable|string|max:100',
             'bank_account_name' => 'nullable|string|max:255',
             'bank_account_number' => 'nullable|string|max:50',

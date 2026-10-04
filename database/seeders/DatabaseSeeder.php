@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             AnalysisModelSeeder::class,
             SiteSettingsSeeder::class,
             ContentItemsSeeder::class,
+            AssessmentSeeder::class,
         ]);
     }
 }

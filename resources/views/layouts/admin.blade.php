@@ -255,36 +255,6 @@
                         </div>
                     </div>
                     
-                    {{-- Security --}}
-                    @if(auth()->user()->role === 'admin')
-                    <div x-data="{ open: {{ request()->routeIs('admin.security*') ? 'true' : 'false' }} }">
-                        <button @click="open = !open" 
-                                class="flex items-center justify-between w-full px-4 py-3 rounded-xl text-gray-300 hover:bg-white/10 hover:text-white transition">
-                            <div class="flex items-center gap-3">
-                                <i class="fas fa-shield-alt w-5"></i>
-                                <span>الأمان</span>
-                            </div>
-                            <i class="fas fa-chevron-down transform transition" :class="open ? 'rotate-180' : ''"></i>
-                        </button>
-                        <div x-show="open" x-collapse class="mr-4 mt-2 space-y-1">
-                            <a href="{{ route('admin.security.logs') }}" 
-                               class="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition text-sm">
-                                <i class="fas fa-history w-4"></i>
-                                سجل الأمان
-                            </a>
-                            <a href="{{ route('admin.security.activity') }}" 
-                               class="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition text-sm">
-                                <i class="fas fa-user-clock w-4"></i>
-                                نشاط المشرفين
-                            </a>
-                            <a href="{{ route('admin.security.blocked-ips') }}" 
-                               class="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition text-sm">
-                                <i class="fas fa-ban w-4"></i>
-                                IP المحظورة
-                            </a>
-                        </div>
-                    </div>
-                    @endif
                     
                     {{-- Divider --}}
                     <div class="border-t border-white/10 my-4"></div>

@@ -40,14 +40,8 @@ Artisan::command('sessions:send-reminders', function (\App\Services\SessionRemin
 
 Schedule::command('sessions:send-reminders')->everyFiveMinutes()->withoutOverlapping();
 
-// Security cleanup - run daily at 2:00 AM
-Schedule::command('security:cleanup')->dailyAt('02:00');
 
-// Database backup - run daily at 3:00 AM
-Schedule::command('database:backup')->dailyAt('03:00');
 
-// Clear old log files - run weekly on Sundays
-Schedule::command('log:clear --days=90')->weeklyOn(0, '04:00');
 
 
 

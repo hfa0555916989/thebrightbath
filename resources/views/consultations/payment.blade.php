@@ -81,28 +81,15 @@
                         </div>
                     </div>
 
-                    {{-- Payment Methods --}}
+                    {{-- Accepted methods (chosen on the bank's secure page) --}}
                     <div class="mb-6">
-                        <h3 class="font-bold text-brand-dark mb-4">طريقة الدفع</h3>
-                        <div class="space-y-3">
-                            <label class="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer hover:border-brand-gold transition">
-                                <input type="radio" name="payment_method" value="card" checked class="w-5 h-5 text-brand-gold">
-                                <div class="flex items-center gap-3">
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Visa.svg/200px-Visa.svg.png" class="h-6" alt="Visa">
-                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/200px-Mastercard-logo.svg.png" class="h-6" alt="Mastercard">
-                                </div>
-                                <span class="font-medium">بطاقة ائتمانية</span>
-                            </label>
-                            <label class="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer hover:border-brand-gold transition">
-                                <input type="radio" name="payment_method" value="mada" class="w-5 h-5 text-brand-gold">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Mada_Logo.svg/200px-Mada_Logo.svg.png" class="h-6" alt="Mada">
-                                <span class="font-medium">مدى</span>
-                            </label>
-                            <label class="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer hover:border-brand-gold transition">
-                                <input type="radio" name="payment_method" value="apple_pay" class="w-5 h-5 text-brand-gold">
-                                <i class="fab fa-apple text-2xl"></i>
-                                <span class="font-medium">Apple Pay</span>
-                            </label>
+                        <h3 class="font-bold text-brand-dark mb-3">طرق الدفع المقبولة</h3>
+                        <p class="text-sm text-gray-600 mb-3">ستنتقل إلى صفحة الدفع الآمنة لمصرف الراجحي، وتختار فيها طريقة الدفع:</p>
+                        <div class="flex flex-wrap items-center gap-4 p-4 border rounded-xl bg-gray-50">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Mada_Logo.svg/200px-Mada_Logo.svg.png" class="h-6" alt="مدى">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Visa.svg/200px-Visa.svg.png" class="h-6" alt="Visa">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/200px-Mastercard-logo.svg.png" class="h-6" alt="Mastercard">
+                            <span class="text-sm text-gray-700"><i class="fab fa-apple"></i> Apple Pay</span>
                         </div>
                     </div>
 
@@ -112,7 +99,7 @@
                             <i class="fas fa-info-circle text-blue-600 mt-1"></i>
                             <div class="text-sm text-blue-800">
                                 <p class="font-medium mb-1">ملاحظة هامة:</p>
-                                <p>سيتم إرسال رابط الاجتماع إلى بريدك الإلكتروني بعد تأكيد الدفع. يمكنك إلغاء الحجز واسترداد المبلغ قبل موعد الجلسة بساعتين على الأقل.</p>
+                                <p>بعد الدفع يصلك تأكيد بالبريد، ثم تذكير قبل الجلسة بيوم وبساعة. تدخل الجلسة من "جلساتي" قبل موعدها بـ 10 دقائق. يمكنك إلغاء الحجز واسترداد المبلغ إلى بطاقتك قبل الموعد بساعتين على الأقل.</p>
                             </div>
                         </div>
                     </div>

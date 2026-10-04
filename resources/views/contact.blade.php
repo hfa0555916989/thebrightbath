@@ -262,7 +262,7 @@
 
                                         // Encode and open WhatsApp
                                         const encodedMessage = encodeURIComponent(message);
-                                        const whatsappUrl = `https://wa.me/966543494316?text=${encodedMessage}`;
+                                        const whatsappUrl = `https://wa.me/{{ preg_replace('/\D/', '', setting('whatsapp', '966543494316')) }}?text=${encodedMessage}`;
                                         
                                         window.open(whatsappUrl, '_blank');
                                         this.sent = true;

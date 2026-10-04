@@ -78,12 +78,6 @@
                            class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold">
                     @error('experience_years')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">رابط الاجتماع (Zoom/Meet)</label>
-                    <input type="url" name="meeting_link" value="{{ old('meeting_link') }}" placeholder="https://zoom.us/j/..."
-                           class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold" dir="ltr">
-                    @error('meeting_link')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
-                </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">نبذة عن المستشار (بالعربية)</label>
                     <textarea name="bio_ar" rows="3" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-gold/20 focus:border-brand-gold">{{ old('bio_ar') }}</textarea>

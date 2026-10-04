@@ -9,7 +9,11 @@ class ContentItemsSeeder extends Seeder
 {
     public function run(): void
     {
-        ContentItem::truncate();
+        // Never wipe content edited from the admin panel: only fill an empty table.
+        if (ContentItem::exists()) {
+            $this->command?->warn('تخطي المحتوى: الجدول فيه بيانات مسبقًا');
+            return;
+        }
 
         $items = [
             // ===== STATS (Home) =====

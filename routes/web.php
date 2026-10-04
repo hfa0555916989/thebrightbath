@@ -124,10 +124,6 @@ Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
-Route::post('/contact', function () {
-    return redirect()->route('contact')->with('success', 'تم إرسال رسالتك بنجاح!');
-})->name('contact.submit');
-
 /*
 |--------------------------------------------------------------------------
 | Consultations Routes
@@ -211,19 +207,6 @@ Route::prefix(config('app.admin_path'))
         // Book Chapters
         Route::resource('book-chapters', BookChapterController::class);
         
-        // Security
-        Route::get('security/logs', function () {
-            return view('admin.security.logs');
-        })->name('security.logs');
-        
-        Route::get('security/activity', function () {
-            return view('admin.security.activity');
-        })->name('security.activity');
-        
-        Route::get('security/blocked-ips', function () {
-            return view('admin.security.blocked-ips');
-        })->name('security.blocked-ips');
-        
         // Profile & Settings
         Route::get('profile', function () {
             return view('admin.profile');
@@ -231,21 +214,21 @@ Route::prefix(config('app.admin_path'))
         
         Route::put('profile', function (\Illuminate\Http\Request $request) {
             $user = auth()->user();
-            $user->update($request->only(['name', 'email']));
-            if ($request->filled('password')) {
-                $user->update(['password' => bcrypt($request->password)]);
+            $data = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', \Illuminate\Validation\Rule::unique('users')->ignore($user->id)],
+                'password' => ['nullable', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+            ]);
+            $user->update(['name' => $data['name'], 'email' => strtolower($data['email'])]);
+            if (filled($data['password'] ?? null)) {
+                $user->updatePassword($data['password']);
             }
             return back()->with('success', 'تم تحديث الملف الشخصي بنجاح');
         })->name('profile.update');
-        
-        Route::get('settings', function () {
-            return view('admin.settings');
-        })->name('settings');
-        
-        Route::put('settings', function (\Illuminate\Http\Request $request) {
-            return back()->with('success', 'تم حفظ الإعدادات بنجاح');
-        })->name('settings.update');
-        
+
+        // Site settings live in the CMS (site-settings); this name is kept for old links
+        Route::get('settings', fn () => redirect()->route('admin.site-settings.index'))->name('settings');
+
         // Users Management
         Route::get('users', function () {
             $users = \App\Models\User::latest()->paginate(20);

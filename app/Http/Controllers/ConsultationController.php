@@ -159,7 +159,6 @@ class ConsultationController extends Controller
             'status' => 'pending_approval', // Waiting for consultant approval
             'payment_status' => 'pending',
             'client_notes' => $request->notes,
-            'meeting_link' => $consultant->meeting_link,
         ]);
 
         // Send notification to consultant for approval

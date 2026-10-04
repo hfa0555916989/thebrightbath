@@ -111,12 +111,6 @@
                 </div>
                 <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">رابط الاجتماع (Zoom/Meet)</label>
-                        <input type="url" name="meeting_link" value="{{ old('meeting_link', $consultant->meeting_link) }}"
-                               placeholder="https://zoom.us/j/..."
-                               class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-primary-500" dir="ltr">
-                    </div>
-                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">نسبتك من الجلسة</label>
                         <div class="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600">
                             {{ 100 - ($consultant->commission_rate ?? 20) }}% (يحددها الإدارة)

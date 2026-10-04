@@ -51,7 +51,6 @@ class ConsultantController extends Controller
             'price_per_30_min' => ['required', 'numeric', 'min:0'],
             'price_per_60_min' => ['required', 'numeric', 'min:0'],
             'experience_years' => ['required', 'integer', 'min:0'],
-            'meeting_link' => ['nullable', 'url'],
             'is_active' => ['boolean'],
             'is_featured' => ['boolean'],
         ]);
@@ -82,7 +81,6 @@ class ConsultantController extends Controller
             'price_per_30_min' => $request->price_per_30_min,
             'price_per_60_min' => $request->price_per_60_min,
             'experience_years' => $request->experience_years,
-            'meeting_link' => $request->meeting_link,
             'is_active' => $request->boolean('is_active', true),
             'is_featured' => $request->boolean('is_featured', false),
         ]);
@@ -130,7 +128,6 @@ class ConsultantController extends Controller
             'price_per_30_min' => ['required', 'numeric', 'min:0'],
             'price_per_60_min' => ['required', 'numeric', 'min:0'],
             'experience_years' => ['required', 'integer', 'min:0'],
-            'meeting_link' => ['nullable', 'url'],
             'is_active' => ['boolean'],
             'is_featured' => ['boolean'],
         ]);
@@ -166,7 +163,6 @@ class ConsultantController extends Controller
             'price_per_30_min' => $request->price_per_30_min,
             'price_per_60_min' => $request->price_per_60_min,
             'experience_years' => $request->experience_years,
-            'meeting_link' => $request->meeting_link,
             'is_active' => $request->boolean('is_active', true),
             'is_featured' => $request->boolean('is_featured', false),
         ]);
