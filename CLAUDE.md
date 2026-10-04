@@ -40,8 +40,9 @@
 
 ## حقائق في الكود يجب احترامها
 - **الأدوار** (`users.role`): `admin`، `counselor` (= المستشار)، `client`.
-  - middleware `admin` يسمح للأدمن والمستشار.
-  - `admin:strict` للأدمن فقط (المالية وإعدادات الدفع).
+  - middleware `admin` (لوحة الإدارة) للأدمن فقط. المستشار له `/consultant`.
+  - مسار لوحة الإدارة من `config('app.admin_path')` (`ADMIN_PATH`). في الكود استخدم دائمًا `route('admin.*')`.
+- **الحماية من البوتات:** `App\Rules\Turnstile` و`<x-turnstile />` في التسجيل والدخول ونسيت كلمة المرور. معطّل ما لم تُضبط `TURNSTILE_*`.
 - **حالات الحجز:** `pending_approval` ← `approved` (وافق المستشار) ← `confirmed` (دُفع) ← `completed`. وأيضًا `rejected` و`cancelled` و`no_show`.
 - **الدفع:** بوابة مصرف الراجحي (تشغيل نيوليب)، تكامل Bank Hosted. المرجع: دليل "ARB Merchant Integration Guide – REST" v1.31.
   - `App\Services\NeoleapService`: التشفير (URL-encode ثم AES-256-CBC بـ IV ثابت `PGKEYENCDECIVSPC` ثم hex)، وطلب صفحة الدفع، ومعالجة النتيجة.
