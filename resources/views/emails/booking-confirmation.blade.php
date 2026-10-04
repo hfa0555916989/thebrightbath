@@ -46,7 +46,7 @@
         </div>
         <div class="info-row">
             <span class="info-label">المدة</span>
-            <span class="info-value">{{ $booking->consultant->session_duration }} دقيقة</span>
+            <span class="info-value">{{ $booking->duration_minutes }} دقيقة</span>
         </div>
         <div class="info-row">
             <span class="info-label">رقم الحجز</span>

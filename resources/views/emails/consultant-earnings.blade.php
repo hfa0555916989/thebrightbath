@@ -18,7 +18,7 @@
         <h3>💵 تفاصيل الأرباح</h3>
         <div class="info-row">
             <span class="info-label">قيمة الجلسة</span>
-            <span class="info-value">{{ number_format($booking->consultant->hourly_rate, 2) }} ر.س</span>
+            <span class="info-value">{{ number_format($booking->price, 2) }} ر.س</span>
         </div>
         <div class="info-row">
             <span class="info-label">نسبة العمولة</span>
@@ -46,7 +46,7 @@
         </div>
         <div class="info-row">
             <span class="info-label">المدة</span>
-            <span class="info-value">{{ $consultant->session_duration }} دقيقة</span>
+            <span class="info-value">{{ $booking->duration_minutes }} دقيقة</span>
         </div>
     </div>
     

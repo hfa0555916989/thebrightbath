@@ -67,7 +67,7 @@
                             <p style="margin: 3px 0 0 0; font-size: 13px; color: #6c757d;">التخصص: {{ $payment->booking->consultant->specialization }}</p>
                         </td>
                         <td style="text-align: center; border-bottom: 1px solid #e9ecef; color: #495057;">
-                            {{ $payment->booking->consultant->session_duration }} دقيقة
+                            {{ $payment->booking->duration_minutes }} دقيقة
                         </td>
                         <td style="text-align: left; border-bottom: 1px solid #e9ecef; font-weight: 600; color: #2d3748;">
                             {{ number_format($payment->amount, 2) }} ر.س

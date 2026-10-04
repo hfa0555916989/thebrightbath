@@ -4,8 +4,10 @@ namespace App\Mail;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\Booking;
+use App\Support\BookingCalendar;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -37,6 +39,17 @@ class BookingConfirmation extends Mailable implements ShouldQueue
         return new Content(
             view: 'emails.booking-confirmation',
         );
+    }
+
+    /**
+     * Calendar invitation (.ics) so the session can be added to any calendar app.
+     */
+    public function attachments(): array
+    {
+        return [
+            Attachment::fromData(fn () => BookingCalendar::ics($this->booking, $this->recipientType), 'session.ics')
+                ->withMime('text/calendar'),
+        ];
     }
 }
 

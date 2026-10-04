@@ -119,6 +119,14 @@ class Consultant extends Model
         return !$hasConflict;
     }
 
+    /**
+     * Consultants have no name column: the name lives on their user account.
+     */
+    public function getNameAttribute(?string $value): string
+    {
+        return $value ?? $this->user?->name ?? '';
+    }
+
     public function getPhotoUrlAttribute(): string
     {
         return storage_asset($this->photo);

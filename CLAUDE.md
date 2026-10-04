@@ -62,4 +62,6 @@
   - نافذة الدخول من `Booking::joinOpensAt()` إلى `joinClosesAt()`: قبل البداية بـ10 دقائق حتى بعد النهاية بـ30 دقيقة.
   - ملفات الجلسة على قرص `private`، ولطرفي الجلسة فقط.
   - المفتاح `DAILY_API_KEY`، وفي الاختبارات `Http::fake`.
+- **التذكيرات:** `App\Services\SessionReminderService` عبر `sessions:send-reminders` (Scheduler كل 5 دقائق). التقويم عبر `App\Support\BookingCalendar::ics()`.
+- **الأوامر المجدولة كلها** في `routes/console.php` وتحتاج Scheduler مفعّل (Laravel Cloud).
 - **Factories** موجودة للمستخدم والمستشار والحجز والدفعة، بحالات جاهزة.

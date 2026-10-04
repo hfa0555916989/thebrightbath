@@ -32,6 +32,14 @@ Artisan::command('payments:reconcile', function (\App\Services\NeoleapService $n
 
 Schedule::command('payments:reconcile')->everyTenMinutes()->withoutOverlapping();
 
+// Session reminders: 24 hours and 1 hour before, to client and consultant
+Artisan::command('sessions:send-reminders', function (\App\Services\SessionReminderService $reminders) {
+    $sent = $reminders->sendDue();
+    $this->info("Sent: {$sent['24h']} (24h), {$sent['1h']} (1h)");
+})->purpose('Email session reminders 24 hours and 1 hour before');
+
+Schedule::command('sessions:send-reminders')->everyFiveMinutes()->withoutOverlapping();
+
 // Security cleanup - run daily at 2:00 AM
 Schedule::command('security:cleanup')->dailyAt('02:00');
 
