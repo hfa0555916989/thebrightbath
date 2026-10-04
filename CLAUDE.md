@@ -1,6 +1,6 @@
 # Bright Path Portal — دليل العمل
 
-منصة إرشاد مهني عربية: Laravel 11 + MySQL + Blade/Tailwind/Alpine (Vite).
+منصة إرشاد مهني عربية: **Laravel 13** (PHP 8.3+) + MySQL + Blade/Tailwind (CDN)/Alpine.
 الأقسام: الموقع العام، لوحة العميل، لوحة المستشار (`/consultant`)، لوحة الإدارة (`/control-panel`).
 الهدف: النشر على Laravel Cloud.
 
@@ -16,6 +16,8 @@
 - لا مفاتيح ولا كلمات مرور في الكود: كل شيء عبر `config/*.php` و`.env`، وكل متغير جديد يُضاف إلى `.env.example`.
 - `route()` بدل الروابط المكتوبة يدويًا، في الـ views والإيميلات.
 - Feature Test لكل سلوك جديد أو مُصلَح، والمجموعة كاملة تنجح قبل الـ commit.
+- **PHPUnit 13:** استخدم الـ attributes (`#[DataProvider('...')]`)، فالتعليقات `@dataProvider` لم تعد تعمل.
+- قبل أي إضافة حزمة شغّل `composer audit`. الحالة الحالية: صفر ثغرات.
 - واجهة المستخدم ورسائل الخطأ بالعربية.
 - الملفات بنهايات CRLF؛ حافظ على نمط الملف عند التعديل.
 

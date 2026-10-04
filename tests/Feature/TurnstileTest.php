@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class TurnstileTest extends TestCase
@@ -52,7 +53,7 @@ class TurnstileTest extends TestCase
 
     // ── Off by default ───────────────────────────────────────────────────
 
-    /** @dataProvider formPages */
+    #[DataProvider('formPages')]
     public function test_widget_is_hidden_without_keys(string $route): void
     {
         $this->get(route($route))->assertOk()->assertDontSee('cf-turnstile', false);
@@ -72,7 +73,7 @@ class TurnstileTest extends TestCase
 
     // ── On with keys ─────────────────────────────────────────────────────
 
-    /** @dataProvider formPages */
+    #[DataProvider('formPages')]
     public function test_widget_is_shown_with_keys(string $route): void
     {
         $this->enable();

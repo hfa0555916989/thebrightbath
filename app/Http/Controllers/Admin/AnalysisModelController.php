@@ -7,7 +7,6 @@ use App\Models\AnalysisModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AnalysisModelController extends Controller
@@ -208,7 +207,7 @@ class AnalysisModelController extends Controller
                 $rowData = [];
                 $hasData = false;
                 for ($col = 1; $col <= $highestColumnIndex; $col++) {
-                    $cell = $sheet->getCellByColumnAndRow($col, $row);
+                    $cell = $sheet->getCell([$col, $row]);
                     $value = $cell->getValue();
                     
                     // Handle RichText

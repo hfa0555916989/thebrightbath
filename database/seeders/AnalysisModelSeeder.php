@@ -76,7 +76,7 @@ class AnalysisModelSeeder extends Seeder
                 $rowData  = [];
                 $hasData  = false;
                 for ($col = 1; $col <= $colIndex; $col++) {
-                    $cell  = $sheet->getCellByColumnAndRow($col, $row);
+                    $cell  = $sheet->getCell([$col, $row]);
                     $value = $cell->getValue();
 
                     if ($value instanceof \PhpOffice\PhpSpreadsheet\RichText\RichText) {

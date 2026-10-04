@@ -26,12 +26,7 @@ class User extends Authenticatable
         'password',
         'role',
         'has_book_access',
-        'two_factor_secret',
-        'two_factor_recovery_codes',
-        'two_factor_confirmed_at',
         'password_changed_at',
-        'last_login_at',
-        'last_login_ip',
         'email_verified_at',
         'verification_token',
         'verification_token_expires_at',
@@ -47,8 +42,6 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'two_factor_secret',
-        'two_factor_recovery_codes',
     ];
 
     /**
@@ -62,9 +55,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'has_book_access' => 'boolean',
-            'two_factor_confirmed_at' => 'datetime',
-            'password_changed_at' => 'datetime',
-            'last_login_at' => 'datetime',
+                'password_changed_at' => 'datetime',
             'verification_token_expires_at' => 'datetime',
             'password_reset_expires_at' => 'datetime',
         ];
@@ -100,46 +91,6 @@ class User extends Authenticatable
     public function canAccessAdmin(): bool
     {
         return $this->role === 'admin';
-    }
-
-    /**
-     * Check if user has 2FA enabled
-     */
-    public function hasTwoFactorEnabled(): bool
-    {
-        return !is_null($this->two_factor_secret) && !is_null($this->two_factor_confirmed_at);
-    }
-
-    /**
-     * Get decrypted 2FA secret
-     */
-    public function getTwoFactorSecret(): ?string
-    {
-        if (!$this->two_factor_secret) {
-            return null;
-        }
-
-        try {
-            return decrypt($this->two_factor_secret);
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
-
-    /**
-     * Get recovery codes
-     */
-    public function getRecoveryCodes(): array
-    {
-        if (!$this->two_factor_recovery_codes) {
-            return [];
-        }
-
-        try {
-            return json_decode(decrypt($this->two_factor_recovery_codes), true) ?? [];
-        } catch (\Exception $e) {
-            return [];
-        }
     }
 
     /**
@@ -194,11 +145,4 @@ class User extends Authenticatable
         return $this->hasMany(AssessmentAttempt::class, 'counselor_id');
     }
 
-    /**
-     * Requires 2FA for admin/counselor roles
-     */
-    public function requiresTwoFactor(): bool
-    {
-        return in_array($this->role, ['admin', 'counselor']);
-    }
 }

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 /**
@@ -26,7 +27,7 @@ class AdminPaymentAccessTest extends TestCase
         ];
     }
 
-    /** @dataProvider controlPanelRoutes */
+    #[DataProvider('controlPanelRoutes')]
     public function test_counselors_cannot_reach_the_control_panel(string $route): void
     {
         $this->actingAs(User::factory()->counselor()->create())
@@ -34,7 +35,7 @@ class AdminPaymentAccessTest extends TestCase
             ->assertRedirect(route('home'));
     }
 
-    /** @dataProvider controlPanelRoutes */
+    #[DataProvider('controlPanelRoutes')]
     public function test_clients_cannot_reach_the_control_panel(string $route): void
     {
         $this->actingAs(User::factory()->create())
@@ -42,7 +43,7 @@ class AdminPaymentAccessTest extends TestCase
             ->assertRedirect(route('home'));
     }
 
-    /** @dataProvider controlPanelRoutes */
+    #[DataProvider('controlPanelRoutes')]
     public function test_admins_can_reach_the_control_panel(string $route): void
     {
         $this->actingAs(User::factory()->admin()->create())
