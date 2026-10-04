@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Mail\PasswordResetEmail;
 use App\Models\User;
+use App\Rules\Turnstile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -30,6 +31,7 @@ class PasswordResetController extends Controller
     {
         $request->validate([
             'email' => ['required', 'email'],
+            'cf-turnstile-response' => [new Turnstile],
         ], [
             'email.required' => 'البريد الإلكتروني مطلوب',
             'email.email' => 'يرجى إدخال بريد إلكتروني صحيح',

@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Mail\WelcomeEmail;
 use App\Models\User;
+use App\Rules\Turnstile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
@@ -35,7 +35,7 @@ class RegisteredUserController extends Controller
             'phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'terms' => ['required', 'accepted'],
-            'g-recaptcha-response' => [$this->recaptchaEnabled() ? 'required' : 'nullable'],
+            'cf-turnstile-response' => [new Turnstile],
         ], [
             'name.required' => 'الاسم مطلوب',
             'email.required' => 'البريد الإلكتروني مطلوب',
@@ -44,21 +44,7 @@ class RegisteredUserController extends Controller
             'password.required' => 'كلمة المرور مطلوبة',
             'password.confirmed' => 'كلمة المرور غير متطابقة',
             'terms.accepted' => 'يجب الموافقة على الشروط والأحكام',
-            'g-recaptcha-response.required' => 'يرجى التحقق من أنك لست روبوت',
         ]);
-
-        // Verify reCAPTCHA (only when keys are configured)
-        if ($this->recaptchaEnabled()) {
-            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-                'secret' => config('services.recaptcha.secret_key'),
-                'response' => $request->input('g-recaptcha-response'),
-                'remoteip' => $request->ip(),
-            ]);
-
-            if (!$response->json('success')) {
-                return back()->withErrors(['g-recaptcha-response' => 'فشل التحقق، يرجى المحاولة مرة أخرى'])->withInput();
-            }
-        }
 
         // Generate verification token
         $verificationToken = Str::random(64);
@@ -140,10 +126,5 @@ class RegisteredUserController extends Controller
         }
 
         return back()->with('success', 'تم إرسال رابط التفعيل إلى بريدك الإلكتروني.');
-    }
-
-    private function recaptchaEnabled(): bool
-    {
-        return filled(config('services.recaptcha.site_key')) && filled(config('services.recaptcha.secret_key'));
     }
 }

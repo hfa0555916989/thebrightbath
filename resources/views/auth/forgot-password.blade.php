@@ -101,6 +101,8 @@
                     </div>
                 </div>
                 
+                <x-turnstile />
+
                 {{-- Submit Button --}}
                 <button type="submit" 
                         class="w-full bg-brand-gold text-brand-dark py-4 rounded-xl font-bold hover:bg-brand-goldDeep transition shadow-lg">
