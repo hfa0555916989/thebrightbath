@@ -2,145 +2,119 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AnalysisModel;
+use App\Models\BookChapter;
+use App\Models\Consultant;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
 
+/**
+ * XML sitemaps for search engines. Every URL is built with route(), so it always
+ * matches a real page (the old version listed Arabic paths that did not exist).
+ */
 class SitemapController extends Controller
 {
     /**
-     * Generate the main sitemap index
+     * Sitemap index pointing to the section sitemaps
      */
     public function index(): Response
     {
-        $content = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $content .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-        
-        // Main pages sitemap
-        $content .= '  <sitemap>' . "\n";
-        $content .= '    <loc>' . url('/sitemap-pages.xml') . '</loc>' . "\n";
-        $content .= '    <lastmod>' . Carbon::now()->toW3cString() . '</lastmod>' . "\n";
-        $content .= '  </sitemap>' . "\n";
-        
-        // Assessments sitemap
-        $content .= '  <sitemap>' . "\n";
-        $content .= '    <loc>' . url('/sitemap-assessments.xml') . '</loc>' . "\n";
-        $content .= '    <lastmod>' . Carbon::now()->toW3cString() . '</lastmod>' . "\n";
-        $content .= '  </sitemap>' . "\n";
-        
-        // Consultations sitemap
-        $content .= '  <sitemap>' . "\n";
-        $content .= '    <loc>' . url('/sitemap-consultations.xml') . '</loc>' . "\n";
-        $content .= '    <lastmod>' . Carbon::now()->toW3cString() . '</lastmod>' . "\n";
-        $content .= '  </sitemap>' . "\n";
-        
+        $content = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $content .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+
+        foreach (['sitemap.pages', 'sitemap.assessments', 'sitemap.consultations'] as $name) {
+            $content .= "  <sitemap>\n";
+            $content .= '    <loc>'.e(route($name))."</loc>\n";
+            $content .= '    <lastmod>'.Carbon::now()->toW3cString()."</lastmod>\n";
+            $content .= "  </sitemap>\n";
+        }
+
         $content .= '</sitemapindex>';
-        
-        return response($content, 200)
-            ->header('Content-Type', 'application/xml');
+
+        return $this->xml($content);
     }
-    
+
     /**
-     * Generate sitemap for static pages
+     * Static pages, library chapters and analysis models
      */
     public function pages(): Response
     {
         $pages = [
-            ['url' => url('/'), 'priority' => '1.0', 'changefreq' => 'daily'],
-            ['url' => url('/عن-المؤسسة'), 'priority' => '0.8', 'changefreq' => 'monthly'],
-            ['url' => url('/الرؤية-والرسالة'), 'priority' => '0.7', 'changefreq' => 'monthly'],
-            ['url' => url('/الأهداف-الاستراتيجية'), 'priority' => '0.7', 'changefreq' => 'monthly'],
-            ['url' => url('/القيم'), 'priority' => '0.7', 'changefreq' => 'monthly'],
-            ['url' => url('/الخدمات-والبرامج'), 'priority' => '0.8', 'changefreq' => 'weekly'],
-            ['url' => url('/اختبارات-الميول'), 'priority' => '0.9', 'changefreq' => 'weekly'],
-            ['url' => url('/استشارات-فورية'), 'priority' => '0.9', 'changefreq' => 'daily'],
-            ['url' => url('/الكتاب-المهني'), 'priority' => '0.8', 'changefreq' => 'weekly'],
-            ['url' => url('/تواصل-معنا'), 'priority' => '0.6', 'changefreq' => 'monthly'],
-            ['url' => url('/الشروط-والأحكام'), 'priority' => '0.3', 'changefreq' => 'yearly'],
-            ['url' => url('/سياسة-الخصوصية'), 'priority' => '0.3', 'changefreq' => 'yearly'],
-            ['url' => url('/login'), 'priority' => '0.5', 'changefreq' => 'monthly'],
-            ['url' => url('/register'), 'priority' => '0.5', 'changefreq' => 'monthly'],
+            ['url' => route('home'), 'priority' => '1.0', 'changefreq' => 'daily'],
+            ['url' => route('about'), 'priority' => '0.8', 'changefreq' => 'monthly'],
+            ['url' => route('vision-mission'), 'priority' => '0.7', 'changefreq' => 'monthly'],
+            ['url' => route('strategic-goals'), 'priority' => '0.7', 'changefreq' => 'monthly'],
+            ['url' => route('values'), 'priority' => '0.7', 'changefreq' => 'monthly'],
+            ['url' => route('services'), 'priority' => '0.8', 'changefreq' => 'weekly'],
+            ['url' => route('career-book.index'), 'priority' => '0.8', 'changefreq' => 'weekly'],
+            ['url' => route('analysis-models.index'), 'priority' => '0.8', 'changefreq' => 'weekly'],
+            ['url' => route('contact'), 'priority' => '0.6', 'changefreq' => 'monthly'],
+            ['url' => route('terms'), 'priority' => '0.3', 'changefreq' => 'yearly'],
+            ['url' => route('privacy'), 'priority' => '0.3', 'changefreq' => 'yearly'],
         ];
-        
-        $content = $this->generateSitemap($pages);
-        
-        return response($content, 200)
-            ->header('Content-Type', 'application/xml');
+
+        try {
+            foreach (BookChapter::published()->ordered()->get() as $chapter) {
+                $pages[] = ['url' => route('career-book.show', $chapter->slug), 'priority' => '0.6', 'changefreq' => 'monthly', 'lastmod' => $chapter->updated_at];
+            }
+
+            foreach (AnalysisModel::active()->ordered()->get() as $model) {
+                $pages[] = ['url' => route('analysis-models.show', $model), 'priority' => '0.7', 'changefreq' => 'monthly', 'lastmod' => $model->updated_at];
+            }
+        } catch (\Exception $e) {
+            // Sitemap must still be served if a table is missing
+        }
+
+        return $this->xml($this->generateSitemap($pages));
     }
-    
+
     /**
-     * Generate sitemap for assessments
+     * Assessments listing (individual tests require signing in, so they are not listed)
      */
     public function assessments(): Response
     {
-        $pages = [];
-        
-        // Add main assessments page
-        $pages[] = ['url' => url('/اختبارات-الميول'), 'priority' => '0.9', 'changefreq' => 'weekly'];
-        
-        // Add individual assessment pages (Holland, MBTI, MI)
-        $assessmentSlugs = ['holland', 'mbti', 'mi'];
-        foreach ($assessmentSlugs as $slug) {
-            $pages[] = [
-                'url' => url('/اختبارات-الميول/' . $slug),
-                'priority' => '0.8',
-                'changefreq' => 'monthly'
-            ];
-        }
-        
-        $content = $this->generateSitemap($pages);
-        
-        return response($content, 200)
-            ->header('Content-Type', 'application/xml');
+        return $this->xml($this->generateSitemap([
+            ['url' => route('assessments.index'), 'priority' => '0.9', 'changefreq' => 'weekly'],
+        ]));
     }
-    
+
     /**
-     * Generate sitemap for consultations
+     * Consultants listing and each active consultant's booking page
      */
     public function consultations(): Response
     {
-        $pages = [];
-        
-        // Add main consultations page
-        $pages[] = ['url' => url('/استشارات-فورية'), 'priority' => '0.9', 'changefreq' => 'daily'];
-        
-        // Add individual consultant pages
-        $consultants = \App\Models\Consultant::where('is_active', true)->get();
-        foreach ($consultants as $consultant) {
-            $pages[] = [
-                'url' => url('/استشارات-فورية/' . $consultant->id),
-                'priority' => '0.7',
-                'changefreq' => 'weekly'
-            ];
+        $pages = [['url' => route('consultations.index'), 'priority' => '0.9', 'changefreq' => 'daily']];
+
+        try {
+            foreach (Consultant::where('is_active', true)->get() as $consultant) {
+                $pages[] = ['url' => route('consultations.show', $consultant), 'priority' => '0.8', 'changefreq' => 'weekly', 'lastmod' => $consultant->updated_at];
+            }
+        } catch (\Exception $e) {
+            // Sitemap must still be served if a table is missing
         }
-        
-        $content = $this->generateSitemap($pages);
-        
-        return response($content, 200)
-            ->header('Content-Type', 'application/xml');
+
+        return $this->xml($this->generateSitemap($pages));
     }
-    
-    /**
-     * Generate sitemap XML content
-     */
+
     private function generateSitemap(array $pages): string
     {
-        $content = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $content .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-        
+        $content = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $content .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+
         foreach ($pages as $page) {
-            $content .= '  <url>' . "\n";
-            $content .= '    <loc>' . htmlspecialchars($page['url']) . '</loc>' . "\n";
-            $content .= '    <lastmod>' . Carbon::now()->toW3cString() . '</lastmod>' . "\n";
-            $content .= '    <changefreq>' . $page['changefreq'] . '</changefreq>' . "\n";
-            $content .= '    <priority>' . $page['priority'] . '</priority>' . "\n";
-            $content .= '  </url>' . "\n";
+            $content .= "  <url>\n";
+            $content .= '    <loc>'.e($page['url'])."</loc>\n";
+            $content .= '    <lastmod>'.($page['lastmod'] ?? Carbon::now())->toW3cString()."</lastmod>\n";
+            $content .= '    <changefreq>'.$page['changefreq']."</changefreq>\n";
+            $content .= '    <priority>'.$page['priority']."</priority>\n";
+            $content .= "  </url>\n";
         }
-        
-        $content .= '</urlset>';
-        
-        return $content;
+
+        return $content.'</urlset>';
+    }
+
+    private function xml(string $content): Response
+    {
+        return response($content, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
     }
 }
-
-
-

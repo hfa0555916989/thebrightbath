@@ -18,7 +18,7 @@
     
     {{-- SEO Component --}}
     <x-seo 
-        :title="$title ?? null" 
+        :title="$title ?? (trim($__env->yieldContent('title')) ?: null)" 
         :description="$description ?? null" 
         :keywords="$keywords ?? null" 
         :image="$image ?? null" 

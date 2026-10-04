@@ -13,7 +13,13 @@
     $defaultKeywords = 'اختبار الميول المهنية، هولاند، MBTI، الذكاءات المتعددة، الإرشاد المهني، التدريب، التطوير، الطريق المشرق';
     $defaultImage = site_image('site_og_image', 'images/og-image.jpg');
     
-    $pageTitle = $title ?? $defaultTitle;
+    // Page titles get the site name appended: "حجز موعد مع سارة | الطريق المشرق"
+    $pageTitle = $title
+        ? (str_contains($title, 'الطريق المشرق') ? $title : $title.' | الطريق المشرق')
+        : $defaultTitle;
+    $type = $type ?: 'website';
+    // Pages behind a login are never indexed
+    $robots = in_array('auth', request()->route()?->gatherMiddleware() ?? [], true) ? 'noindex, nofollow' : 'index, follow';
     $pageDescription = $description ?? $defaultDescription;
     $pageKeywords = $keywords ?? $defaultKeywords;
     $pageImage = $image ?? $defaultImage;
@@ -29,7 +35,7 @@
 <meta name="description" content="{{ $pageDescription }}">
 <meta name="keywords" content="{{ $pageKeywords }}">
 <meta name="author" content="الطريق المشرق للتدريب والتطوير">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="{{ $robots }}">
 <meta name="language" content="Arabic">
 
 {{-- Canonical URL --}}
@@ -53,7 +59,7 @@
 
 {{-- Favicon --}}
 <link rel="icon" type="image/png" href="{{ site_image('site_favicon', 'favicon.png') }}">
-<link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+<link rel="apple-touch-icon" href="{{ site_image('site_favicon', 'favicon.png') }}">
 
 {{-- Theme Color --}}
 <meta name="theme-color" content="#1F3A63">
