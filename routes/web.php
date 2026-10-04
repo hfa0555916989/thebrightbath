@@ -174,7 +174,7 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('control-panel')
+Route::prefix(config('app.admin_path'))
     ->middleware(['auth', 'admin'])
     ->name('admin.')
     ->group(function () {
@@ -283,15 +283,13 @@ Route::prefix('control-panel')
         Route::patch('analysis-models/{analysisModel}/toggle-active', [App\Http\Controllers\Admin\AnalysisModelController::class, 'toggleActive'])->name('analysis-models.toggle-active');
         Route::post('analysis-models/reorder', [App\Http\Controllers\Admin\AnalysisModelController::class, 'reorder'])->name('analysis-models.reorder');
         
-        // Financial Reports (admins only — counselors also pass the 'admin' middleware)
-        Route::middleware('admin:strict')->group(function () {
-            Route::get('finance', [App\Http\Controllers\Admin\FinanceController::class, 'index'])->name('finance.index');
-            Route::get('finance/settings', [App\Http\Controllers\Admin\FinanceController::class, 'settings'])->name('finance.settings');
-            Route::put('finance/settings', [App\Http\Controllers\Admin\FinanceController::class, 'updateSettings'])->name('finance.settings.update');
-        });
+        // Financial Reports
+        Route::get('finance', [App\Http\Controllers\Admin\FinanceController::class, 'index'])->name('finance.index');
+        Route::get('finance/settings', [App\Http\Controllers\Admin\FinanceController::class, 'settings'])->name('finance.settings');
+        Route::put('finance/settings', [App\Http\Controllers\Admin\FinanceController::class, 'updateSettings'])->name('finance.settings.update');
 
-        // Payment Settings (admins only)
-        Route::prefix('payment-settings')->name('payment-settings.')->middleware('admin:strict')->group(function () {
+        // Payment Settings
+        Route::prefix('payment-settings')->name('payment-settings.')->group(function () {
             Route::get('/', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'index'])->name('index');
             Route::put('/', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'update'])->name('update');
             Route::post('/test', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'testConnection'])->name('test');

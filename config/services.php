@@ -19,4 +19,11 @@ return [
         'api_url' => env('DAILY_API_URL', 'https://api.daily.co/v1'),
     ],
 
+    // Bot protection on the registration form (https://www.google.com/recaptcha/admin, v2 checkbox).
+    // Leave both empty to disable the check.
+    'recaptcha' => [
+        'site_key' => env('RECAPTCHA_SITE_KEY'),
+        'secret_key' => env('RECAPTCHA_SECRET_KEY'),
+    ],
+
 ];

@@ -16,7 +16,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     {{-- Google reCAPTCHA --}}
+    @if(config('services.recaptcha.site_key'))
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @endif
     
     <script>
         tailwind.config = {
@@ -228,9 +230,11 @@
                     </div>
                     
                     {{-- Google reCAPTCHA --}}
+                    @if(config('services.recaptcha.site_key'))
                     <div class="flex justify-center">
-                        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key', '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI') }}"></div>
+                        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
                     </div>
+                    @endif
                     @error('g-recaptcha-response')
                         <p class="text-red-500 text-sm text-center">{{ $message }}</p>
                     @enderror

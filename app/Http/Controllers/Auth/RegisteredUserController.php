@@ -35,7 +35,7 @@ class RegisteredUserController extends Controller
             'phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'terms' => ['required', 'accepted'],
-            'g-recaptcha-response' => ['required'],
+            'g-recaptcha-response' => [$this->recaptchaEnabled() ? 'required' : 'nullable'],
         ], [
             'name.required' => 'الاسم مطلوب',
             'email.required' => 'البريد الإلكتروني مطلوب',
@@ -47,16 +47,17 @@ class RegisteredUserController extends Controller
             'g-recaptcha-response.required' => 'يرجى التحقق من أنك لست روبوت',
         ]);
 
-        // Verify reCAPTCHA
-        $recaptchaSecret = config('services.recaptcha.secret_key', '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe');
-        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-            'secret' => $recaptchaSecret,
-            'response' => $request->input('g-recaptcha-response'),
-            'remoteip' => $request->ip(),
-        ]);
+        // Verify reCAPTCHA (only when keys are configured)
+        if ($this->recaptchaEnabled()) {
+            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                'secret' => config('services.recaptcha.secret_key'),
+                'response' => $request->input('g-recaptcha-response'),
+                'remoteip' => $request->ip(),
+            ]);
 
-        if (!$response->json('success')) {
-            return back()->withErrors(['g-recaptcha-response' => 'فشل التحقق، يرجى المحاولة مرة أخرى'])->withInput();
+            if (!$response->json('success')) {
+                return back()->withErrors(['g-recaptcha-response' => 'فشل التحقق، يرجى المحاولة مرة أخرى'])->withInput();
+            }
         }
 
         // Generate verification token
@@ -139,5 +140,10 @@ class RegisteredUserController extends Controller
         }
 
         return back()->with('success', 'تم إرسال رابط التفعيل إلى بريدك الإلكتروني.');
+    }
+
+    private function recaptchaEnabled(): bool
+    {
+        return filled(config('services.recaptcha.site_key')) && filled(config('services.recaptcha.secret_key'));
     }
 }

@@ -99,7 +99,7 @@ class User extends Authenticatable
      */
     public function canAccessAdmin(): bool
     {
-        return in_array($this->role, ['admin', 'counselor']);
+        return $this->role === 'admin';
     }
 
     /**

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\PaymentTransaction;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class BookingController extends Controller
 {
@@ -20,13 +22,21 @@ class BookingController extends Controller
     public function show(Booking $booking)
     {
         $booking->load(['user', 'consultant.user', 'payment']);
-        return view('admin.bookings.show', compact('booking'));
+
+        // Latest gateway transaction (paid or refunded): drives the refund button
+        $transaction = PaymentTransaction::where('payable_type', Booking::class)
+            ->where('payable_id', $booking->id)
+            ->whereIn('status', ['success', 'refunded'])
+            ->latest()
+            ->first();
+
+        return view('admin.bookings.show', compact('booking', 'transaction'));
     }
 
     public function update(Request $request, Booking $booking)
     {
         $request->validate([
-            'status' => ['required', 'in:pending,confirmed,completed,cancelled,no_show'],
+            'status' => ['required', Rule::in(array_keys(Booking::$statusLabels))],
             'consultant_notes' => ['nullable', 'string'],
         ]);
 
@@ -35,7 +45,3 @@ class BookingController extends Controller
         return back()->with('success', 'تم تحديث الحجز بنجاح');
     }
 }
-
-
-
-

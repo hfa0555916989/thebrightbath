@@ -141,7 +141,7 @@
                             ] as [$cType, $icon, $label])
                             <a href="{{ route('admin.content.index', $cType) }}"
                                class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-white hover:bg-white/5 transition text-sm
-                               {{ request()->is("control-panel/content/{$cType}*") ? 'text-brand-gold' : 'text-gray-400' }}">
+                               {{ request()->routeIs('admin.content.*') && request()->route('type') === $cType ? 'text-brand-gold' : 'text-gray-400' }}">
                                 <i class="{{ $icon }} w-4"></i> {{ $label }}
                             </a>
                             @endforeach
@@ -213,9 +213,15 @@
                     
                     {{-- Payment Settings --}}
                     <a href="{{ route('admin.payment-settings.index') }}" 
-                       class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.payment-settings*') ? 'bg-brand-gold text-brand-dark' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.payment-settings.index') ? 'bg-brand-gold text-brand-dark' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
                         <i class="fas fa-credit-card w-5"></i>
                         <span>إعدادات الدفع</span>
+                    </a>
+                    {{-- Transactions & refunds --}}
+                    <a href="{{ route('admin.payment-settings.transactions') }}" 
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.payment-settings.transactions') ? 'bg-brand-gold text-brand-dark' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                        <i class="fas fa-receipt w-5"></i>
+                        <span>المعاملات والاسترداد</span>
                     </a>
                     
                     {{-- Analysis Models --}}

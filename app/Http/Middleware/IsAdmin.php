@@ -13,14 +13,10 @@ class IsAdmin
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, ?string $level = null): Response
+    public function handle(Request $request, Closure $next): Response
     {
-        // 'admin' lets admins and counselors in; 'admin:strict' is for admins only.
-        $allowed = $level === 'strict'
-            ? $request->user()?->isAdmin()
-            : $request->user()?->canAccessAdmin();
-
-        if (!$allowed) {
+        // The control panel is for admins only; consultants (counselor role) use /consultant.
+        if (!$request->user()?->canAccessAdmin()) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'غير مصرح بالوصول'], 403);
             }

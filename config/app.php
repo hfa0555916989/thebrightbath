@@ -43,6 +43,12 @@ return [
     'timezone' => env('APP_TIMEZONE', 'Asia/Riyadh'),
 
     /*
+    | URL prefix of the admin control panel (e.g. ADMIN_PATH=bp-admin-7k2).
+    | Route names stay "admin.*", so links never hard-code this path.
+    */
+    'admin_path' => trim(env('ADMIN_PATH', 'control-panel'), '/'),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
