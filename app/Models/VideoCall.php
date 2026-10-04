@@ -7,11 +7,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
+/**
+ * One per booking: holds the Daily.co room and the files shared in the session.
+ */
 class VideoCall extends Model
 {
     protected $fillable = [
         'booking_id',
         'room_token',
+        'daily_room_name',
+        'daily_room_url',
         'status',
         'started_at',
         'ended_at',
@@ -38,9 +43,9 @@ class VideoCall extends Model
         return $this->belongsTo(Booking::class);
     }
 
-    public function signals(): HasMany
+    public function messages(): HasMany
     {
-        return $this->hasMany(VideoCallSignal::class);
+        return $this->hasMany(VideoCallMessage::class);
     }
 
     public static function getOrCreateForBooking(Booking $booking): self
@@ -53,10 +58,12 @@ class VideoCall extends Model
 
     public function start(): void
     {
-        $this->update([
-            'status' => 'active',
-            'started_at' => now(),
-        ]);
+        if ($this->status === 'waiting') {
+            $this->update([
+                'status' => 'active',
+                'started_at' => now(),
+            ]);
+        }
     }
 
     public function end(): void
@@ -65,6 +72,5 @@ class VideoCall extends Model
             'status' => 'ended',
             'ended_at' => now(),
         ]);
-        $this->signals()->delete();
     }
 }

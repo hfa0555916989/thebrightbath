@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -133,6 +134,39 @@ class Booking extends Model
     public function getFormattedTimeAttribute(): string
     {
         return date('h:i A', strtotime($this->start_time)) . ' - ' . date('h:i A', strtotime($this->end_time));
+    }
+
+    /**
+     * The session room opens this many minutes before the start time...
+     */
+    public const JOIN_OPENS_MINUTES_BEFORE = 10;
+
+    /**
+     * ...and closes this many minutes after the scheduled end (overrun margin).
+     */
+    public const JOIN_CLOSES_MINUTES_AFTER = 30;
+
+    public function sessionStartsAt(): Carbon
+    {
+        return Carbon::parse($this->booking_date->format('Y-m-d').' '.$this->start_time, config('app.timezone'));
+    }
+
+    public function sessionEndsAt(): Carbon
+    {
+        $end = Carbon::parse($this->booking_date->format('Y-m-d').' '.$this->end_time, config('app.timezone'));
+
+        // A session crossing midnight ends the next day.
+        return $end->lte($this->sessionStartsAt()) ? $end->addDay() : $end;
+    }
+
+    public function joinOpensAt(): Carbon
+    {
+        return $this->sessionStartsAt()->subMinutes(self::JOIN_OPENS_MINUTES_BEFORE);
+    }
+
+    public function joinClosesAt(): Carbon
+    {
+        return $this->sessionEndsAt()->addMinutes(self::JOIN_CLOSES_MINUTES_AFTER);
     }
 
     /**

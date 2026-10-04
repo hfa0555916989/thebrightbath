@@ -57,4 +57,9 @@
   - لا تكتب ملفات مباشرة في `public_path()`: نظام ملفات Cloud يُمسح مع كل نشر.
 - **صور الموقع** (الشعار، favicon، og): عبر `site_image('site_logo', 'images/...')` من إعدادات الموقع، مع ملف افتراضي في `public/`.
 - **البريد:** عبر Resend (`MAIL_MAILER=resend` و`RESEND_KEY`). كل الـ Mailables تنفذ `ShouldQueue`، فاستخدم `Mail::assertQueued` في الاختبارات وليس `assertSent`. الروابط داخل الإيميلات عبر `route()` فقط.
+- **الجلسات (Daily.co):**
+  - `App\Services\DailyService` ينشئ غرفة خاصة لكل حجز عند أول دخول، ويصدر meeting token لكل طرف (المستشار owner).
+  - نافذة الدخول من `Booking::joinOpensAt()` إلى `joinClosesAt()`: قبل البداية بـ10 دقائق حتى بعد النهاية بـ30 دقيقة.
+  - ملفات الجلسة على قرص `private`، ولطرفي الجلسة فقط.
+  - المفتاح `DAILY_API_KEY`، وفي الاختبارات `Http::fake`.
 - **Factories** موجودة للمستخدم والمستشار والحجز والدفعة، بحالات جاهزة.

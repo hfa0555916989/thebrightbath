@@ -324,20 +324,17 @@ Route::middleware(['auth'])->prefix('consultant')->name('consultant.')->group(fu
 
 /*
 |--------------------------------------------------------------------------
-| Video Call Routes (WebRTC)
+| Video Session Routes (Daily.co)
 |--------------------------------------------------------------------------
 */
 
 Route::middleware(['auth'])->prefix('video-call')->name('video-call.')->group(function () {
     Route::get('/{booking}/join', [App\Http\Controllers\VideoCallController::class, 'join'])->name('join');
     Route::post('/{booking}/end', [App\Http\Controllers\VideoCallController::class, 'end'])->name('end');
-    Route::post('/{videoCall}/signal', [App\Http\Controllers\VideoCallController::class, 'sendSignal'])->name('signal');
-    Route::get('/{videoCall}/signals', [App\Http\Controllers\VideoCallController::class, 'getSignals'])->name('get-signals');
-    Route::get('/{videoCall}/status', [App\Http\Controllers\VideoCallController::class, 'checkStatus'])->name('status');
-    // Chat & Files
-    Route::post('/{videoCall}/message', [App\Http\Controllers\VideoCallController::class, 'sendMessage'])->name('send-message');
-    Route::get('/{videoCall}/messages', [App\Http\Controllers\VideoCallController::class, 'getMessages'])->name('get-messages');
+    // Files shared in the session (private disk, participants only)
+    Route::get('/{videoCall}/files', [App\Http\Controllers\VideoCallController::class, 'files'])->name('files');
     Route::post('/{videoCall}/upload', [App\Http\Controllers\VideoCallController::class, 'uploadFile'])->name('upload-file');
+    Route::get('/files/{message}', [App\Http\Controllers\VideoCallController::class, 'downloadFile'])->name('download-file');
 });
 
 /*
