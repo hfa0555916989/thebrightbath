@@ -505,7 +505,7 @@
 @push('schema')
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "ItemList",
     "name": "اختبارات الميول المهنية - الطريق المشرق",
     "description": "اختبارات علمية معتمدة لاكتشاف الميول والشخصية المهنية",

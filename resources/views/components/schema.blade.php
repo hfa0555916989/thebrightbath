@@ -4,7 +4,7 @@
 @if($type === 'organization')
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "Organization",
     "name": "الطريق المشرق للتدريب والتطوير",
     "alternateName": "Bright Path Training",
@@ -44,7 +44,7 @@
 @if($type === 'website')
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "WebSite",
     "name": "الطريق المشرق للتدريب والتطوير",
     "url": "https://thebrightbath.com",
@@ -66,7 +66,7 @@
 @if(count($breadcrumbs) > 0)
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
         @foreach($breadcrumbs as $index => $crumb)
@@ -90,7 +90,7 @@
 @if($service)
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "Service",
     "name": "{{ $service['name'] ?? 'خدمة استشارية' }}",
     "description": "{{ $service['description'] ?? '' }}",
@@ -116,7 +116,7 @@
 @if($consultant)
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "Person",
     "name": "{{ $consultant->user->name ?? '' }}",
     "jobTitle": "{{ $consultant->specialization ?? 'مستشار مهني' }}",
@@ -145,7 +145,7 @@
 @if($assessment)
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "Quiz",
     "name": "{{ $assessment['name'] ?? 'اختبار الميول' }}",
     "description": "{{ $assessment['description'] ?? '' }}",
@@ -171,7 +171,7 @@
 @if(count($faqs) > 0)
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": [
         @foreach($faqs as $faq)
@@ -193,7 +193,7 @@
 @if($type === 'localBusiness')
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "ProfessionalService",
     "name": "الطريق المشرق للتدريب والتطوير",
     "image": "https://thebrightbath.com/images/bright-path-logo.png",

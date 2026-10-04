@@ -19,7 +19,7 @@
 {{-- FAQ Schema for Home Page --}}
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": [
         {
@@ -61,7 +61,7 @@
 {{-- Service Schema --}}
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "Service",
     "serviceType": "Career Counseling",
     "name": "خدمات الإرشاد المهني",
@@ -631,7 +631,7 @@
 @push('schema')
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
+    "@@context": "https://schema.org",
     "@type": "Organization",
     "name": "الطريق المشرق للتدريب والتطوير",
     "alternateName": "Bright Path",
