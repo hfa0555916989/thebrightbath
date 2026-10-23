@@ -230,11 +230,11 @@ textarea:focus {
 }
 
 .btn-secondary {
-    @apply bg-brand-DEFAULT text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-dark transition shadow-lg;
+    @apply bg-brand text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-dark transition shadow-lg;
 }
 
 .btn-outline {
-    @apply border-2 border-brand-DEFAULT text-brand-DEFAULT px-6 py-3 rounded-lg font-bold hover:bg-brand-DEFAULT hover:text-white transition;
+    @apply border-2 border-brand text-brand px-6 py-3 rounded-lg font-bold hover:bg-brand hover:text-white transition;
 }
 
 /* ============================================
