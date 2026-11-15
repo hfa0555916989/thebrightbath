@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Contracts\Provider;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
@@ -314,6 +315,45 @@ class SocialLoginTest extends TestCase
         $this->post(route('login.apple.callback'), ['code' => 'c', 'state' => $this->state('n-6')])
             ->assertRedirect(route('login'))->assertSessionHas('error');
 
+        $this->assertGuest();
+    }
+
+    public function test_apple_refusing_the_token_exchange_is_logged_with_its_reason(): void
+    {
+        $this->enableApple();
+        Http::fake(['appleid.apple.com/auth/token' => Http::response(['error' => 'invalid_client'], 400)]);
+        Log::spy();
+
+        $this->post(route('login.apple.callback'), ['code' => 'c', 'state' => $this->state('n-7')])
+            ->assertRedirect(route('login'))->assertSessionHas('error');
+
+        Log::shouldHaveReceived('warning')->with('Apple sign-in: token exchange refused', ['status' => 400, 'error' => 'invalid_client']);
+        $this->assertGuest();
+    }
+
+    public function test_apple_malformed_private_key_is_logged_instead_of_crashing(): void
+    {
+        $this->enableApple();
+        config(['services.apple.private_key' => 'not-a-key']);
+        Http::fake();
+        Log::spy();
+
+        $this->post(route('login.apple.callback'), ['code' => 'c', 'state' => $this->state('n-8')])
+            ->assertRedirect(route('login'))->assertSessionHas('error');
+
+        Log::shouldHaveReceived('warning')->with('Apple sign-in: token request failed', Mockery::type('array'));
+        Http::assertNothingSent();
+    }
+
+    public function test_apple_rejected_id_token_is_logged_with_its_reason(): void
+    {
+        $this->enableApple();
+        $this->fakeApple(['sub' => 'apple-009', 'nonce' => hash('sha256', 'other')]);
+        Log::spy();
+
+        $this->post(route('login.apple.callback'), ['code' => 'c', 'state' => $this->state('n-9')]);
+
+        Log::shouldHaveReceived('warning')->with('Apple sign-in: ID token rejected', ['reason' => 'nonce']);
         $this->assertGuest();
     }
 }

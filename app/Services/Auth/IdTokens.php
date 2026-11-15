@@ -6,6 +6,7 @@ use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
@@ -32,19 +33,25 @@ class IdTokens
         try {
             JWT::$leeway = 60;
             $claims = (array) JWT::decode($token, JWK::parseKeySet($this->keys(), 'RS256'));
-        } catch (Throwable) {
-            return null;
+        } catch (Throwable $e) {
+            return $this->reject($e->getMessage());
         }
 
-        if (($claims['iss'] ?? null) !== self::ISSUER
-            || ! in_array($audience, (array) ($claims['aud'] ?? []), true)
-            || blank($claims['sub'] ?? null)
+        return match (true) {
+            ($claims['iss'] ?? null) !== self::ISSUER => $this->reject('issuer'),
+            ! in_array($audience, (array) ($claims['aud'] ?? []), true) => $this->reject('audience'),
+            blank($claims['sub'] ?? null) => $this->reject('subject'),
             // We send the SHA-256 of the nonce; the token must carry it back (replay protection).
-            || ! hash_equals(hash('sha256', $nonce), (string) ($claims['nonce'] ?? ''))) {
-            return null;
-        }
+            ! hash_equals(hash('sha256', $nonce), (string) ($claims['nonce'] ?? '')) => $this->reject('nonce'),
+            default => $claims,
+        };
+    }
 
-        return $claims;
+    private function reject(string $reason): null
+    {
+        Log::warning('Apple sign-in: ID token rejected', ['reason' => $reason]);
+
+        return null;
     }
 
     /**

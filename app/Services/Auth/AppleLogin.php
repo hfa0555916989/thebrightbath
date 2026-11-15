@@ -6,6 +6,7 @@ use App\Models\User;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -81,12 +82,21 @@ class AppleLogin
                 'client_id' => $clientId,
                 'client_secret' => $this->clientSecret(),
             ]);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            // Also catches a malformed APPLE_PRIVATE_KEY (the client secret cannot be signed).
+            Log::warning('Apple sign-in: token request failed', ['error' => $e->getMessage()]);
+
             return null;
         }
 
         $idToken = (string) $response->json('id_token', '');
         if (! $response->successful() || $idToken === '') {
+            // e.g. "invalid_client": the key, APPLE_KEY_ID, APPLE_TEAM_ID or Services ID do not match.
+            Log::warning('Apple sign-in: token exchange refused', [
+                'status' => $response->status(),
+                'error' => $response->json('error'),
+            ]);
+
             return null;
         }
 
