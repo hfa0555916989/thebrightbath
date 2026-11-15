@@ -108,6 +108,11 @@
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
+                                        @if($booking->otherPartyInSession(true))
+                                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs animate-pulse">
+                                            ● العميل في الجلسة الآن
+                                        </span>
+                                        @endif
                                         <a href="{{ route('video-call.join', $booking) }}" class="bg-brand-gold text-brand-dark px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-brand-goldDeep transition">
                                             <i class="fas fa-video ml-1"></i> انضم
                                         </a>

@@ -9,7 +9,7 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">📋 طلبات الحجز المعلقة</h1>
-                <p class="text-gray-500 mt-1">طلبات تحتاج موافقتك قبل إتمام الدفع</p>
+                <p class="text-gray-500 mt-1">{{ \App\Services\BookingFlowService::paymentsRequired() ? 'طلبات تحتاج موافقتك قبل إتمام الدفع' : 'طلبات تحتاج موافقتك، وتتأكد مباشرة بعد الموافقة' }}</p>
             </div>
             <a href="{{ route('consultant.dashboard') }}" class="text-primary-600 hover:text-primary-700 font-medium">
                 <i class="fas fa-arrow-right ml-2"></i>

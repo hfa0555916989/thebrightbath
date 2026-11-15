@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ParticipantJoined;
 use App\Models\Booking;
 use App\Models\VideoCall;
 use App\Models\VideoCallMessage;
@@ -9,6 +10,7 @@ use App\Services\DailyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -64,6 +66,10 @@ class VideoCallController extends Controller
             }
         }
 
+        if ($state === 'live') {
+            $this->announceJoin($booking, $isConsultant);
+        }
+
         return view('video-call.room', [
             'booking' => $booking,
             'videoCall' => $videoCall,
@@ -74,6 +80,31 @@ class VideoCallController extends Controller
             'otherUserName' => $isConsultant ? $booking->user->name : $booking->consultant->user->name,
             'files' => $this->fileList($videoCall),
         ]);
+    }
+
+    /**
+     * أول دخول لكل طرف إلى الغرفة المفتوحة: نُبلغ الطرف الآخر مرة واحدة فقط.
+     * (العمود يُحجز بتحديث مشروط، فإعادة التحميل أو الخروج والعودة لا يكرر الإيميل)
+     */
+    private function announceJoin(Booking $booking, bool $isConsultant): void
+    {
+        $column = $isConsultant ? 'consultant_joined_at' : 'client_joined_at';
+
+        if (Booking::whereKey($booking->id)->whereNull($column)->update([$column => now()]) !== 1) {
+            return;
+        }
+
+        $booking->setAttribute($column, now());
+
+        try {
+            if ($isConsultant) {
+                Mail::to($booking->user->email)->send(new ParticipantJoined($booking, 'client'));
+            } else {
+                Mail::to($booking->consultant->notificationEmail())->send(new ParticipantJoined($booking, 'consultant'));
+            }
+        } catch (\Throwable $e) {
+            Log::error('Failed to send session joined email: '.$e->getMessage(), ['booking_id' => $booking->id]);
+        }
     }
 
     /**

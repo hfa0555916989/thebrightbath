@@ -16,6 +16,31 @@
             </div>
         @endif
 
+        {{-- Notification email: its own form, saved separately --}}
+        <form action="{{ route('consultant.notification-email.update') }}" method="POST" class="mb-6">
+            @csrf
+            @method('PUT')
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100 bg-gray-50">
+                    <h2 class="text-lg font-bold text-gray-900">🔔 بريد الإشعارات</h2>
+                    <p class="text-sm text-gray-500 mt-1">تصلك عليه طلبات الحجز والتأكيدات والتذكيرات وتنبيه دخول العميل للجلسة. اتركه فارغًا لاستخدام بريد حسابك ({{ $consultant->user->email }}).</p>
+                </div>
+                <div class="p-6 flex flex-col md:flex-row gap-4 md:items-start">
+                    <div class="flex-1">
+                        <input type="email" name="notification_email" value="{{ old('notification_email', $consultant->notification_email) }}"
+                               placeholder="{{ $consultant->user->email }}" dir="ltr"
+                               class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                        @error('notification_email')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <button type="submit" class="px-6 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition">
+                        حفظ البريد
+                    </button>
+                </div>
+            </div>
+        </form>
+
         <form action="{{ route('consultant.profile.update') }}" method="POST" class="space-y-6">
             @csrf
             @method('PUT')

@@ -13,6 +13,7 @@ class Consultant extends Model
 
     protected $fillable = [
         'user_id',
+        'notification_email',
         'name',
         'phone',
         'specialization',
@@ -125,6 +126,14 @@ class Consultant extends Model
     public function getNameAttribute(?string $value): string
     {
         return $value ?? $this->user?->name ?? '';
+    }
+
+    /**
+     * Where booking and session emails go: the address the consultant chose, else their account email.
+     */
+    public function notificationEmail(): string
+    {
+        return $this->notification_email ?: $this->user->email;
     }
 
     public function getPhotoUrlAttribute(): string

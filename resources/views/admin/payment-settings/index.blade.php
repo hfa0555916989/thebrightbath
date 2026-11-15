@@ -25,6 +25,51 @@
             </div>
         </div>
 
+        <!-- Booking & notifications -->
+        <form action="{{ route('admin.payment-settings.booking-flow') }}" method="POST" class="bg-white rounded-xl shadow-sm border border-gray-100 mb-8 overflow-hidden">
+            @csrf
+            @method('PUT')
+            <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-amber-50 to-yellow-50">
+                <h2 class="text-xl font-semibold text-gray-900">الحجز والإشعارات</h2>
+                <p class="text-sm text-gray-500">هل يدفع العميل قبل الجلسة، وأين تصل إشعارات الإدارة</p>
+            </div>
+            <div class="p-6 space-y-6">
+                @error('admin_notification_email')
+                    <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">{{ $message }}</div>
+                @enderror
+
+                <label class="flex items-start gap-3 cursor-pointer">
+                    <input type="hidden" name="payments_required" value="0">
+                    <input type="checkbox" name="payments_required" value="1" {{ $paymentsRequired ? 'checked' : '' }}
+                           class="mt-1 w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    <span>
+                        <span class="block font-medium text-gray-900">الدفع مطلوب قبل الجلسة</span>
+                        <span class="block text-sm text-gray-500">
+                            مفعّل: بعد موافقة المستشار يدفع العميل عبر بوابة الراجحي، ثم يتأكد الحجز.
+                            <br>
+                            موقوف: يتأكد الحجز مباشرة بعد موافقة المستشار، بدون دفع، ويصل التأكيد للطرفين. الحجوزات السابقة لا تتغير.
+                        </span>
+                        <span class="inline-block mt-2 text-xs font-medium px-2 py-1 rounded {{ $paymentsRequired ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-800' }}">
+                            الحالة الآن: {{ $paymentsRequired ? 'الدفع مطلوب' : 'الدفع موقوف' }}
+                        </span>
+                    </span>
+                </label>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">بريد إشعارات الإدارة</label>
+                    <input type="email" name="admin_notification_email" dir="ltr"
+                           value="{{ old('admin_notification_email', $adminNotificationEmail) }}"
+                           placeholder="{{ config('app.supervisor_email') ?: 'admin@example.com' }}"
+                           class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <p class="mt-1 text-xs text-gray-500">يصله إشعار بكل طلب حجز جديد.{{ config('app.supervisor_email') ? ' إن تُرك فارغًا يُستخدم '.config('app.supervisor_email').'.' : ' إن تُرك فارغًا لا تُرسل إشعارات للإدارة.' }}</p>
+                </div>
+
+                <button type="submit" class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition">
+                    حفظ
+                </button>
+            </div>
+        </form>
+
         <!-- Statistics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">

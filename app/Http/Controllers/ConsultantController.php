@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\Consultant;
 use App\Models\ConsultantSchedule;
 use App\Models\AssessmentAttempt;
+use App\Services\BookingFlowService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -215,6 +216,28 @@ class ConsultantController extends Controller
     }
 
     /**
+     * Where the consultant wants booking and session emails (empty = account email).
+     */
+    public function updateNotificationEmail(Request $request): RedirectResponse
+    {
+        $consultant = Consultant::where('user_id', auth()->id())->first();
+
+        if (!$consultant) {
+            abort(403);
+        }
+
+        $request->validate([
+            'notification_email' => 'nullable|email|max:255',
+        ], [
+            'notification_email.email' => 'البريد الإلكتروني غير صحيح',
+        ]);
+
+        $consultant->update(['notification_email' => trim((string) $request->input('notification_email')) ?: null]);
+
+        return back()->with('success', 'تم حفظ بريد الإشعارات');
+    }
+
+    /**
      * Show pending booking requests
      */
     public function pendingRequests(): View
@@ -252,15 +275,12 @@ class ConsultantController extends Controller
             return back()->with('error', 'لا يمكن تغيير حالة هذا الحجز');
         }
         
-        // كل الحجوزات تمر بالدفع قبل التأكيد
-        $booking->update([
-            'status' => 'approved',
-        ]);
-        
-        // Send notification to client that booking is approved and ready for payment
-        $this->sendApprovalNotification($booking, true);
-        
-        return back()->with('success', 'تم قبول الحجز وإشعار العميل بالدفع');
+        // الدفع مطلوب: ينتظر الحجز دفع العميل. الدفع موقوف: يتأكد الحجز مباشرة.
+        $status = app(BookingFlowService::class)->approve($booking);
+
+        return back()->with('success', $status === 'confirmed'
+            ? 'تم قبول الحجز وتأكيده، وأُرسل التأكيد لك وللعميل'
+            : 'تم قبول الحجز وإشعار العميل بالدفع');
     }
 
     /**

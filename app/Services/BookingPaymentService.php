@@ -90,9 +90,9 @@ class BookingPaymentService
 
         try {
             Mail::to($booking->user->email)->send(new BookingConfirmation($booking, 'client'));
-            Mail::to($booking->consultant->user->email)->send(new BookingConfirmation($booking, 'consultant'));
+            Mail::to($booking->consultant->notificationEmail())->send(new BookingConfirmation($booking, 'consultant'));
             Mail::to($booking->user->email)->send(new InvoiceEmail($payment));
-            Mail::to($booking->consultant->user->email)
+            Mail::to($booking->consultant->notificationEmail())
                 ->send(new ConsultantEarnings($booking->consultant, $booking, (float) $booking->consultant_earnings));
         } catch (\Exception $e) {
             // Log error but don't fail the payment process
