@@ -33,6 +33,7 @@
 | 7 | تنظيف وإصلاحات متبقية | ✅ تم | `chore/cleanup` |
 | 7ب | ترقية Laravel 11 إلى 13، وحذف حزم غير مستخدمة (PDF وExcel و2FA وBreeze) | ✅ تم | `chore/laravel-13` |
 | 8 | النشر | — | |
+| 9 | إصلاح تنبيهات npm العالية (Vite 8) وDependabot وCI | ✅ تم | `cursor/security-audit-fixes-c69f` |
 
 ### 3. تجهيز Laravel Cloud
 - إرجاع الهيكل القياسي:
@@ -130,7 +131,8 @@
 
 ## مشاكل معروفة (خارج نطاق ما تم)
 - `DatabaseSeeder` يشمل `AnalysisModelSeeder`، الذي يتخطى نفسه بلا ملف. نماذج التحليل تُرفع من لوحة الإدارة.
-- **`composer audit` (2026-11-15):** 11 تنبيهًا أمنيًا جديدًا في 8 حزم موجودة مسبقًا (`laravel/framework` < 13.40، وحزم Symfony، و`phpunit` 13.4.0). صدرت بعد 2026-10-04، وليست من الحزم المضافة لتسجيل الدخول. العلاج: `composer update` في مهمة مستقلة، ثم تشغيل الاختبارات.
+- **`composer audit` (2026-11-15):** 11 تنبيهًا أمنيًا جديدًا في 8 حزم موجودة مسبقًا (`laravel/framework` < 13.40، وحزم Symfony، و`phpunit` 13.4.0). صدرت بعد فحص 2026-10-23، وليست من الحزم المضافة لتسجيل الدخول. لذلك يفشل فحص `composer audit` في GitHub Actions (`audit.yml`) حتى تُحدَّث. العلاج: `composer update` في مهمة مستقلة، ثم تشغيل الاختبارات.
+- **npm متوسط (ليس عاليًا):** `tailwindcss` 3.4 عبر `postcss-selector-parser` (GHSA-rj75-hqrm-r3gf). الإصلاح الوحيد هو Tailwind 4، ويغيّر مخرجات CSS. صفحات الموقع الحي تحمّل Tailwind من CDN ولا تستهلك حزمة Vite، فتُرك كما هو. `npm audit --audit-level=high` ينجح.
 
 ## سجل الإنجاز
 - **2026-10-03:** المهمة 1. PHPUnit مع MySQL في Docker، وFactories، وحارس يمنع لمس قاعدة التطوير أو الإنتاج.
@@ -209,6 +211,13 @@
   - **العناوين:** كل صفحة صار لها عنوانها، بعد أن كانت كلها تحمل العنوان الافتراضي.
   - **noindex** للصفحات التي تتطلب تسجيل دخول، و`og:type`، وأيقونة Apple.
   - 157 اختبارًا ناجحًا.
+- **2026-10-23:** إصلاح التنبيهات الأمنية العالية (`cursor/security-audit-fixes-c69f`):
+  - **npm:** Vite `5.4.21` → `8.3.5`، و`laravel-vite-plugin` `1.3.0` → `3.2.0`. كانت التنبيهات العالية في خادم التطوير (`GHSA-fx2h-pf6j-xcff` و`GHSA-587h-7wmj-h5pm` وما يتبعها حتى `<=6.4.3`). `npm audit --audit-level=high` نظيف.
+  - **Composer:** `composer audit` بلا تنبيهات (عالية أو غيرها). لم يُمس `composer.lock`. لا migration ولا متغير `.env` جديد.
+  - **البناء:** `resources/js/app.js` كان مفقودًا ففشل `npm run build`. أُضيف مدخل فارغ. `@apply` كان يستخدم `brand-DEFAULT` وهي ليست صنف Tailwind صالحًا؛ صارت `brand` (نفس لون `DEFAULT`). الصفحات العامة لا تستدعي `@vite`؛ Tailwind وAlpine وChart تبقى من CDN.
+  - **CI:** `.github/workflows/audit.yml` يشغّل `npm audit --audit-level=high` و`composer audit`. Dependabot أسبوعي لـ npm وcomposer وgithub-actions، مع تجميع minor/patch.
+  - أُضيف `package-lock.json` حتى يعمل `npm ci`.
+  - **التحقق:** `npm run build` ينجح، و`npm audit --audit-level=high` و`composer audit` نظيفان، و157 اختبارًا ناجحًا (629 assertion).
 - **2026-11-15:** دخول بلا كلمة مرور (`feat/email-code-social-login`):
   - **رمز بالبريد:** صفحة `auth/code`، رمز من 6 أرقام صالح 10 دقائق ولمرة واحدة، ويُحفظ مشفرًا (hash). يتعطل بعد 5 محاولات خاطئة، والرمز الأحدث فقط صالح. الإرسال محمي بـ Turnstile وحد 3 في الدقيقة لكل بريد و20 في الساعة لكل IP.
   - **Google وApple:** منقولان من مشروع علوم حسن. الربط بمعرّف الحساب (`google_id` و`apple_id`)، ثم بالبريد الموثّق. رد Apple يصل POST من موقعه، فاستُثني من CSRF ويحميه state مشفر وnonce.
