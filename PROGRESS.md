@@ -227,6 +227,10 @@
   - **migration:** جدول `login_codes`، وعمودا `google_id` و`apple_id` في `users`.
   - **متغيرات `.env`:** `GOOGLE_CLIENT_ID` و`GOOGLE_CLIENT_SECRET` و`APPLE_CLIENT_ID` و`APPLE_TEAM_ID` و`APPLE_KEY_ID` و`APPLE_PRIVATE_KEY`.
   - 191 اختبارًا ناجحًا (34 جديدًا).
+- **2026-11-15:** تشخيص فشل Apple على الإنتاج (`fix/apple-login-diagnostics`):
+  - كان الدخول ينتهي بـ "تعذر التحقق" بلا سبب في السجل. صار يُسجَّل warning بالسبب: رفض Apple لتبادل الرمز (مثل `invalid_client`)، أو مفتاح `.p8` تالف، أو سبب رفض ID token (issuer/audience/nonce/التوقيع). لا تُسجَّل أي قيمة سرية.
+  - المفاتيح في Apple: `8VTXJLQH58` (علوم حسن) و`2X8TZBQD5T` (Bright Path SIWA، جديد). كلاهما Sign in with Apple على `com.hassanide.app`.
+  - 194 اختبارًا ناجحًا (3 جديدة).
 
 ## قائمة ما قبل الإطلاق (المتبقي)
 1. الاختبارات اليدوية (القائمة في المحادثة: الحساب، الإدارة، المستشار، الحجز، الجلسة، التذكيرات، الاختبارات).
