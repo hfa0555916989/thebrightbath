@@ -327,7 +327,16 @@ class SocialLoginTest extends TestCase
         $this->post(route('login.apple.callback'), ['code' => 'c', 'state' => $this->state('n-7')])
             ->assertRedirect(route('login'))->assertSessionHas('error');
 
-        Log::shouldHaveReceived('warning')->with('Apple sign-in: token exchange refused', ['status' => 400, 'error' => 'invalid_client']);
+        $key = (string) config('services.apple.private_key');
+        Log::shouldHaveReceived('warning')->with('Apple sign-in: token exchange refused', Mockery::on(fn (array $context) => $context['status'] === 400
+            && $context['error'] === 'invalid_client'
+            && $context['client_id'] === 'com.thebrightbath.web'
+            && $context['team_id'] === 'TEAM123456'
+            && $context['key_id'] === 'KEY1234567'
+            && $context['key_fingerprint'] === AppleLogin::keyFingerprint()
+            && preg_match('/^[0-9a-f]{12}$/', $context['key_fingerprint']) === 1
+            // Nothing secret is logged.
+            && ! str_contains(json_encode($context), substr(str_replace('\n', '', $key), 30, 20))));
         $this->assertGuest();
     }
 

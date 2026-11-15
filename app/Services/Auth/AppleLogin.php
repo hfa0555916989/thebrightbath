@@ -92,9 +92,14 @@ class AppleLogin
         $idToken = (string) $response->json('id_token', '');
         if (! $response->successful() || $idToken === '') {
             // e.g. "invalid_client": the key, APPLE_KEY_ID, APPLE_TEAM_ID or Services ID do not match.
+            // Only public identifiers, so they can be compared with Apple Developer → Keys.
             Log::warning('Apple sign-in: token exchange refused', [
                 'status' => $response->status(),
                 'error' => $response->json('error'),
+                'client_id' => $clientId,
+                'team_id' => (string) config('services.apple.team_id'),
+                'key_id' => (string) config('services.apple.key_id'),
+                'key_fingerprint' => self::keyFingerprint(),
             ]);
 
             return null;
@@ -142,6 +147,21 @@ class AppleLogin
         $user->forceFill(['apple_id' => $appleId])->save();
 
         return $user;
+    }
+
+    /**
+     * First 12 hex characters of the SHA-256 of the key's PUBLIC half: tells
+     * which .p8 file is configured without revealing anything secret.
+     */
+    public static function keyFingerprint(): ?string
+    {
+        try {
+            $public = openssl_pkey_get_details(openssl_pkey_get_private(self::privateKey()))['key'] ?? null;
+        } catch (Throwable) {
+            return null;
+        }
+
+        return is_string($public) ? substr(hash('sha256', $public), 0, 12) : null;
     }
 
     /**
