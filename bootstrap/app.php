@@ -19,6 +19,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 return Limit::perMinute(5)->by($request->ip());
             });
             
+            // Sending sign-in codes: limits mail to one address and from one IP
+            RateLimiter::for('login-code', function (Request $request) {
+                return [
+                    Limit::perMinute(3)->by('email:'.strtolower((string) $request->input('email'))),
+                    Limit::perHour(20)->by('ip:'.$request->ip()),
+                ];
+            });
+
             RateLimiter::for('assessment-submit', function (Request $request) {
                 return Limit::perMinute(10)->by($request->ip());
             });
@@ -41,6 +49,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Payment gateway posts results from its own servers/pages
         $middleware->validateCsrfTokens(except: [
             'payment/neoleap/*',
+            // Apple posts the sign-in result cross-site; an encrypted state + nonce protect it
+            'auth/apple/callback',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

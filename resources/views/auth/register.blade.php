@@ -117,6 +117,14 @@
                     </div>
                 @endif
                 
+                @include('auth.partials.social-buttons')
+
+                <div class="flex items-center gap-4 my-6">
+                    <div class="flex-1 h-px bg-gray-200"></div>
+                    <span class="text-brand-textMuted text-sm">أو أنشئ حسابًا بكلمة مرور</span>
+                    <div class="flex-1 h-px bg-gray-200"></div>
+                </div>
+
                 <form method="POST" action="{{ route('register') }}" class="space-y-5">
                     @csrf
                     
