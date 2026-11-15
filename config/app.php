@@ -49,6 +49,12 @@ return [
     'admin_path' => trim(env('ADMIN_PATH', 'control-panel'), '/'),
 
     /*
+    | Fallback address for admin booking notifications, used until an address is
+    | set in the admin panel (payment settings → booking and notifications).
+    */
+    'supervisor_email' => env('SUPERVISOR_EMAIL'),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------

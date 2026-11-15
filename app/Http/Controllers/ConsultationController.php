@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\BookingStatusNotice;
 use App\Models\Booking;
 use App\Models\Consultant;
+use App\Services\BookingFlowService;
 use App\Services\NeoleapService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -251,6 +253,11 @@ class ConsultationController extends Controller
             'cancellation_reason' => 'إلغاء من قبل العميل',
         ]);
 
+        // The consultant's slot is free again: tell them.
+        $booking->load('consultant.user', 'user');
+        Mail::to($booking->consultant->notificationEmail())
+            ->send(new BookingStatusNotice($booking, 'consultant', BookingStatusNotice::CANCELLED_BY_CLIENT));
+
         // Refund through the payment gateway if paid
         if ($booking->payment_status === 'paid') {
             $refund = $neoleap->refundBooking($booking, 'إلغاء من قبل العميل', $request->ips());
@@ -298,8 +305,13 @@ class ConsultationController extends Controller
 
         try {
             // Send notification to consultant about new booking request
-            Mail::to($booking->consultant->user->email)
+            Mail::to($booking->consultant->notificationEmail())
                 ->send(new \App\Mail\BookingApprovalRequest($booking));
+
+            // Admin is told of every request, at the address chosen in the admin panel
+            if ($adminEmail = BookingFlowService::adminNotificationEmail()) {
+                Mail::to($adminEmail)->send(new \App\Mail\AdminBookingRequest($booking));
+            }
                 
             // Send notification to client that booking is pending review
             Mail::to($booking->user->email)

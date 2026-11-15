@@ -2,13 +2,17 @@
 
 namespace Tests\Feature;
 
+use App\Mail\AdminBookingRequest;
 use App\Mail\BookingApprovalRequest;
 use App\Mail\BookingApprovalResponse;
 use App\Mail\BookingConfirmation;
 use App\Mail\BookingPendingNotification;
+use App\Mail\BookingStatusNotice;
 use App\Mail\ConsultantEarnings;
 use App\Mail\InvoiceEmail;
+use App\Mail\ParticipantJoined;
 use App\Mail\PasswordResetEmail;
+use App\Mail\SessionReminder;
 use App\Mail\WelcomeEmail;
 use App\Models\Consultant;
 use App\Models\ConsultantSchedule;
@@ -75,6 +79,13 @@ class MailTest extends TestCase
             new InvoiceEmail($payment),
             new PasswordResetEmail($user, route('password.reset', 'token123')),
             new WelcomeEmail($user, route('verification.verify', 'token123')),
+            new AdminBookingRequest($booking),
+            new BookingStatusNotice($booking, 'client', BookingStatusNotice::CANCELLED_BY_ADMIN),
+            new BookingStatusNotice($booking, 'consultant', BookingStatusNotice::CANCELLED_BY_CLIENT),
+            new BookingStatusNotice($booking, 'client', BookingStatusNotice::NO_SHOW),
+            new ParticipantJoined($booking, 'client'),
+            new ParticipantJoined($booking, 'consultant'),
+            new SessionReminder($booking, 'client', 'open'),
         ];
 
         $checked = 0;

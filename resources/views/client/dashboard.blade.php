@@ -108,9 +108,16 @@
                                 </div>
                             </div>
                             @if($booking->status === 'confirmed' || $booking->status === 'paid')
-                            <a href="{{ route('video-call.join', $booking) }}" class="bg-brand-gold text-brand-dark px-4 py-2 rounded-lg text-sm font-medium">
-                                <i class="fas fa-video ml-1"></i> انضم
-                            </a>
+                            <div class="flex items-center gap-2">
+                                @if($booking->otherPartyInSession(false))
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-sm animate-pulse">
+                                    <i class="fas fa-circle text-xs ml-1"></i> المستشار في الجلسة الآن
+                                </span>
+                                @endif
+                                <a href="{{ route('video-call.join', $booking) }}" class="bg-brand-gold text-brand-dark px-4 py-2 rounded-lg text-sm font-medium">
+                                    <i class="fas fa-video ml-1"></i> انضم
+                                </a>
+                            </div>
                             @elseif($booking->status === 'approved')
                             <a href="{{ route('consultations.payment', $booking) }}" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium animate-pulse">
                                 <i class="fas fa-credit-card ml-1"></i> ادفع الآن

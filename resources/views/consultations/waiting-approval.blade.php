@@ -45,7 +45,7 @@
                         <div>
                             <p class="text-amber-800 font-medium">طلبك قيد المراجعة</p>
                             <p class="text-amber-700 text-sm mt-1">
-                                سيقوم المستشار بمراجعة طلبك والموافقة عليه. سيتم إشعارك عبر البريد الإلكتروني فور الموافقة لإتمام الدفع.
+                                سيقوم المستشار بمراجعة طلبك والموافقة عليه. @if(\App\Services\BookingFlowService::paymentsRequired())سيتم إشعارك عبر البريد الإلكتروني فور الموافقة لإتمام الدفع.@else سيصلك تأكيد الحجز عبر البريد الإلكتروني فور الموافقة.@endif
                             </p>
                         </div>
                     </div>
@@ -95,7 +95,7 @@
                         </div>
                         <div class="flex items-start gap-3">
                             <span class="w-6 h-6 bg-brand-gold/20 text-brand-gold rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                            <span>في حالة الموافقة، يمكنك إتمام الدفع لتأكيد الحجز</span>
+                            <span>@if(\App\Services\BookingFlowService::paymentsRequired())في حالة الموافقة، يمكنك إتمام الدفع لتأكيد الحجز@else في حالة الموافقة، يتأكد الحجز مباشرة ويصلك موعد الجلسة@endif</span>
                         </div>
                     </div>
                 </div>

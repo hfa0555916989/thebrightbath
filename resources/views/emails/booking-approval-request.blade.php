@@ -18,7 +18,11 @@
     <p style="color: #64748b; font-size: 16px; line-height: 1.7; margin: 0 0 25px; text-align: center;">
         مرحباً {{ $booking->consultant->user->name ?? 'المستشار' }}،
         <br>
-        لديك طلب حجز جديد من عميل يحتاج موافقتك قبل إتمام عملية الدفع.
+        @if(\App\Services\BookingFlowService::paymentsRequired())
+            لديك طلب حجز جديد من عميل يحتاج موافقتك قبل إتمام عملية الدفع.
+        @else
+            لديك طلب حجز جديد من عميل يحتاج موافقتك. بعد موافقتك يتأكد الحجز مباشرة.
+        @endif
     </p>
 
     <!-- Booking Details Card -->
@@ -90,7 +94,11 @@
     <!-- Action Note -->
     <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; padding: 20px; margin-bottom: 25px; border: 1px solid #f59e0b;">
         <p style="color: #92400e; font-size: 14px; line-height: 1.6; margin: 0; text-align: center;">
-            <strong>ملاحظة:</strong> لن يتم تحصيل أي مبلغ من العميل إلا بعد موافقتك على الحجز.
+            @if(\App\Services\BookingFlowService::paymentsRequired())
+                <strong>ملاحظة:</strong> لن يتم تحصيل أي مبلغ من العميل إلا بعد موافقتك على الحجز.
+            @else
+                <strong>ملاحظة:</strong> عند موافقتك يصلك أنت والعميل تأكيد الحجز مع ملف التقويم.
+            @endif
         </p>
     </div>
 

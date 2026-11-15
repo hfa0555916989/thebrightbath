@@ -18,7 +18,7 @@ class SessionReminder extends Mailable implements ShouldQueue
 
     /**
      * @param  string  $recipientType  'client' or 'consultant'
-     * @param  string  $kind  '24h' or '1h'
+     * @param  string  $kind  '24h', '1h' or 'open' (the room just opened)
      */
     public function __construct(
         public Booking $booking,
@@ -30,9 +30,11 @@ class SessionReminder extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->kind === '1h'
-                ? 'جلستك الاستشارية تبدأ بعد ساعة'
-                : 'تذكير: جلستك الاستشارية غدًا',
+            subject: match ($this->kind) {
+                'open' => 'غرفة جلستك الاستشارية مفتوحة الآن',
+                '1h' => 'جلستك الاستشارية تبدأ بعد ساعة',
+                default => 'تذكير: جلستك الاستشارية غدًا',
+            },
         );
     }
 

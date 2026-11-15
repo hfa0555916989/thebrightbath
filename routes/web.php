@@ -275,6 +275,7 @@ Route::prefix(config('app.admin_path'))
         Route::prefix('payment-settings')->name('payment-settings.')->group(function () {
             Route::get('/', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'index'])->name('index');
             Route::put('/', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'update'])->name('update');
+            Route::put('/booking-flow', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'updateBookingFlow'])->name('booking-flow');
             Route::post('/test', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'testConnection'])->name('test');
             Route::get('/transactions', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'transactions'])->name('transactions');
             Route::post('/transactions/{transaction}/refund', [App\Http\Controllers\Admin\PaymentSettingsController::class, 'refund'])->name('refund');
@@ -295,6 +296,7 @@ Route::middleware(['auth'])->prefix('consultant')->name('consultant.')->group(fu
     Route::get('/sessions', [App\Http\Controllers\ConsultantController::class, 'sessions'])->name('sessions');
     Route::get('/profile', [App\Http\Controllers\ConsultantController::class, 'profile'])->name('profile');
     Route::put('/profile', [App\Http\Controllers\ConsultantController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/profile/notification-email', [App\Http\Controllers\ConsultantController::class, 'updateNotificationEmail'])->name('notification-email.update');
     Route::get('/client/{booking}', [App\Http\Controllers\ConsultantController::class, 'clientDetails'])->name('client-details');
     
     // Booking approval routes

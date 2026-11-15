@@ -7,7 +7,8 @@ use App\Models\Booking;
 use Illuminate\Support\Facades\Mail;
 
 /**
- * Emails client and consultant 24 hours and 1 hour before each confirmed session.
+ * Emails client and consultant 24 hours and 1 hour before each confirmed session,
+ * and once more when the session room opens (Booking::joinOpensAt()).
  * Run every few minutes by the scheduler (sessions:send-reminders); each reminder
  * is claimed with a conditional update, so it goes out once even if runs overlap.
  */
@@ -20,21 +21,33 @@ class SessionReminderService
     private const SKIP_24H_IF_PAID_WITHIN_MINUTES = 120;
 
     /**
-     * @return array{24h: int, 1h: int} reminders sent
+     * @return array{24h: int, 1h: int, open: int} reminders sent
      */
     public function sendDue(): array
     {
-        $sent = ['24h' => 0, '1h' => 0];
+        $sent = ['24h' => 0, '1h' => 0, 'open' => 0];
         $now = now();
 
         $bookings = Booking::with(['user', 'consultant.user'])
             ->where('status', 'confirmed')
             ->whereBetween('booking_date', [$now->copy()->subDay()->toDateString(), $now->copy()->addDays(2)->toDateString()])
-            ->where(fn ($q) => $q->whereNull('reminder_24h_sent_at')->orWhereNull('reminder_1h_sent_at'))
+            ->where(fn ($q) => $q->whereNull('reminder_24h_sent_at')->orWhereNull('reminder_1h_sent_at')->orWhereNull('room_open_sent_at'))
             ->get();
 
         foreach ($bookings as $booking) {
             $startsAt = $booking->sessionStartsAt();
+
+            // The room is open (until the start time): one "join now" email replaces any reminder not sent yet.
+            if ($now->gte($booking->joinOpensAt())) {
+                if ($now->lt($startsAt) && $this->claim($booking, 'room_open_sent_at')) {
+                    $this->claim($booking, 'reminder_1h_sent_at');
+                    $this->claim($booking, 'reminder_24h_sent_at');
+                    $this->send($booking, 'open');
+                    $sent['open']++;
+                }
+
+                continue;
+            }
 
             if ($startsAt->lte($now)) {
                 continue;
@@ -53,7 +66,9 @@ class SessionReminderService
 
             // 24 hours before
             if ($minutesLeft <= 24 * 60 && $minutesLeft > 65 && $this->claim($booking, 'reminder_24h_sent_at')) {
-                if ($booking->paid_at && $booking->paid_at->gt($now->copy()->subMinutes(self::SKIP_24H_IF_PAID_WITHIN_MINUTES))) {
+                $confirmedAt = $booking->paid_at ?? $booking->confirmed_at;
+
+                if ($confirmedAt && $confirmedAt->gt($now->copy()->subMinutes(self::SKIP_24H_IF_PAID_WITHIN_MINUTES))) {
                     continue;
                 }
 
@@ -75,7 +90,15 @@ class SessionReminderService
 
     private function send(Booking $booking, string $kind): void
     {
-        Mail::to($booking->user->email)->send(new SessionReminder($booking, 'client', $kind));
-        Mail::to($booking->consultant->user->email)->send(new SessionReminder($booking, 'consultant', $kind));
+        // Whoever is already in the room needs no "room is open" email.
+        $fresh = $kind === 'open' ? $booking->fresh() : $booking;
+
+        if (!($kind === 'open' && $fresh->client_joined_at)) {
+            Mail::to($booking->user->email)->send(new SessionReminder($booking, 'client', $kind));
+        }
+
+        if (!($kind === 'open' && $fresh->consultant_joined_at)) {
+            Mail::to($booking->consultant->notificationEmail())->send(new SessionReminder($booking, 'consultant', $kind));
+        }
     }
 }

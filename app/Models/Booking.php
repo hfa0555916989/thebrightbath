@@ -29,6 +29,7 @@ class Booking extends Model
         'payment_method',
         'transaction_id',
         'paid_at',
+        'confirmed_at',
         'cancelled_at',
         'cancellation_reason',
         'consultant_earnings',
@@ -40,6 +41,10 @@ class Booking extends Model
         'price' => 'decimal:2',
         'paid_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'confirmed_at' => 'datetime',
+        'room_open_sent_at' => 'datetime',
+        'client_joined_at' => 'datetime',
+        'consultant_joined_at' => 'datetime',
     ];
 
     /**
@@ -64,6 +69,7 @@ class Booking extends Model
         'paid' => 'مدفوع',
         'refunded' => 'مسترد',
         'failed' => 'فشل',
+        'waived' => 'بدون دفع',
     ];
 
     /**
@@ -167,6 +173,24 @@ class Booking extends Model
     public function joinClosesAt(): Carbon
     {
         return $this->sessionEndsAt()->addMinutes(self::JOIN_CLOSES_MINUTES_AFTER);
+    }
+
+    /**
+     * The room is open now (from joinOpensAt() to joinClosesAt()).
+     */
+    public function isJoinWindowOpen(): bool
+    {
+        return now()->between($this->joinOpensAt(), $this->joinClosesAt());
+    }
+
+    /**
+     * The other party is already in the session room, for a "X is waiting for you" badge.
+     */
+    public function otherPartyInSession(bool $viewerIsConsultant): bool
+    {
+        $joinedAt = $viewerIsConsultant ? $this->client_joined_at : $this->consultant_joined_at;
+
+        return $this->status === 'confirmed' && $joinedAt !== null && $this->isJoinWindowOpen();
     }
 
     /**

@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\BookingStatusNotice;
 use App\Models\Booking;
 use App\Models\PaymentSetting;
 use App\Models\PaymentTransaction;
+use App\Models\SiteSetting;
+use App\Services\BookingFlowService;
 use App\Services\NeoleapService;
 use Illuminate\Http\Request;
 
@@ -33,7 +36,35 @@ class PaymentSettingsController extends Controller
             'total_amount' => PaymentTransaction::successful()->sum('amount'),
         ];
 
-        return view('admin.payment-settings.index', compact('settings', 'transactions', 'stats'));
+        return view('admin.payment-settings.index', [
+            'settings' => $settings,
+            'transactions' => $transactions,
+            'stats' => $stats,
+            'paymentsRequired' => BookingFlowService::paymentsRequired(),
+            'adminNotificationEmail' => setting(BookingFlowService::ADMIN_EMAIL_SETTING, ''),
+        ]);
+    }
+
+    /**
+     * Booking and notifications: whether bookings need payment, and where admin emails go.
+     */
+    public function updateBookingFlow(Request $request, BookingFlowService $flow)
+    {
+        $request->validate([
+            'payments_required' => 'boolean',
+            'admin_notification_email' => 'nullable|email|max:255',
+        ], [
+            'admin_notification_email.email' => 'بريد إشعارات الإدارة غير صحيح',
+        ]);
+
+        $flow->setPaymentsRequired($request->boolean('payments_required'));
+        SiteSetting::set(BookingFlowService::ADMIN_EMAIL_SETTING, trim((string) $request->input('admin_notification_email')));
+
+        return redirect()
+            ->route('admin.payment-settings.index')
+            ->with('success', $request->boolean('payments_required')
+                ? 'تم الحفظ: الحجوزات تتطلب الدفع بعد موافقة المستشار'
+                : 'تم الحفظ: الحجوزات تتأكد مباشرة بعد موافقة المستشار، بدون دفع');
     }
 
     /**
@@ -121,6 +152,8 @@ class PaymentSettingsController extends Controller
                 'cancelled_at' => now(),
                 'cancellation_reason' => 'إلغاء واسترداد من الإدارة',
             ]);
+
+            BookingController::notifyParties($booking, BookingStatusNotice::CANCELLED_BY_ADMIN);
         }
 
         return back()->with('success', $result === 'refunded'

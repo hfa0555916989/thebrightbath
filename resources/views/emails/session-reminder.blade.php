@@ -1,7 +1,7 @@
 @extends('emails.layout')
 
 @section('title', 'تذكير بالجلسة')
-@section('header-title', $kind === '1h' ? 'جلستك تبدأ بعد ساعة ⏰' : 'تذكير بجلستك غدًا 📅')
+@section('header-title', match ($kind) { 'open' => 'غرفة الجلسة مفتوحة الآن 🎥', '1h' => 'جلستك تبدأ بعد ساعة ⏰', default => 'تذكير بجلستك غدًا 📅' })
 
 @section('content')
     @php($otherName = $recipientType === 'consultant' ? $booking->user->name : $booking->consultant->name)
@@ -9,7 +9,10 @@
     <p class="greeting">مرحباً {{ $recipientType === 'consultant' ? $booking->consultant->name : $booking->user->name }}!</p>
 
     <p class="content">
-        @if($kind === '1h')
+        @if($kind === 'open')
+            غرفة جلستك الاستشارية مع <strong>{{ $otherName }}</strong> مفتوحة الآن، والجلسة تبدأ بعد دقائق.
+            يمكنك الدخول من الزر أدناه.
+        @elseif($kind === '1h')
             نذكّرك بأن جلستك الاستشارية مع <strong>{{ $otherName }}</strong> تبدأ بعد ساعة تقريبًا.
             تُفتح غرفة الجلسة قبل الموعد بـ {{ \App\Models\Booking::JOIN_OPENS_MINUTES_BEFORE }} دقائق.
         @else
